@@ -1,0 +1,14 @@
+<server>
+    <visible>1</visible>
+    <name>Test template name</name>
+    <username>Test</username>
+    <password>test</password>
+    <region>2</region>
+    <number_of_nodes>2</number_of_nodes>
+    <number_of_services>2</number_of_services>
+    <strategy>connections</strategy>
+    <session_persistence>0</session_persistence>
+    <ssl>0</ssl>
+    <default_destination_port>80</default_destination_port>
+    <default_source_port>80</default_source_port>
+</server>

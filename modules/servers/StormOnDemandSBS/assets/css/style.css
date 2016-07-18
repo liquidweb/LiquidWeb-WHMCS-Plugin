@@ -1,0 +1,9 @@
+button.btn img {margin-right: 2px;}
+#vm_alerts .box-success, .box-error {padding:5px;margin-bottom:10px;}
+#vm_alerts .box-success {background-color: #DFF0D8;}
+#vm_alerts .box-error {background-color: #F2DEDE;}
+.os_slider {margin:10px 5px;}
+.green {font-weight:bold;color:green;}
+.red {font-weight:bold;color:red}
+#rbuttons,#nbuttons { padding-bottom: 20px; text-align: center; }
+#rbuttons .btn,#nbuttons .btn {margin:5px;width:30%;}

@@ -1,0 +1,35 @@
+<server>
+	<!--- 1 / 0 -->
+	<visible>1</visible>
+    <name>Test template name</name>
+    
+    <zone>27</zone>
+    
+    <!-- no / yes-->
+    <backup_enabled>yes</backup_enabled>
+    
+    <backup_plan>daily</backup_plan>
+    <backup_quota>4000</backup_quota>
+    
+    <bandwidth_quota>0</bandwidth_quota>
+    
+    <ips_number>1</ips_number>
+    <maximal_ips_number>88</maximal_ips_number>
+    
+    <!-- no / yes-->
+    <monitoring>yes</monitoring>
+    
+    <!-- no / yes-->
+    <ips_management>yes</ips_management>
+    
+    <!-- no / yes-->
+    <firewall>no</firewall>
+    
+    <template>test template</template>
+    <config>test config</config>
+    <image>test image</image>
+    
+    <username></username>
+    <password></password>
+    
+</server>

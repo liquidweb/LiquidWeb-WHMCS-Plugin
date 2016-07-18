@@ -1,0 +1,47 @@
+<server>
+	<!--- 1 / 0 -->
+	<visible>0</visible>
+    <name>Template name</name>
+    
+    <username>Test</username>
+    <password>test</password>
+    
+    <!-- uniq_id parent server -->
+    <parent>MJKUC2</parent>
+    
+    <!-- uniq_id parents server -->
+    <available_parents></available_parents>
+    
+    <!-- no / yes-->
+    <auto_parent>yes</auto_parent>
+    
+    <template>DEBIAN_7_UNMANAGED</template>
+    
+    <!-- id serve image -->
+    <image></image>
+    
+    <!-- no / yes-->
+    <monitoring>yes</monitoring>
+    
+    <!-- no / yes-->
+    <firewall>yes</firewall>
+    
+    <!-- no / yes-->
+    <ips_management>yes</ips_management>
+    
+    
+    <!-- values: 0 or quota or daily -->
+    <backup_plan>daily</backup_plan>
+    <backup_quota></backup_quota>
+    <daily_backup_quota></daily_backup_quota>
+    
+    <memory>2345</memory>
+    <diskspace>250</diskspace>
+    <vcpu>2</vcpu>
+    
+    <ips_number>1</ips_number>
+    <maximal_ips_number>4</maximal_ips_number>
+    <bandwidth_quota>500</bandwidth_quota>
+    
+    
+</server>    
