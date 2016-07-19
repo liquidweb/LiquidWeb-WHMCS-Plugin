@@ -39,7 +39,7 @@ class StormBilling
     public $default_page = 'configuration';
 
     //LiquidWeb report ink
-    public $liquidwebReportApi = "http://whmcspluginstats.liquidweb.com:8484/liquidwebwhmcsplugin/Webservice";
+    public $liquidwebReportApi = "http://whmcspluginstats.liquidweb.com:8484/liquidwebwhmcsplugin/Webservice.php";
 
     //Top Menu
     public $top_menu =  array
