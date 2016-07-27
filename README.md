@@ -2,7 +2,7 @@
 
 ## Description
 
-Liquid Web Storm® API plugin for WHMCS providing Liquid Web resellers a total solution to their provisioning needs.
+[Liquid Web](https://liquidweb.com/) Storm® API plugin for WHMCS providing [Liquid Web resellers](https://www.liquidweb.com/partners/reseller.html) a total solution to their provisioning needs.
 
 
 ## Installation
@@ -27,4 +27,4 @@ After both modules have been activated you should see "Liquid Web Storm Servers"
 
 This plugin is provided as-is and does not carry any warranty nor does it include any form of support. Bugs and Issues with the plugin can be reported via the Issue tracker built into GitHub and they will be addressed in a timely manner.
 
-Any managed Liquid Web customers experiencing immediate issues can feel free to contact our Heroic Support® via Call, Email or LiveChat.
+Any managed Liquid Web customers experiencing immediate issues can feel free to contact our Heroic Support® via [Call, Email or LiveChat](https://www.liquidweb.com/support/).
