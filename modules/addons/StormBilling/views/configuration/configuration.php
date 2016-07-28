@@ -5,10 +5,10 @@ echo '<div class="border-box">
         <div class="control-group">
         <strong style="color: #cc0000">Please note:</strong><br />
             <strong>To enable automatic synchronization, please setup a following command in the cron (each 5 minutes suggested):</strong> <br />
-            <em>php -q '.$crondir.'cron.php'.'</em>
+            <em>*/5 * * * *    php -q '.$crondir.'cron.php'.'</em>
             <br /><br />
             <strong>To enable automatic account suspension for credit billing, please setup a following command in the cron (each 3 minutes suggested):</strong> <br />
-            <em>php -q '.$crondir.'autosuspend.php'.'</em>
+            <em>*/3 * * * *    php -q '.$crondir.'autosuspend.php'.'</em>
         </div>
       </div>';
 
@@ -27,7 +27,7 @@ if($disabled)
                 });
             });
           </script>
-          
+
         <form action="" method="post" class="form-horizontal form-low">
         <input type="hidden" value="enable" name="modaction" />
         <div class="border-box">
@@ -97,7 +97,7 @@ if($enabled)
         $p = new SBProduct($id);
         $billing = $p->getBillingSettings();
         $class_name = get_class($p->module());
-        
+
         echo '<tr>
                 <td>
                     <a href="addonmodules.php?module=StormBilling&modpage=configuration&modsubpage=edit&id='.$id.'">'.$product['group'].' - '.$product['product_name'].'</a>
