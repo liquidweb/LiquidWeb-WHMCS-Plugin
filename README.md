@@ -22,6 +22,17 @@ After you've extracted the files and placed them in the correct directories, log
 
 After both modules have been activated you should see "Liquid Web Storm Servers" located under the main "Addons" tab.
 
+### Post-install clean up
+
+Assuming you just completed the install, you can use the following commands to remove any unneeded install related files:
+
+<pre>
+cd ..
+find ./LiquidWeb-WHMCS-Plugin-master/ -delete
+rm master.zip
+</pre>
+
+The above commands, in order of execution, will change directory to the Main WHMCS folder and then will remove the plugin's install folder and package.
 
 ## Support
 
