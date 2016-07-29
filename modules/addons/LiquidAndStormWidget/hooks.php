@@ -383,7 +383,7 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
         } else {
             $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
         }
-        $content = $content.'Goto Liquidweb Product Setup Wizard</a></div>';
+        $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
     }
     else
     {
@@ -396,7 +396,7 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
                 } else {
                     $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
                 }
-                $content = $content.'Goto Liquidweb Product Setup Wizard</a></div>';
+                $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
     }
     echo $table.'<hr />'.$content;
 
@@ -507,9 +507,9 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
 
 
                     <div id="dialog" title="Liquidweb">
-                    	<img style="position:absolute; right:8px; width:230px; height:70px;" src="../modules/addons/LiquidAndStormWidget/lw-logo.png" alt="LiquidWeb">
+                    	<img style="position:absolute; right:8px; width:230px; height:70px;" src="../modules/addons/LiquidAndStormWidget/lw-logo.png" alt="Liquid Web">
                     	<br/>
-                      	<p>New version of Liquidweb addon available. <br/><a href="'.$ret->tarball_url.'">Click here to download</a></p>
+                      	<p>New version of Liquid Web addon available. <br/><a href="'.$ret->tarball_url.'">Click here to download</a></p>
                     </div>';
 
                 }
@@ -525,7 +525,7 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
                 } else {
                     $out = $out.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
                 }
-                $out = $out.'Goto Liquidweb Product Setup Wizard</a></div>';
+                $out = $out.'Goto Liquid Web Product Setup Wizard</a></div>';
 
             echo $out;
         }

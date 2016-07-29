@@ -29,7 +29,7 @@ if(isset($_REQUEST['savecustomconfig'])) {
             	<h2>Liquid Web Custom Configuration</h2>
             </div>
             <!--<div class="clear"></div>-->
-            <a class="slogan" href="http://www.liquidweb.com" target="_blank" alt="Liquidweb">
+            <a class="slogan" href="http://www.liquidweb.com" target="_blank" alt="Liquid Web">
                 <span class="lw-logo"></span>
             </a>
         	</div><!-- end of TOP BAR -->
@@ -72,11 +72,11 @@ if ($conf['log_api_calls'] == 'YES') {
    	<div class="row controls" style="margin-bottom:20px;">
 	  	<div style="margin-left:50px">
   			<input type="checkbox" name="modulelog_api_errors" <?php echo $modulelog_api_errors;?> id="modulelog_api_errors" />
-  			<span class="help-inline"><?php echo MG_Language::translate('Log LiquidWeb api error to <a href="systemmodulelog.php" target="_blank">"System Module Debug Log"</a>');?></span>
+  			<span class="help-inline"><?php echo MG_Language::translate('Log Liquid Web api error to <a href="systemmodulelog.php" target="_blank">"System Module Debug Log"</a>');?></span>
   		</div>
 	  	<div style="margin-left:50px">
   			<input type="checkbox" name="modulelog_api_calls" <?php echo $modulelog_api_calls;?> id="modulelog_api_calls" />
-  			<span class="help-inline"><?php echo MG_Language::translate('Log all LiquidWeb api calls to <a href="systemmodulelog.php" target="_blank">"System Module Debug Log"</a>');?></span>
+  			<span class="help-inline"><?php echo MG_Language::translate('Log all Liquid Web api calls to <a href="systemmodulelog.php" target="_blank">"System Module Debug Log"</a>');?></span>
   		</div>
 	</div>
 	<div style="margin-left:70px; margin-top:20px;">
@@ -102,5 +102,3 @@ if ($conf['log_api_calls'] == 'YES') {
 
     <script src="'.$ASSETS_DIR.'/js/application.js"></script>
     <script src="'.$ASSETS_DIR.'/js/modulesgarden.js"></script>
-
-

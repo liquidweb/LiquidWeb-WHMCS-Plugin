@@ -31,7 +31,7 @@ if($SIDE_MENU)
 }
 
 echo '
-        <a class="slogan nblue-box" href="http://www.liquidweb.com" target="_blank" alt="LiquidWeb Custom Development">
+        <a class="slogan nblue-box" href="http://www.liquidweb.com" target="_blank" alt="Liquid Web Custom Development">
             <span>Do you want to extend your <br/> WHMCS functionality ?</span>
             <span class="lw-logo"></span>
             <small>We are here to help you, just click!</small>

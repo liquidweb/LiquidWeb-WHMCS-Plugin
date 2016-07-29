@@ -311,7 +311,7 @@ if (isset($_REQUEST['ajaxload'])) {
         </div>
 
         <!--<div class="clear"></div>-->
-        <a class="slogan" href="http://www.liquidweb.com" target="_blank" alt="Liquidweb">
+        <a class="slogan" href="http://www.liquidweb.com" target="_blank" alt="Liquid Web">
             <span class="lw-logo"></span>
         </a>
     </div><!-- end of TOP BAR -->
@@ -424,7 +424,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             }
         } else {
             $_REQUEST['pg'] = $_POST['wiz_page'];
-            print_error('Please enter your Liquidweb API / ACCOUNT username and password.');
+            print_error('Please enter your Liquid Web API / ACCOUNT username and password.');
         }
     }
 

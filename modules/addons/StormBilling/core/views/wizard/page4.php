@@ -194,7 +194,7 @@ function submitForm(action) {
 </script>
 
     	<h2 class="section-heading">
-    		<i class="icon-tasks"></i>Liquidweb SSD VPS configuration
+    		<i class="icon-tasks"></i>Liquid Web SSD VPS configuration
     	</h2>
 
 	<form id="setupWizPg4" action="addonmodules.php?module=StormBilling&action=setup&pg=5" method="post">
@@ -209,7 +209,7 @@ function submitForm(action) {
 				<tr>
                     <td class="fieldlabel"><?php echo MG_Language::translate('Product Name :');?></td>
     				<td class="fieldarea">
-    					<input type="text" name="setup_lw_productname" id="setup_lw_productname" style="width: 200px;" value="<?php if (!@$row['name']) { echo "Liquidweb VPS"; } else { echo $row['name']; };?>"/>
+    					<input type="text" name="setup_lw_productname" id="setup_lw_productname" style="width: 200px;" value="<?php if (!@$row['name']) { echo "Liquid Web VPS"; } else { echo $row['name']; };?>"/>
 					</td>
 					<td class="fieldlabel" rowspan="2"><?php echo MG_Language::translate('Product Description :');?></td>
     				<td class="fieldarea" rowspan="2">

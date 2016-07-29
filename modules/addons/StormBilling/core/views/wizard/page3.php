@@ -5,7 +5,7 @@ $action = 'addonmodules.php?module=StormBilling&action=setup&pg=5';
      }
 ?>
     	<h2 class="section-heading">
-    		<i class="icon-check"></i>Liquidweb new API account credentials
+    		<i class="icon-check"></i>Liquid Web new API account credentials
     	</h2>
 
 	<div style="width: 80%;text-align: justify;">

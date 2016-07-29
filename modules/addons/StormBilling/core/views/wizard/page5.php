@@ -28,7 +28,7 @@ global $CONFIG;
 
 
     	<h2 class="section-heading">
-    		<i class="icon-tasks"></i>Liquidweb Storm Private parent / cloud configuration
+    		<i class="icon-tasks"></i>Liquid Web Storm Private parent / cloud configuration
     	</h2>
 
 	<form id="setupWizPg5" action="addonmodules.php?module=StormBilling&action=setup&pg=5" method="post">
@@ -58,7 +58,7 @@ global $CONFIG;
 				<tr>
                     <td class="fieldlabel"><?php echo MG_Language::translate('Product Name :');?></td>
     				<td class="fieldarea">
-    					<input type="text" name="setup_lw_spp_productname" id="setup_lw_spp_productname" style="width: 200px;" value="<?php if (!@$private_parent['name']) { echo "Liquidweb PP"; } else { echo $private_parent['name']; };?>"/>
+    					<input type="text" name="setup_lw_spp_productname" id="setup_lw_spp_productname" style="width: 200px;" value="<?php if (!@$private_parent['name']) { echo "Liquid Web PP"; } else { echo $private_parent['name']; };?>"/>
 					</td>
 					<td class="fieldlabel" rowspan="2"><?php echo MG_Language::translate('Product Description :');?></td>
     				<td class="fieldarea" rowspan="2">

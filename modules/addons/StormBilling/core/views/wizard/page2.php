@@ -5,14 +5,14 @@
   </script>
 
 	<h2 class="section-heading">
-		<i class="icon-signin"></i>Liquidweb account authentication
+		<i class="icon-signin"></i>Liquid Web account authentication
 	</h2>
 		<div id="accordion">
-		<h3 style="line-height: 2.5; color: #1c4b8c;">&nbsp;&nbsp;<?php echo MG_Language::translate('I have Liquidweb API credentials');?></h3>
+		<h3 style="line-height: 2.5; color: #1c4b8c;">&nbsp;&nbsp;<?php echo MG_Language::translate('I have Liquid Web API credentials');?></h3>
     	<form id="setupWizPg2API" action="addonmodules.php?module=StormBilling&action=setup&pg=4" method="post" >
     		<input type="hidden" name="wiz_page" value="2">
     		<input type="hidden" name="wiz_page2_usertype" value="API">
-		    <div class="col-md-12 text-center" style="margin-bottom: 15px; margin-top: 20px;"><h3><?php echo MG_Language::translate('Please provide your Liquidweb API username and password to continue');?></h3></div>
+		    <div class="col-md-12 text-center" style="margin-bottom: 15px; margin-top: 20px;"><h3><?php echo MG_Language::translate('Please provide your Liquid Web API username and password to continue');?></h3></div>
     		<table class="table" width="40%" border="0" cellspacing="2" cellpadding="3">
         	<tbody>
 				<tr>
@@ -29,11 +29,11 @@
             <a class="btn btn-success clearfix" href="addonmodules.php?module=StormBilling&action=setup"><i class="icon-chevron-left"></i> Back</a>
             <a class="btn btn-success clearfix pull-right" href="" onclick="document.forms['setupWizPg2API'].submit();return false;">Continue <i class="icon-chevron-right"></i></a>
     	</form>
-		<h3 style="line-height: 2.5; color: #1c4b8c;">&nbsp;&nbsp;<?php echo MG_Language::translate('Create a NEW Liquidweb API username and password for me');?></h3>
+		<h3 style="line-height: 2.5; color: #1c4b8c;">&nbsp;&nbsp;<?php echo MG_Language::translate('Create a NEW Liquid Web API username and password for me');?></h3>
     	<form id="setupWizPg2ACCOUNT" action="addonmodules.php?module=StormBilling&action=setup&pg=3" method="post" >
     		<input type="hidden" name="wiz_page" value="2">
     		<input type="hidden" name="wiz_page2_usertype" value="ACCOUNT">
-			<div class="col-md-12 text-center" style="margin-bottom: 15px; margin-top: 20px;"><h3><?php echo MG_Language::translate('Please provide your Liquidweb ACCOUNT username and password to continue');?></h3></div>
+			<div class="col-md-12 text-center" style="margin-bottom: 15px; margin-top: 20px;"><h3><?php echo MG_Language::translate('Please provide your Liquid Web ACCOUNT username and password to continue');?></h3></div>
     		<table class="table" width="40%" border="0" cellspacing="2" cellpadding="3">
         	<tbody>
 				<tr>

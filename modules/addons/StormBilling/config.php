@@ -284,7 +284,7 @@ class StormBilling
 
         mysql_safequery("DELETE FROM `mg_LiquidWeb_def_config_options` WHERE `prod_type` in ('LiquidWeb','LiquidWebPrivatePare')");
         mysql_safequery("INSERT INTO `mg_LiquidWeb_def_config_options` (`prod_type`, `field_name`, `field_value`)
-                            VALUES ('LiquidWeb', 'name', 'LiquidWeb VPS'),
+                            VALUES ('LiquidWeb', 'name', 'Liquid Web VPS'),
                              ('LiquidWeb', 'description', 'High Performance Fully Managed VPS'),
                              ('LiquidWeb', 'os_template', 'UBUNTU_1404_COREMANAGED'),
                              ('LiquidWeb', 'zone', '27'),
@@ -298,7 +298,7 @@ class StormBilling
                              ('LiquidWeb', 'ips_management', 'on'),
                              ('LiquidWeb', 'max_ips_number', '20'),
                              ('LiquidWeb', 'bandwidth_quota', '5000'),
-                             ('LiquidWebPrivatePare', 'name', 'LiquidWeb PP'),
+                             ('LiquidWebPrivatePare', 'name', 'Liquid Web PP'),
                              ('LiquidWebPrivatePare', 'description', ''),
                              ('LiquidWebPrivatePare', 'os_template', 'UBUNTU_1404_COREMANAGED'),
                              ('LiquidWebPrivatePare', 'memory', '1024'),
@@ -439,7 +439,7 @@ class StormBilling
 
             mysql_safequery("DELETE FROM `mg_LiquidWeb_def_config_options` WHERE `prod_type` in ('LiquidWeb','LiquidWebPrivatePare')");
             mysql_safequery("INSERT INTO `mg_LiquidWeb_def_config_options` (`prod_type`, `field_name`, `field_value`)
-                            VALUES ('LiquidWeb', 'name', 'LiquidWeb VPS'),
+                            VALUES ('LiquidWeb', 'name', 'Liquid Web VPS'),
                              ('LiquidWeb', 'description', 'High Performance Fully Managed VPS'),
                              ('LiquidWeb', 'os_template', 'UBUNTU_1404_COREMANAGED'),
                              ('LiquidWeb', 'zone', '27'),
@@ -453,7 +453,7 @@ class StormBilling
                              ('LiquidWeb', 'ips_management', 'on'),
                              ('LiquidWeb', 'max_ips_number', '20'),
                              ('LiquidWeb', 'bandwidth_quota', '5000'),
-                             ('LiquidWebPrivatePare', 'name', 'LiquidWeb PP'),
+                             ('LiquidWebPrivatePare', 'name', 'Liquid Web PP'),
                              ('LiquidWebPrivatePare', 'description', ''),
                              ('LiquidWebPrivatePare', 'os_template', 'UBUNTU_1404_COREMANAGED'),
                              ('LiquidWebPrivatePare', 'memory', '1024'),
