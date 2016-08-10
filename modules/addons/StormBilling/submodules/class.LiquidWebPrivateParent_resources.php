@@ -32,10 +32,10 @@ require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOn
 
 if(!class_exists('LiquidWebPrivateParent_resources'))
 {
-    class LiquidWebPrivateParent_resources extends SBResource 
+    class LiquidWebPrivateParent_resources extends SBResource
     {
         //module name
-        const name = 'Liquid Web Private Parent';
+        const name = 'Liquid Web Private Cloud';
 
         //module description
         const description = '';
@@ -180,7 +180,7 @@ if(!class_exists('LiquidWebPrivateParent_resources'))
             {
                 //Get Uniq ID
                 $custom_fields = mysql_get_array("SELECT v.value, f.fieldname
-                    FROM tblcustomfieldsvalues v 
+                    FROM tblcustomfieldsvalues v
                     LEFT JOIN tblcustomfields f ON v.fieldid = f.id
                     WHERE v.relid = ? ", array($account['id']));
 
@@ -239,7 +239,7 @@ if(!class_exists('LiquidWebPrivateParent_resources'))
                 $error = $server->getError();
                 if($error)
                 {
-                    $this->logError($error); 
+                    $this->logError($error);
                     continue;
                 }
 
@@ -252,7 +252,7 @@ if(!class_exists('LiquidWebPrivateParent_resources'))
                 //Bandwidth out
                 $bandwidth_out      =   isset($ret['actual']['out']['MB']) ? $ret['actual']['out']['MB'] : 0;
                 //Bandwidth in
-                $bandwidth_in       =   isset($ret['actual']['in']['MB']) ? $ret['actual']['in']['MB'] : 0; 
+                $bandwidth_in       =   isset($ret['actual']['in']['MB']) ? $ret['actual']['in']['MB'] : 0;
 
                 //IF this is firs cron run we need to make initial data
                 if(!$settings)
@@ -264,7 +264,7 @@ if(!class_exists('LiquidWebPrivateParent_resources'))
                         'bandwidth_in_sum'          =>  0,
                         'bandwidth_out_sum'         =>  0,
                     );
-                }  
+                }
 
                 //Create new settings
                 $new_settings = array
@@ -338,7 +338,7 @@ if(!class_exists('LiquidWebPrivateParent_resources'))
                 $usage_records['disk_used']             =   $disk_used;
                 $usage_records['backup_size']           =   $details['backup_size'];
                 $usage_records['memory']                =   $details['memory'];
-                $usage_records['virtual_memory_usage']  =   $virtual_memory_usage;  
+                $usage_records['virtual_memory_usage']  =   $virtual_memory_usage;
                 $usage_records['physical_memory_usage'] =   $physical_memory_usage;
                 $usage_records['vcpu']                  =   $details['vcpu'];
                 $usage_records['load_avg']              =   $load_avg;

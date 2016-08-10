@@ -28,7 +28,7 @@ global $CONFIG;
 
 
     	<h2 class="section-heading">
-    		<i class="icon-tasks"></i>Liquid Web Storm Private parent / cloud configuration
+    		<i class="icon-tasks"></i>Liquid Web Storm Private Cloud configuration
     	</h2>
 
 	<form id="setupWizPg5" action="addonmodules.php?module=StormBilling&action=setup&pg=5" method="post">

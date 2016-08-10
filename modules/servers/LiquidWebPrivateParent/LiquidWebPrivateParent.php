@@ -484,7 +484,7 @@ function LiquidWebPrivateParent_ConfigOptions()
     {
         $product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
         echo $product->renderConfigOptions();
-        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">You do not have any <b>Private Parents</b>. Please create it before continue.</span></p>';
+        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">You do not have any <b>Private Cloud servers</b>. Please create it before continue.</span></p>';
         return array();
     }
 
@@ -523,7 +523,7 @@ function LiquidWebPrivateParent_ConfigOptions()
     if($newVersion && $_GET['action'] != 'save')
     {
         echo '<p style="text-align: center;" class="infobox op_version">
-            <span style="font-weight: bold">New version of Liquid Web Private Parent module is available!</span>
+            <span style="font-weight: bold">New version of Liquid Web Private Cloud module is available!</span>
             <span style="font-weight: bold"><br />Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span>
          </p>';
     }
@@ -2514,7 +2514,7 @@ function LiquidWebPrivateParent_registerInstance()
      *              EDIT ME
      ***************************************************/
     //Set up name for your module.
-    $moduleName         =   'Liquid Web Private Parent For WHMCS';
+    $moduleName         =   'Liquid Web Private Cloud For WHMCS';
     //Set up module version. You should change module version every time after updating source code.
     $moduleVersion      =   LIQUID_WEB_PRIVATE_PARENT_VERSION;
     //Encryption key
@@ -2651,4 +2651,3 @@ function LiquidWebPrivateParent_validateArray($array, $pregs){
 	}
 	return true;
 }
-
