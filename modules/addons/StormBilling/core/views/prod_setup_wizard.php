@@ -357,7 +357,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             }
         } else {
             $_REQUEST['pg'] = $_POST['wiz_page'];
-            print_error('Please select any one option.');
+            print_error('Please select an option.');
         }
     }
 
