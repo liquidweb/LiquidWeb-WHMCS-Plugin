@@ -55,7 +55,7 @@ if(!class_exists('LiquidWeb_resources'))
             ),
             'ipsnumber'                 =>  array
             (
-                'FriendlyName'          =>  "IPs Number",
+                'FriendlyName'          =>  'Number of IPs',
                 'Description'           =>  '',
                 'InvoiceDescription'    =>  '',
                 'Unit'                  =>  '/hr',

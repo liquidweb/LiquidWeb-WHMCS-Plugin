@@ -691,10 +691,10 @@ function LiquidWeb_ConfigOptions()
             )
         );
 
-        //IPs Number
+        //Number of IPs
         $configurable_options[] = array
         (
-            'Name'      =>  'IPs Number|IPs Number',
+            'Name'      =>  'Number of IP Addresses|Number of IP Addresses',
             'Type'      =>  'select',
             'Values'    =>  array
             (
@@ -704,10 +704,10 @@ function LiquidWeb_ConfigOptions()
             )
         );
 
-        //Maximal IPs Number
+        //Maximum IP Addresses
         $configurable_options[] = array
         (
-            'Name'      =>  'Maximal IPs Number|Maximal IPs Number',
+            'Name'      =>  'Maximum IP Addresses|Maximum IP Addresses',
             'Type'      =>  'select',
             'Values'    =>  array
             (
@@ -996,13 +996,13 @@ function LiquidWeb_ConfigOptions()
             'Size'          =>  '25',*/
             'Type'          =>  'dropdown',
         ),
-        "IPs Number"       =>  array
+        "Number of IP Addresses"       =>  array
         (
             'Type'          =>  'text',
             'Size'          =>  '25',
             'Default'       =>  1
         ),
-        "Maximal IPs Number"=>  array
+        "Maximum IP Addresses"=>  array
         (
             'Type'          =>  'text',
             'Size'          =>  '25',
@@ -1127,12 +1127,12 @@ function LiquidWeb_ConfigOptions()
 
 			'ips_number' => array(
 				'type'	=> 'text',
-				'name'  => 'packageconfigoption['.(array_search('IPs Number',$configFormKeys)+1).']',
+				'name'  => 'packageconfigoption['.(array_search('Number of IPs',$configFormKeys)+1).']',
 			),
 
-			'maximal_ips_number' => array(
+			'maximum_ips_number' => array(
 				'type'  => 'text',
-				'name'	=> 'packageconfigoption['.(array_search('Maximal IPs Number',$configFormKeys)+1).']',
+				'name'	=> 'packageconfigoption['.(array_search('Maximum IP Addresses',$configFormKeys)+1).']',
 			),
 
 			'monitoring' => array(
@@ -1346,7 +1346,7 @@ function LiquidWeb_CreateAccount($params)
 
 	    $configuration = array
 	    (
-	        'ip_count'          =>  (LiquidWeb_getOption("IPs Number", $params) == null)? $row['configoption11']:LiquidWeb_getOption("IPs Number", $params),
+	        'ip_count'          =>  (LiquidWeb_getOption("Number of IPs", $params) == null)? $row['configoption11']:LiquidWeb_getOption("Number of IPs", $params),
 	        'image_id'          =>  (LiquidWeb_getOption('Image', $params) == null)? $row['configoption6']:LiquidWeb_getOption('Image', $params),
 	        'bandwidth_quota'   =>  $bandwidth_quota ,
 	        'zone'              =>  (LiquidWeb_getOption('Zone', $params) == null)? $row['configoption4']:LiquidWeb_getOption('Zone', $params)
@@ -1731,7 +1731,7 @@ function LiquidWeb_ChangePackage($params)
     //get configuration
     $username           =   LiquidWeb_getOption('Username', $params);
     $password           =   LiquidWeb_getOption('Password', $params);
-    $ipcount            =   LiquidWeb_getOption("IPs Number", $params);
+    $ipcount            =   LiquidWeb_getOption("Number of IPs", $params);
     $bandwidth_quota    =   LiquidWeb_getOption('Bandwidth Quota', $params);
     $hostname           =   $params['customfields']['hostname'] ? $params['customfields']['hostname'] : $params['domain'];
 
@@ -2411,7 +2411,7 @@ function LiquidWeb_IPManagement($params)
     //get configuration
     $username   =   LiquidWeb_getOption('Username', $params);
     $password   =   LiquidWeb_getOption('Password', $params);
-    $ipcount    =   LiquidWeb_getOption("Maximal IPs Number", $params);
+    $ipcount    =   LiquidWeb_getOption("Maximum IP Addresses", $params);
 
     //we need uniq_id to terminate server
     $q = mysql_query("SELECT * FROM mg_liquid_web WHERE hosting_id = ".(int)$params['serviceid']);

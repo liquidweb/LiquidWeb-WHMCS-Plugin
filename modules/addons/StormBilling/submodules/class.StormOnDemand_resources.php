@@ -7,7 +7,7 @@ if(!class_exists('StormOnDemand_resources'))
 {
     class StormOnDemand_resources extends SBResource
     {
-        const name = 'Liquid Web'; 
+        const name = 'Liquid Web';
         //module description
         const description = '';
 
@@ -54,7 +54,7 @@ if(!class_exists('StormOnDemand_resources'))
             ),
             'ipsnumber'                 =>  array
             (
-                'FriendlyName'          =>  "IPs Number",
+                'FriendlyName'          =>  'Number of IPs',
                 'Description'           =>  '',
                 'InvoiceDescription'    =>  '',
                 'Unit'                  =>  '/hr',
@@ -128,11 +128,11 @@ if(!class_exists('StormOnDemand_resources'))
 
 
         public function getProductAccounts()
-        { 
+        {
             $accounts = array();
             $q = mysql_safequery("SELECT DISTINCT d.uniq_id, h.id as id, h.userid, p.configoption1 as Username, p.configoption2 as Password, h.domainstatus
-                                  FROM `tblhosting` h 
-                                  JOIN `tblproducts` p ON(h.packageid = p.id) 
+                                  FROM `tblhosting` h
+                                  JOIN `tblproducts` p ON(h.packageid = p.id)
                                   LEFT JOIN mg_storm_on_demand d ON h.id = d.hosting_id
                                   WHERE p.id = ? AND domainstatus <> 'Terminated'", array($this->product_id));
 
@@ -180,7 +180,7 @@ if(!class_exists('StormOnDemand_resources'))
                 $error = $server->getError();
                 if($error)
                 {
-                    $this->logError($error); 
+                    $this->logError($error);
                     continue;
                 }
 
@@ -193,7 +193,7 @@ if(!class_exists('StormOnDemand_resources'))
                 //Bandwidth out
                 $bandwidth_out      =   isset($ret['actual']['out']['MB']) ? $ret['actual']['out']['MB'] : 0;
                 //Bandwidth in
-                $bandwidth_in       =   isset($ret['actual']['in']['MB']) ? $ret['actual']['in']['MB'] : 0; 
+                $bandwidth_in       =   isset($ret['actual']['in']['MB']) ? $ret['actual']['in']['MB'] : 0;
 
                 //IF this is firs cron run we need to make initial data
                 if(!$settings)
@@ -205,7 +205,7 @@ if(!class_exists('StormOnDemand_resources'))
                         'bandwidth_in_sum'          =>  0,
                         'bandwidth_out_sum'         =>  0,
                     );
-                }  
+                }
 
                 //Create new settings
                 $new_settings = array
@@ -279,7 +279,7 @@ if(!class_exists('StormOnDemand_resources'))
                 $usage_records['disk_used']             =   $disk_used;
                 $usage_records['backup_size']           =   $details['backup_size'];
                 $usage_records['memory']                =   $details['memory'];
-                $usage_records['virtual_memory_usage']  =   $virtual_memory_usage;  
+                $usage_records['virtual_memory_usage']  =   $virtual_memory_usage;
                 $usage_records['physical_memory_usage'] =   $physical_memory_usage;
                 $usage_records['vcpu']                  =   $details['vcpu'];
                 $usage_records['load_avg']              =   $load_avg;

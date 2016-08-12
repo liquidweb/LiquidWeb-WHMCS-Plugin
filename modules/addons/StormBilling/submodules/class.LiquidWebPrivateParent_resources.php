@@ -83,7 +83,7 @@ if(!class_exists('LiquidWebPrivateParent_resources'))
             ),
             'ipsnumber'                 =>  array
             (
-                'FriendlyName'          =>  "IPs Number",
+                'FriendlyName'          =>  'Number of IPs',
                 'Description'           =>  '',
                 'InvoiceDescription'    =>  '',
                 'Unit'                  =>  '/hr',

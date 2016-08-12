@@ -124,15 +124,15 @@ class LiquidWebPrivateParentProduct extends StormOnDemand_Product
             'type'                      =>  'text',
             'default'                   =>  0
         ),
-        'IPs Number'                    =>  array
+        'Number of IPs'                 =>  array
         (
-            'title'                     =>  'IPs Number',
+            'title'                     =>  'Number of IPs',
             'type'                      =>  'text',
             'default'                   =>  1
         ),
-        'Maximal IPs Number'            =>  array
+        'Maximum IP Addresses'            =>  array
         (
-            'title'                     =>  'Maximal IPs Number',
+            'title'                     =>  'Maximum IP Addresses',
             'type'                      =>  'text',
             'default'                   =>  1
         ),
@@ -330,9 +330,9 @@ class LiquidWebPrivateParentProduct extends StormOnDemand_Product
                         )
                     )
                 ),
-                'IPs Number'            =>  array
+                'Number of IPs'         =>  array
                 (
-                    'title'             =>  'IPs Number',
+                    'title'             =>  'Number of IPs',
                     'type'              =>  'select',
                     'options'           =>  array
                     (
@@ -358,9 +358,9 @@ class LiquidWebPrivateParentProduct extends StormOnDemand_Product
                         )
                     )
                 ),
-                'Maximal IPs Number'    =>  array
+                'Maximum IP Addresses'    =>  array
                 (
-                    'title'             =>  'Maximal IPs Number',
+                    'title'             =>  'Maximum IP Addresses',
                     'type'              =>  'select',
                     'options'           =>  array
                     (
@@ -537,12 +537,12 @@ class LiquidWebPrivateParentProduct extends StormOnDemand_Product
 
         'ips_number' =>  array(
 				'type'  => 'text',
-				'name'	=> 'customconfigoption[IPs Number]',
+				'name'	=> 'customconfigoption[Number of IPs]',
         ),
 
-        'maximal_ips_number' =>  array(
+        'maximum_ips_number' =>  array(
 				'type'  => 'text',
-				'name'	=> 'customconfigoption[Maximal IPs Number]',
+				'name'	=> 'customconfigoption[Maximum Number of IPs]',
         ),
 
         'bandwidth_quota' =>  array(

@@ -782,10 +782,10 @@ function StormOnDemand_ConfigOptions()
             )
         );
 
-        //IPs Number
+        //Number of IPs
         $configurable_options[8] = array
         (
-            'Name'      => 'IPs Number|IPs Number',
+            'Name'      => 'Number of IPs|Number of IPs',
             'Type'      => 'select',
             'Values'    => array
             (
@@ -795,10 +795,10 @@ function StormOnDemand_ConfigOptions()
             )
         );
 
-        //Maximal IPs Number
+        //Maximum IP Addresses
         $configurable_options[9] = array
         (
-            'Name'      => 'Maximal IPs Number|Maximal IPs Number',
+            'Name'      => 'Maximum IP Addresses|Maximum IP Addresses',
             'Type'      => 'select',
             'Values'    => array
             (
@@ -1196,13 +1196,13 @@ function StormOnDemand_ConfigOptions()
             'Size'          =>  '25', */
             'Type'          => 'dropdown',
         ),
-        "IPs Number"        => array
+        "Number of IPs"     => array
         (
             'Type'          => 'text',
             'Size'          => '25',
             'Default'       => 1
         ),
-        "Maximal IPs Number"=> array
+        "Maximum IP Addresses"=> array
         (
             'Type'          => 'text',
             'Size'          => '25',
@@ -1319,11 +1319,11 @@ function StormOnDemand_ConfigOptions()
         ),
         'ips_number'     => array(
             'type'       => 'text',
-            'name'       => 'packageconfigoption['.(array_search('IPs Number', $configFormKeys)+1).']',
+            'name'       => 'packageconfigoption['.(array_search('Number of IPs', $configFormKeys)+1).']',
         ),
-        'maximal_ips_number'=> array(
+        'maximum_ips_number'=> array(
             'type'       => 'text',
-            'name'       => 'packageconfigoption['.(array_search('Maximal IPs Number', $configFormKeys)+1).']',
+            'name'       => 'packageconfigoption['.(array_search('Maximum IP Addresses', $configFormKeys)+1).']',
         ),
         'monitoring'     => array(
             'type'       => 'checkbox',
@@ -1528,7 +1528,7 @@ function StormOnDemand_CreateAccount($params)
         //create server with base configuration
         $configuration = array
         (
-            'ip_count'          => (StormOnDemand_getOption("IPs Number", $params) == null) ? $row['configoption11']:StormOnDemand_getOption("IPs Number", $params),
+            'ip_count'          => (StormOnDemand_getOption("Number of IPs", $params) == null) ? $row['configoption11']:StormOnDemand_getOption("Number of IPs", $params),
             'image_id'          => (StormOnDemand_getOption('Image', $params )== null)?$row['configoption6']:StormOnDemand_getOption('Image', $params ),
             'bandwidth_quota'   => ($bandwidth_quota == 'Pay as You Go') ? 0 : $bandwidth_quota,//NTODO: w liquid web jest samo $bandwidth_quota
             'zone'              => (StormOnDemand_getOption('Zone', $params) == null)?$row['configoption4']:StormOnDemand_getOption('Zone', $params),
@@ -1931,7 +1931,7 @@ function StormOnDemand_ChangePackage($params)
     //get configuration
     $username           = StormOnDemand_getOption('Username', $params);
     $password           = StormOnDemand_getOption('Password', $params);
-    $ipcount            = StormOnDemand_getOption("IPs Number", $params);
+    $ipcount            = StormOnDemand_getOption("Number of IPs", $params);
     $bandwidth_quota    = StormOnDemand_getOption('Bandwidth Quota', $params);
     $hostname           = $params['customfields']['hostname'] ? $params['customfields']['hostname'] : $params['domain'];
     //check bandwidth quota
@@ -2666,7 +2666,7 @@ function StormOnDemand_IPManagement($params)
     //get configuration
     $username   =   StormOnDemand_getOption('Username', $params);
     $password   =   StormOnDemand_getOption('Password', $params);
-    $ipcount    =   StormOnDemand_getOption("Maximal IPs Number", $params);
+    $ipcount    =   StormOnDemand_getOption("Maximum IP Addresses", $params);
 
     //we need uniq_id to terminate server
     $q = mysql_query("SELECT * FROM mg_storm_on_demand WHERE hosting_id = ".(int)$params['serviceid']);
