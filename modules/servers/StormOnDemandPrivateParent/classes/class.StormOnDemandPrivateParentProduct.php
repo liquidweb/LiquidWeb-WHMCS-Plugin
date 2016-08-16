@@ -52,7 +52,7 @@ class StormOnDemandPrivateParentProduct extends StormOnDemand_Product
         'gr3'                           =>  'Configuration',
         'Parent'                        =>  array
         (
-            'title'                     =>  'Parent',
+            'title'                     =>  'Parent Server',
             'type'                      =>  'select',
             'options'                   =>  array(),
             'useOptionsKeys'            =>  true,
@@ -195,7 +195,7 @@ class StormOnDemandPrivateParentProduct extends StormOnDemand_Product
             (
                 'Parent'                =>  array
                 (
-                    'title'             =>  'Parent',
+                    'title'             =>  'Parent Server',
                     'type'              =>  'select',
                     'options'           =>  array()
                 ),
@@ -483,7 +483,7 @@ class StormOnDemandPrivateParentProduct extends StormOnDemand_Product
 
         'parent' => array(
 				'type' => 'select',
-				'name' => 'customconfigoption[Parent]',
+				'name' => 'customconfigoption[Parent Server]',
         ),
 
         'available_parents' =>  array(
