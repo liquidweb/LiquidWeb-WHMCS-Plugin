@@ -9,9 +9,9 @@
       			<h3><input type="checkbox" name="setup_lw_ssd_vps" id="setup_lw_ssd_vps"/>
       			<span class="help-inline"><?php echo MG_Language::translate('Liquid Web SSD VPS & Storm Dedicated'); ?></span></h3>
             <div style="margin-left:50px;"><?php echo MG_Language::translate('Choose this option if you want to resell Liquid Web\'s standard SSD VPS or Storm Dedicated line.');?></div>
-            <div style="margin-left:50px;"><?php echo MG_Language::translate('For more info please visit: ');?>
-              <a target="_blank" href="https://www.liquidweb.com/vps.html">https://www.liquidweb.com/vps.html</a>
-              <a target="_blank" href="https://www.liquidweb.com/storm/dedicated.html">https://www.liquidweb.com/storm/dedicated.html</a>
+            <div style="margin-left:50px;"><?php echo MG_Language::translate('For more info please visit: ');?><a target="_blank" href="https://www.liquidweb.com/vps.html">https://www.liquidweb.com/vps.html</a>
+              <br/>
+              <?php echo MG_Language::translate('Or: ');?><a target="_blank" href="https://www.liquidweb.com/storm/dedicated.html">https://www.liquidweb.com/storm/dedicated.html</a>
             </div>
       		</div>
     	</div>
