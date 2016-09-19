@@ -7,9 +7,12 @@
        	<div class="row controls" style="margin-bottom:20px;">
       		<div style="margin-left:50px">
       			<h3><input type="checkbox" name="setup_lw_ssd_vps" id="setup_lw_ssd_vps"/>
-      			<span class="help-inline"><?php echo MG_Language::translate('Liquid Web SSD VPS'); ?></span></h3>
-      			<div style="margin-left:50px;"><?php echo MG_Language::translate('Choose this option if you want to resell the Liquid Web\'s standard SSD VPS line, ');?></div>
-      			<div style="margin-left:50px;"><?php echo MG_Language::translate('for more info please visit ');?><a target="_blank" href="https://www.liquidweb.com/vps.html">https://www.liquidweb.com/vps.html</a></div>
+      			<span class="help-inline"><?php echo MG_Language::translate('Liquid Web SSD VPS & Storm Dedicated'); ?></span></h3>
+            <div style="margin-left:50px;"><?php echo MG_Language::translate('Choose this option if you want to resell Liquid Web\'s standard SSD VPS or Storm Dedicated line.');?></div>
+            <div style="margin-left:50px;"><?php echo MG_Language::translate('For more info please visit: ');?>
+              <a target="_blank" href="https://www.liquidweb.com/vps.html">https://www.liquidweb.com/vps.html</a>
+              <a target="_blank" href="https://www.liquidweb.com/storm/dedicated.html">https://www.liquidweb.com/storm/dedicated.html</a>
+            </div>
       		</div>
     	</div>
 
@@ -18,7 +21,7 @@
       			<h3><input type="checkbox" name="setup_lw_pri_cld" id="setup_lw_pri_cld"/>
       			<span class="help-inline"><?php echo MG_Language::translate('Liquid Web Private Cloud');?></span></h3>
       			<div style="margin-left:50px;"><?php echo MG_Language::translate('Storm Private Cloud allows you to create your own private cloud environment, within which you can create, move, resize or destroy any number of virtual instances. With minute control of your resources and the ability to move instances to the public cloud or create a public network of private cloud servers, the usage possibilities are endless.');?></div>
-      			<div style="margin-left:50px;"><?php echo MG_Language::translate('for more info please visit ');?><a target="_blank" href="https://www.liquidweb.com/storm/private-cloud.html">https://www.liquidweb.com/storm/private-cloud.html</a></div>
+      			<div style="margin-left:50px;"><?php echo MG_Language::translate('For more info please visit: ');?><a target="_blank" href="https://www.liquidweb.com/storm/private-cloud.html">https://www.liquidweb.com/storm/private-cloud.html</a></div>
       		</div>
     	</div>
     	<div style="margin-left:70px; margin-top:20px;text-align: right;">
