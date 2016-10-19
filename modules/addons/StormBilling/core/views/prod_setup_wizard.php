@@ -44,7 +44,7 @@ if (isset($_REQUEST['ajaxload'])) {
         $conf_id = $_REQUEST['conf_id'];
         $zoneSelected = $_REQUEST['zone'];
 
-        $template_id = array();
+        $template_id = array('0');
         $q = mysql_query("SELECT * FROM `StormBilling_customconfig` where `config_name` = 'wiz_pg_4_hide_from_tmplt_list'");
         if(($res = mysql_fetch_assoc($q))) {
             $template_id = @explode(",", $res['config_value']);
@@ -69,9 +69,7 @@ if (isset($_REQUEST['ajaxload'])) {
               ';
 
         foreach ($ret['items'] as $item) {
-
             foreach ($template_id as $tempid) {
-
                 if ($tempid != $item['id']) {
                     if ($item['deprecated'] == 1) {
                         continue;
@@ -96,7 +94,7 @@ if (isset($_REQUEST['ajaxload'])) {
     if ($_REQUEST['ajaxload'] == 'pp_template') {
         $conf_id = $_REQUEST['conf_id'];
 
-        $template_id = array();
+        $template_id = array('0');
         $q = mysql_query("SELECT * FROM `StormBilling_customconfig` where `config_name` = 'wiz_pg_4_hide_from_tmplt_list'");
         if(($res = mysql_fetch_assoc($q))) {
             $template_id = @explode(",", $res['config_value']);

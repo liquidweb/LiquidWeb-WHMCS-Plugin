@@ -1,3 +1,10 @@
+<?php
+$action = 'addonmodules.php?module=StormBilling&action=setup&pg=5';
+if (isset($_SESSION['setup_lw_ssd_vps'])){
+    $action = 'addonmodules.php?module=StormBilling&action=setup&pg=4';
+}
+?>
+
 <script>
   $(function() {
     $( "#accordion" ).accordion();
@@ -9,7 +16,7 @@
 	</h2>
 		<div id="accordion">
 		<h3 style="line-height: 2.5; color: #1c4b8c;">&nbsp;&nbsp;<?php echo MG_Language::translate('I have Liquid Web API credentials');?></h3>
-    	<form id="setupWizPg2API" action="addonmodules.php?module=StormBilling&action=setup&pg=4" method="post" >
+    	<form id="setupWizPg2API" action="<?php echo $action;?>" method="post" >
     		<input type="hidden" name="wiz_page" value="2">
     		<input type="hidden" name="wiz_page2_usertype" value="API">
 		    <div class="col-md-12 text-center" style="margin-bottom: 15px; margin-top: 20px;"><h3><?php echo MG_Language::translate('Please provide your Liquid Web API username and password to continue');?></h3></div>

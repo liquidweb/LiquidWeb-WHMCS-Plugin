@@ -297,7 +297,6 @@ if(!class_exists('ModuleInformationClient'))
             } else {
                 $sql_query = mysql_query($query);
             }
-
             return ($sql_query);
         }
     }

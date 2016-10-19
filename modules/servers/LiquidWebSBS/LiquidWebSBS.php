@@ -54,19 +54,19 @@ function LiquidWebSBS_checkConnection()
             {
                 return true;
             }
-            if($_GET['action'] != 'save'){
+            /*if($_GET['action'] != 'save'){
                 echo '<p style="text-align: center;" class="errorbox">
                     <span style="font-weight: bold">Authorization error. Please check username and password.</span>
                  </p>';
-            }
+            }*/
 
             return false;
         }
-        if($_GET['action'] != 'save'){
+        /*if($_GET['action'] != 'save'){
             echo '<p style="text-align: center;" class="infobox">
                     <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
                  </p>';
-        }
+        }*/
     }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'clientsservices.php') !== false){
         if(! empty($username) && ! empty($password))
         {
@@ -297,6 +297,11 @@ function LiquidWebSBS_ConfigOptions($loadValuesFromServer = true) {
             'Type'          =>  'yesno',
             'Description'   =>  'Cross attaching allows a volume to be attached to multiple servers.'
         ),
+        "Error"   =>  array
+        (
+            'Type'          =>  '',
+            'Description'   =>  '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">Authorization error. Please check username and password.</span></p>'
+        )
     );
 
 
@@ -349,13 +354,18 @@ function LiquidWebSBS_ConfigOptions($loadValuesFromServer = true) {
 
     if($testConnection)
     {
+        foreach ($config as $key => $value) {
+          if($key == 'Error') {
+              unset($config[$key]);
+          }
+        }
         return $config;
     }
     else
     {
         foreach ($config as $key => $value)
         {
-            if($key != 'Username' && $key != 'Password')
+            if($key != 'Username' && $key != 'Password' && $key != 'Error')
             {
                 unset($config[$key]);
             }

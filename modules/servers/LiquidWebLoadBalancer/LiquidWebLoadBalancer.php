@@ -33,19 +33,19 @@ function LiquidWebLoadBalancer_checkConnection()
             {
                 return true;
             }
-            if($_GET['action'] != 'save'){
+            /*if($_GET['action'] != 'save'){
                 echo '<p style="text-align: center;" class="errorbox">
                     <span style="font-weight: bold">Authorization error. Please check username and password.</span>
                  </p>';
-            }
+            }*/
 
             return false;
         }
-        if($_GET['action'] != 'save'){
+        /*if($_GET['action'] != 'save'){
             echo '<p style="text-align: center;" class="infobox">
                     <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
                  </p>';
-        }
+        }*/
     }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'orders.php') !== false){
 
         $q = mysql_query("SELECT tblproducts.* FROM tblproducts LEFT JOIN tblhosting ON tblproducts.id = tblhosting.packageid LEFT JOIN tblorders ON tblhosting.orderid = tblorders.id WHERE tblorders.id = " . (int)$_REQUEST['id'] . " LIMIT 1");
@@ -395,11 +395,16 @@ function LiquidWebLoadBalancer_ConfigOptions()
             'Size'              =>  '25',
             'Default'           =>  80
         ),
+        "Error"   =>  array
+        (
+            'Type'          =>  '',
+            'Description'   =>  '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">Authorization error. Please check username and password.</span></p>'
+        )
     );
 
-    $newVersion = LiquidWebLoadBalancer_getLatestVersion();
     $script = substr($_SERVER['SCRIPT_NAME'], strrpos($_SERVER['SCRIPT_NAME'], DIRECTORY_SEPARATOR) + 1);
 
+    /*$newVersion = LiquidWebLoadBalancer_getLatestVersion();
     if($newVersion && $script == 'configproducts.php' && $_GET['action'] != 'save')
     {
         echo '<p style="text-align: center;" class="infobox op_version">
@@ -407,7 +412,7 @@ function LiquidWebLoadBalancer_ConfigOptions()
             <span style="font-weight: bold"><br />Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span>
          </p>
          ';
-    }
+    }*/
 
     if($script == 'configproducts.php'){
         $testConnection = LiquidWebLoadBalancer_checkConnection();
@@ -417,13 +422,17 @@ function LiquidWebLoadBalancer_ConfigOptions()
 
     if($testConnection)
     {
+      foreach ($config as $key => $value) {
+          if($key == 'Error') {
+              unset($config[$key]);
+          }
+      }
       return $config;
     }else
     {
       foreach ($config as $key => $value)
       {
-          if($key != 'Username' && $key != 'Password')
-          {
+          if ($key != 'Username' && $key != 'Password'  && $key != 'Error') {
               unset($config[$key]);
           }
       }

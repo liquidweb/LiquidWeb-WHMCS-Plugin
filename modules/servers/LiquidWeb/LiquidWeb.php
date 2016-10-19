@@ -44,19 +44,18 @@ function LiquidWeb_checkConnection()
             {
                 return true;
             }
-            if($_GET['action'] != 'save'){
+            /* if($_GET['action'] != 'save'){
                 echo '<p style="text-align: center;" class="errorbox">
                     <span style="font-weight: bold">Authorization error. Please check username and password.</span>
                  </p>';
-            }
-
+            } */
             return false;
         }
-        if($_GET['action'] != 'save'){
+        /* if($_GET['action'] != 'save'){
             echo '<p style="text-align: center;" class="infobox">
                     <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
                  </p>';
-        }
+        } */
     }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'orders.php') !== false){
 
         $q = mysql_query("SELECT tblproducts.* FROM tblproducts LEFT JOIN tblhosting ON tblproducts.id = tblhosting.packageid LEFT JOIN tblorders ON tblhosting.orderid = tblorders.id WHERE tblorders.id = " . (int)$_REQUEST['id'] . " LIMIT 1");
@@ -819,7 +818,8 @@ function LiquidWeb_ConfigOptions()
                 }, 1000);
               </script>';
         die();
-    }elseif($_REQUEST['stormajax'] == 'load-quota')
+    }
+    elseif($_REQUEST['stormajax'] == 'load-quota')
     {
     	/*
 		 * get bandwidth and backup quota
@@ -1027,11 +1027,13 @@ function LiquidWeb_ConfigOptions()
         (
             'Type'          =>  'yesno',
             'Description'   =>  'Check if you want to enable IP managing in the clientarea'
+        ),
+        "Error"   =>  array
+        (
+            'Type'          =>  '',
+            'Description'   =>  '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">Authorization error. Please check username and password.</span></p>'
         )
     );
-
-
-
 
 	//input keys
 	//id name form input =  packageconfigoption[array_search($inputName,$configFormKeys) + 1]
@@ -1058,7 +1060,6 @@ function LiquidWeb_ConfigOptions()
 
 	$jsTplParams['backup_quota'] 	= ((int) $productRow[$bqName])?$productRow[$bqName]:100;
 	$jsTplParams['bandwidth_quota'] = ($productRow[$bndqName])?$productRow[$bndqName]:5000;
-
 
 	$zoneResults = array();
 	//get full zone name
@@ -1087,7 +1088,6 @@ function LiquidWeb_ConfigOptions()
 			}
 		}
 	}
-
 
    $config['Zone']['Description'] = '<style type="text/css">input[name="packageconfigoption[4]"]{display:none;}</style><span id="zone_name">'.$jsTplParams['zone_name'].'</span>&nbsp;&nbsp;<a id="load-storm-zone" href="stormajax=load-zone" class="load-configuration">Load Zone</a>';
 
@@ -1235,8 +1235,7 @@ function LiquidWeb_ConfigOptions()
 		$config['Backup Quota']['Description'] .= "<script type='text/javascript'>".LiquidWeb_loadAsset('js/LoadConfiguration.tpl.js', $lcConfig).'</script><div id="conf-dialog" style="display:none;" title=""></div>';
     }
 
-
-    $newVersion = LiquidWeb_getLatestVersion();
+    /*$newVersion = LiquidWeb_getLatestVersion();
     $script = substr($_SERVER['SCRIPT_NAME'], strrpos($_SERVER['SCRIPT_NAME'], DIRECTORY_SEPARATOR) + 1);
 
     if($newVersion && $script == 'configproducts.php' && $_GET['action'] != 'save')
@@ -1245,7 +1244,7 @@ function LiquidWeb_ConfigOptions()
             <span style="font-weight: bold">New version of Liquid Web module is available!</span>
             <span style="font-weight: bold"><br />Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span>
          </p>';
-    }
+    }*/
 
     if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php'){
         $testConnection = LiquidWeb_checkConnection();
@@ -1253,19 +1252,19 @@ function LiquidWeb_ConfigOptions()
         $testConnection = true;
     }
 
-    if($testConnection)
-    {
-      return $config;
-    }else
-    {
-      foreach ($config as $key => $value)
-      {
-          if($key != 'Username' && $key != 'Password')
-          {
+    if($testConnection) {
+      foreach ($config as $key => $value) {
+          if($key == 'Error') {
               unset($config[$key]);
           }
       }
-
+      return $config;
+    } else {
+      foreach ($config as $key => $value) {
+          if($key != 'Username' && $key != 'Password' && $key != 'Error') {
+              unset($config[$key]);
+          }
+      }
       return $config;
     }
 }
