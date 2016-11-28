@@ -25,7 +25,30 @@
  */
 function LiquidWebPrivateParent_ProductEdit($params)
 {
-    if ($_REQUEST['servertype'] == 'LiquidWebPrivateParent' && $_REQUEST['customconfigoption']) {
+    if (($_REQUEST['servertype'] == 'LiquidWebPrivateParent') &&  ($_REQUEST['action'] == 'save')) {
+
+        $q = mysql_query("SELECT * FROM tblproducts WHERE id = " . (int)$params['pid'] . " LIMIT 1");
+        $row = mysql_fetch_assoc($q);
+
+        $_REQUEST['customconfigoption'] = Array (
+											'Username' => $params[configoption1],
+											'Password' => $row[configoption2],
+											'Parent' => $row[configoption5],
+											'AvailableParents' => $row[configoption6],
+        									'Template' => $row[configoption8],
+											'Image' => $row[configoption9],
+											'Memory' => $row[configoption10],
+											'Diskspace' => $row[configoption11],
+											'VCPU' => $row[configoption12],
+											'Backup Plan' => $row[configoption13],
+											'Backup Quota' => $row[configoption14],
+											'Daily Backup Quota' => $row[configoption15],
+											'Number of IPs' => $row[configoption16],
+											'Maximum IP Addresses' => $row[configoption17],
+											'Bandwidth Quota' => $row[configoption18],
+											'Monitoring' => ($row[configoption19] == 'on' ? '1':''),
+											'Firewall' => ($row[configoption20] == 'on' ? '1':''),
+											'IPs Management' => ($row[configoption21] == 'on' ? '1':''));
         //DB
         require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'functions' . DIRECTORY_SEPARATOR . 'database.php';
         //Product Configuration

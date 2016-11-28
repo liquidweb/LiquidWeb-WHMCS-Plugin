@@ -23,436 +23,306 @@ require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOn
 //Product Class
 require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.LiquidWebPrivateParentProduct.php';
 
+function LiquidWebPP_checkConnection()
+{
+    //load server helper class
+    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
+
+    if(strpos($_SERVER['SCRIPT_FILENAME'], 'configproducts.php') !== false)
+    {
+        $q = mysql_query("SELECT * FROM tblproducts WHERE id = " . (int)$_REQUEST['id'] . " LIMIT 1");
+        $row = mysql_fetch_assoc($q);
+
+        $username = $row['configoption1'];
+        $password = $row['configoption2'];
+        //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
+
+        if(! empty($username) && ! empty($password))
+        {
+            require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
+
+            $config = new StormOnDemandStormConfig($username, $password);
+
+            $res = $config->ping();
+
+            if(isset($res['ping']) && $res['ping'] = 'success')
+            {
+                return true;
+            }
+            /* if($_GET['action'] != 'save'){
+                echo '<p style="text-align: center;" class="errorbox">
+                    <span style="font-weight: bold">Authorization error. Please check username and password.</span>
+                 </p>';
+            } */
+            return false;
+        }
+        /* if($_GET['action'] != 'save'){
+            echo '<p style="text-align: center;" class="infobox">
+                    <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
+                 </p>';
+        } */
+    }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'orders.php') !== false){
+
+        $q = mysql_query("SELECT tblproducts.* FROM tblproducts LEFT JOIN tblhosting ON tblproducts.id = tblhosting.packageid LEFT JOIN tblorders ON tblhosting.orderid = tblorders.id WHERE tblorders.id = " . (int)$_REQUEST['id'] . " LIMIT 1");
+        $row = mysql_fetch_assoc($q);
+
+        $username = $row['configoption1'];
+        $password = $row['configoption2'];
+        //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
+
+
+        if(! empty($username) && ! empty($password))
+          {
+              require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
+
+              $config = new StormOnDemandStormConfig($username, $password);
+
+              $res = $config->ping();
+
+              if(isset($res['ping']) && $res['ping'] = 'success')
+              {
+                  return true;
+              }
+              return false;
+          }
+    }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'clientsservices.php') !== false){
+
+        $q = mysql_query("SELECT tblproducts.* FROM tblproducts LEFT JOIN tblhosting ON tblproducts.id = tblhosting.packageid WHERE tblhosting.id = " . (int)$_REQUEST['id'] . " LIMIT 1");
+        $row = mysql_fetch_assoc($q);
+
+        $username = $row['configoption1'];
+        $password = $row['configoption2'];
+        //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
+
+
+        if(! empty($username) && ! empty($password))
+          {
+              require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
+
+              $config = new StormOnDemandStormConfig($username, $password);
+
+              $res = $config->ping();
+
+              if(isset($res['ping']) && $res['ping'] = 'success')
+              {
+                  return true;
+              }
+              return false;
+          }
+    }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'clientarea.php') !== false){
+          return true;
+    }
+}
+
 function LiquidWebPrivateParent_ConfigOptions()
 {
+	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
+    $idProduct    = (int) intval($_REQUEST['id']);
+    $productQuery = ModuleInformationClient::mysql_safequery('SELECT * FROM tblproducts WHERE id = ? LIMIT 1', array($idProduct));
+    $productRow   = mysql_fetch_assoc($productQuery);
 
-	if(isset($_REQUEST['id']) && $_REQUEST['id'] && preg_match('/^[0-9]{1,}$/D', $_REQUEST['id'])){
+    $username     = $productRow['configoption1'];
+    $password     = $productRow['configoption2'];
 
-		$type 	     = 'product';
-		$fieldType 	 = 'dropdown';
-    $fieldName 	 = 'Clone From Server';
-		$description = 'Select server to clone(optional)';
-		$showOrder   = 'on';
 
-		$idRel 			= (int) $_REQUEST['id'];
-		$cfServerCloneQ = ModuleInformationClient::mysql_safequery('SELECT * FROM tblcustomfields WHERE relid = ? AND fieldname = ? LIMIT 1', array($idRel,$fieldName));
-		$cfServerClone  = mysql_fetch_assoc($cfServerCloneQ);
+    $config	=	array(
+     'Username' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25',
+             'Description' => '<div id="custom-dialog" style="display:none;" title=""></div>'
+     ),
+     'Password' => array
+     (
+    		'Type' => 'password',
+    		'Size' => '25'
+     ),
+     'Default Configurable Options' => array
+     (
+    		'Type' => '',
+    		'Description' => '<a id="generate-storm-confoption" href="modaction=generate_configurable_options" class="gen-config-options">Generate Default Configurable Options</a>'
+     ),
+     'Custom Fields' => array
+     (
+    		'Type' => '',
+    		'Description' => '<a id="generate-storm-customfields" href="modaction=generate_custom_fields" class="gen-config-options">Generate Custom Fields</a>'
+     ),
+     'Parent Server' => array
+     (
+    		'Type' => 'dropdown',
+    		'Options' => array()
+     ),
+     'Available Parents' => array
+     (
+    		'Type' => 'dropdown',
+            'Multiple' => TRUE,
+    		'Options' => array()
+     ),
+     'Select Parent Automatically' => array
+     (
+    		'Type' => 'yesno',
+    		'Description' => 'Tick to automatically choose private cloud from "Available Parent"'
+     ),
+     'Template' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25',
+    		'Description' => '<a id="load-storm-template" href="stormajax=load-template" class="load-configuration">Load Template</a>'
+     ),
+     'Image' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25',
+    		'Description' => '<a id="load-storm-image" href="stormajax=load-image" class="load-configuration">Load Image</a>'
+     ),
+     'Memory (MB)' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25'
+     ),
+     'Disk Space (GB)' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25'
+     ),
+     'Virtual CPU' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25'
+     ),
+     'Backup Plan' => array
+     (
+    		'Type' => 'dropdown',
+            'Options' => array
+    		(
+    			'0' => 'Disabled',
+    			'quota' => 'Quota',
+    			'daily' => 'Daily'
+    		)
+     ),
+     'Backup Quota' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25'
+     ),
+     'Daily Backup Quota'=> array
+     (
+    		'Type' => 'text',
+    		'Size' => '25'
+     ),
+     'Number of IPs' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25'
+     ),
+     'Maximum IP Addresses' => array
+     (
+    		'Type' => 'text',
+    		'Size' => '25'
+     ),
+     'Bandwidth Quota' => array
+     (
+    		'Type' => 'dropdown',
+    		'Options' => array
+    		(
+    			'5000' => '5000',
+    			'6000' => '6000',
+    			'8000' => '8000',
+    			'10000' => '10000',
+    			'15000' => '15000',
+    			'20000' => '20000'
+    		)
+     ),
+     'Monitoring' => array
+     (
+    		'Type' => 'yesno',
+    		'Description' => 'Tick to give possibility to monitoring server from Client Area'
+     ),
+     'Firewall' => array
+     (
+    		'Type' => 'yesno',
+    		'Description' => 'Tick to give possibility to manage firewall from Client Area'
+     ),
+     'IPs Management' => array
+     (
+    		'Type' => 'yesno',
+    		'Description' => 'Tick to give possibility to manage IPs addresses from Client Area'
+     ),
+     "Error" => array
+     (
+    		'Type' => '',
+    		'Description' => '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">Authorization error. Please check username and password.</span></p>'
+      )
+    );
 
-		if(!$cfServerClone){
-			$cfServerCloneQC = ModuleInformationClient::mysql_safequery('INSERT INTO tblcustomfields(type,relid,fieldname,fieldtype, showorder, description) VALUES(?,?,?,?,?,?)',
-																		array($type,
-																			  $idRel,
-																			  $fieldName,
-																			  $fieldType,
-																			  $showOrder,
-																			  $description));
-		}
-	}
-    //Product Configuration
-    $product = new LiquidWebPrivateParentProduct($_REQUEST['id']);
 
-    //Load Config
-    $product->loadConfig();
-
-    //Login Details
-    $username   =   $product->getConfig('Username');
-    $password   =   $product->getConfig('Password');
-
-    //Run Auto Configuration
-    if(isset($_REQUEST['modaction']) && $_REQUEST['modaction'] == 'generate_configurable_options')
+    if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php' && $_GET['action'] != 'save')
     {
-        //Get Parents
-        $selected_parents = $product->getConfig('AvailableParents');
-
-        if($selected_parents == null){
-          $selected_parents = $product->getConfig('Parent');
-        }
-
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormPrivateParent.php';
-        $private = new StormOnDemandStormPrivateParent($username, $password, 'bleed');
-
-        $page_num = 1;
-        $page_size = 250;
-
-        $response = $private->lists($page_num, $page_size);
-        if(!$response)
-        {
-            ob_clean();
-            json_encode(array(
-                'status'    =>  0,
-                'message'   =>  $private->getError()
-            ));
-            die();
-        }
-
-        $parents = $response['items'];
-        while($response['item_total'] > $page_num * $page_size)
-        {
-            $page_num++;
-            $response = $private->lists($page_size, $page_num);
-            $parents = array_merge($parents, $response['items']);
-        }
-
-        foreach($parents as $parent)
-        {
-            if(!in_array($parent['uniq_id'], $selected_parents))
-            {
-                continue;
-            }
-
-            $product->defaultConfigurableOptions['mygroup']['fields']['Parent']['options'][] = array
-            (
-                'value' =>  $parent['uniq_id'],
-                'title' =>  $parent['domain']
-            );
-        }
-        unset($selected_parents);
-        unset($parent);
-        unset($parents);
-        unset($response);
-
-        //Get Templates
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
-        $template = new StormOnDemandStormTemplate($username, $password, 'bleed');
-
-        $page_num = 1;
-        $page_size = 250;
-
-        $response = $template->lists($page_size, $page_num);
-        if(!$response)
-        {
-            ob_clean();
-            json_encode(array(
-                'status'    =>  0,
-                'message'   =>  $template->getError()
-            ));
-            die();
-        }
-
-        $templates = $response['items'];
-        while($response['item_total'] > $page_num * $page_size)
-        {
-            $page_num++;
-            $response = $template->lists($page_size, $page_num);
-            $templates = array_merge($templates, $response['items']);
-        }
-
-        foreach($templates as $tpl)
-        {
-            if($tpl['deprecated'])
-            {
-                continue;
-            }
-
-            $product->defaultConfigurableOptions['mygroup']['fields']['Template']['options'][] = array
-            (
-                'value' =>  $tpl['name'],
-                'title' =>  $tpl['description']
-            );
-        }
-        unset($template);
-        unset($templates);
-        unset($response);
-
-        //Image
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
-        $image = new StormOnDemandStormImage($username, $password, 'bleed');
-
-        $page_num = 1;
-        $page_size = 250;
-
-        $response = $image->lists($page_size, $page_num);
-        if(!$response)
-        {
-            ob_clean();
-            json_encode(array(
-                'status'    =>  0,
-                'message'   =>  $image->getError()
-            ));
-            die();
-        }
-
-        $images = $response['items'];
-        while($response['item_total'] > $page_num * $page_size)
-        {
-            $page_num++;
-            $response = $image->lists($page_size, $page_num);
-            $images = array_merge($images, $response['items']);
-        }
-
-        foreach($images as $image)
-        {
-            $product->defaultConfigurableOptions['mygroup']['fields']['Image']['options'][] = array
-            (
-                'value' =>  $image['id'],
-                'title' =>  $image['name']. ' - '.$image['source_hostname']
-            );
-        }
-
-        /*
-        $max_ips = $product->getConfig('Maximum IP Addresses');
-        if($max_ips != null && is_numeric($max_ips)){
-          for($i=1;$i<=$max_ips;$i++){
-            $product->defaultConfigurableOptions['mygroup']['fields']['Maximum IP Addresses']['options'][] = array
-            (
-                'value' =>  $i,
-                'title' =>  $i
-            );
-          }
-        }
-
-        $IPs_Number = $product->getConfig('Number of IPs');
-
-        if($IPs_Number != null && is_numeric($IPs_Number)){
-          for($i=1;$i<=$IPs_Number;$i++){
-            $product->defaultConfigurableOptions['mygroup']['fields']['Number of IPs']['options'][] = array
-            (
-                'value' =>  $i,
-                'title' =>  $i
-            );
-          }
-        }
-
-        $DailyBackupQuota = $product->getConfig('Daily Backup Quota');
-
-        if($DailyBackupQuota != null && is_numeric($DailyBackupQuota)){
-          for($i=1;$i<=$DailyBackupQuota;$i++){
-            $product->defaultConfigurableOptions['mygroup']['fields']['Daily Backup Quota']['options'][] = array
-            (
-                'value' =>  $i,
-                'title' =>  $i
-            );
-          }
-        }
-        */
-
-        unset($images);
-        unset($image);
-        unset($response);
-    }
-    $product->runAutoConfiguration();
-
-
-
-
-    /*********************************** AJAX ***************************************/
-    if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-template')
-    {
-        ob_clean();
-        $conf_id = $_REQUEST['conf_id'];
-
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
-        $template = new StormOnDemandStormTemplate($username, $password, 'bleed');
-        $ret = $template->lists();
-
-        if($error = $template->getError())
-        {
-            echo '<p style="color: red">'.$error.'</p>';
-            die();
-        }
-
-        echo '<table class="datatable" style="width: 100%">
-                <tr>
-                    <th>Template</th>
-                </tr>
-              ';
-        foreach($ret['items'] as $item)
-        {
-            if($item['deprecated'] == 1)
-            {
-                continue;
-            }
-
-            echo '<tr>
-                    <td><input class="storm-template" type="radio" name="template-id" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
-                  </tr>';
-        }
-        echo '</table>';
-        echo '<script type="text/javascript">
-                $(function(){
-                    $(".storm-template").click(function(event){
+        $config['Username']['Description'] .= '
+        	<script type="text/javascript">
+                jQuery(function(){
+                  jQuery( document ).ready(function() {
+                    jQuery(".load-configuration").click(function(event){
                         event.preventDefault();
+                        if($("#custom-dialog").is(":data(dialog)"))
+                        {
+                            $("#custom-dialog").dialog("destroy");
+                        }
+                        $("#ui-id-3").html($(this).html());
+                        $("#custom-dialog").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWebSBS/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>");
+                        $("#custom-dialog").dialog({
+                        	title: $(this).html(),
+                        	minWidth: 650,
+                        	close: function(event, ui) {
+                        		$(this).dialog(\'close\');
+    						}
+    					});
 
-                        val = $(this).parent().find("input[name=\'template-id\']").val();
-                        $("#load-storm-template").closest(".fieldarea").find("input").val(val).change();
-                        $("#conf-dialog").dialog("destroy");
-                        $("#load-storm-image").closest(".fieldarea").find("input").val("");
+                        val = $(this).parent().find("input").val();
+                        jQuery.post("../modules/servers/LiquidWebPrivateParent/stormajax.php?action=edit&id='.$_REQUEST['id'].'&conf_id="+val,jQuery(this).attr("href"), function(data){
+                        	$("#custom-dialog").html(data);
+    					});
                     });
+
+                    jQuery(".gen-config-options").click(function(event){
+                        event.preventDefault();
+                        if($("#custom-dialog").is(":data(dialog)")) {
+                            $("#custom-dialog").dialog("destroy");
+                        }
+                        $("#ui-id-3").html($(this).html());
+                        $("#custom-dialog").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWebSBS/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>");
+                        $("#custom-dialog").dialog({
+                        	title: $(this).html(),
+                        	minWidth: 650,
+                        	close: function(event, ui) {
+                        		$(this).dialog(\'close\');
+    						}
+    					});
+                        jQuery.post("../modules/servers/LiquidWebPrivateParent/stormajax.php?action=edit&id='.$_REQUEST['id'].'",jQuery(this).attr("href"), function(data){
+								$("#custom-dialog").html("<p style=\'text-align: center\'>"+data.message+"<p>");
+								if(data.status == 1) {
+									//window.location.href = "configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5";
+								}
+							},"json");
+                    });
+                  });
                 });
               </script>';
-        die();
-    }
-    elseif(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image')
-    {
-        ob_clean();
-        $conf_id = $_REQUEST['conf_id'];
-
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
-        $image = new StormOnDemandStormImage($username, $password, 'bleed');
-        $ret = $image->lists();
-
-        if($error = $image->getError())
-        {
-            echo '<p style="color: red">'.$error.'</p>';
-            die();
-        }
-
-        echo '<table class="datatable" style="width: 100%">
-                <tr>
-                    <th>Template</th>
-                    <th>Source Hostname</th>
-                    <th>Time take</th>
-                </tr>
-              ';
-        foreach($ret['items'] as $item)
-        {
-            if($item['deprecated'] == 1)
-            {
-                continue;
-            }
-            echo '<tr>
-                    <td><input class="storm-image" type="radio" name="image-id" value="'.$item['id'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').' />'.$item['template_description'].'</td>
-                    <td>'.$item['source_hostname'].'</td>
-                    <td>'.$item['time_taken'].'</td>
-                  </tr>';
-        }
-        echo '</table>';
-        echo '<script type="text/javascript">
-                $(function(){
-                    $(".storm-image").click(function(event){
-                        event.preventDefault();
-
-                        val = $(this).parent().find("input[name=\'image-id\']").val();
-                        $("#load-storm-image").closest(".fieldarea").find("input").val(val);
-                        $("#conf-dialog").dialog("destroy");
-                        $("#load-storm-template").closest(".fieldarea").find("input").val("");
-                    });
-                });
-              </script>';
-        die();
-    }elseif($_REQUEST['stormajax'] == 'load-quota')
-    {
-    	/*
-		 * get bandwidth and backup quota
-		 */
-    	ob_clean();
-
-		$response = array(
-			'type' => 'success',
-			'data' => array(),
-		);
-
-		if(empty($_REQUEST) || !isset($_REQUEST['id']) || !preg_match('/^[0-9]{1,}$/D', $_REQUEST['id'])){
-			$response['type'] = 'error';
-		}else{
-
-	        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
-
-			$idProduct    = (int) intval($_REQUEST['id']);
-	        $productQuery = ModuleInformationClient::mysql_safequery('SELECT * FROM tblproducts WHERE id = ? LIMIT 1', array($idProduct));
-	        $productRow   = mysql_fetch_assoc($productQuery);
-
-	        $username     = $productRow['configoption1'];
-	        $password     = $productRow['configoption2'];
-
-			$baCache = ModuleInformationClient::getWHMCSconfig(LiquidWebCacheName);
-
-			if($baCache){
-				$baCache = json_decode($baCache,true);
-			}
-
-			if(!$baCache || !isset($baCache['cache_time']) || (((int)time() - (int)$baCache['cache_time']) > LiquidWebCacheLive)){
-				//Load data from api
-				//Save cache in database
-				$baCache = array(
-					'cache_time' => time(),
-					'data'	     => array(
-						'bandwidth_quota' => array(),
-						'backup_quota'	  => array(),
-					),
-				);
-
-				require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
-
-				$product 	  = new StormOnDemandProduct($username,$password);
-				$productLists = $product->details(null,'SS.VPS');
-				/* Get backup quota */
-				if($productLists && !empty($productLists['options'])){
-					foreach($productLists['options'] as $kOpt => $vOpt){
-						if(strcmp($vOpt['key'],'LiquidWebBackupPlan') === 0){
-
-							if(!empty($vOpt['values'])){
-								foreach($vOpt['values'] as $kVal => $vVal){
-
-									if(strcmp($vVal['description'],'Quota-based Backups') === 0){
-										if(!empty($vVal['options'])){
-											foreach($vVal['options'] as $vkOpt => $vkVal){
-												 if(strcmp($vkVal['key'], 'BackupQuota') === 0){
-													if(!empty($vkVal['values'])){
-												 	  foreach($vkVal['values'] as $kBack => $vBack){
-															$baCache['data']['backup_quota'][(int)$vBack['display_order']] = array(
-																'description' => $vBack['description'],
-																'value'		  => $vBack['value'],
-															);
-												 	  }
-													}
-													break;
-												 }
-											}
-										}
-										break;
-									}
-								}
-							}
-							break;
-						}
-					}
-				}
-
-				/* Get bandwidth options */
-				if($productLists && !empty($productLists['options'])){
-					foreach($productLists['options'] as $kOpt => $vOpt){
-						if(strcmp($vOpt['key'],'Bandwidth') === 0){
-
-							if(!empty($vOpt['values'])){
-								foreach($vOpt['values'] as $kVal => $vVal){
-
-									$limit = (int) str_replace('SS.','', $vVal['value']);
-
-									$baCache['data']['bandwidth_quota'][$limit] = array(
-										'description' => $limit.' GB',
-										'value'		  => $limit,
-									);
-								}
-							}
-
-							break;
-						}
-					}
-				}
-
-				ModuleInformationClient::saveWHMCSconfig(LiquidWebCacheName,json_encode($baCache));
-			}
-			$response['data'] = $baCache;
-		}
-
-    	echo json_encode($response);
-    	die();
     }
 
 
-
-
+    $lError = FALSE;
 
     //Is set?
-    if((!$username || !$password) && $_GET['action'] != 'save')
+    if((!$username || !$password) && ($_GET['action'] != 'save') && !$lError)
     {
-        $product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
-        echo $product->renderConfigOptions();
-        echo '<p style="text-align: center;" class="infobox">
-                <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
-             </p>';
-        return array();
+      $config["Error"]["Description"] = '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span></p>';
+      foreach ($config as $key => $value) {
+          if($key != 'Username' && $key != 'Password' && $key != 'Error') {
+              unset($config[$key]);
+          }
+      }
+      $lError = TRUE;
     }
 
     //Get Parent Servers
@@ -464,88 +334,62 @@ function LiquidWebPrivateParent_ConfigOptions()
 
     $lists = $private->lists($page, $items_per_page);
 
-    if(!$lists && $_GET['action'] != 'save')
+
+    if(!$lists && ($_GET['action'] != 'save') && !$lError)
     {
-        $product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
-        echo $product->renderConfigOptions();
-        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">'.$private->getError().'</span></p>';
-        return array();
+     $config["Error"]["Description"] = '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">'.$private->getError().'</span></p>';
+     foreach ($config as $key => $value) {
+          if($key != 'Username' && $key != 'Password' && $key != 'Error') {
+              unset($config[$key]);
+          }
+      }
+      $lError = TRUE;
     }
 
-    $items = $lists['items'];
-    while($lists['item_total'] > $page * $items_per_page)
-    {
-        $page++;
-        $lists = $private->lists($page, $items_per_page);
-        $items = array_merge($items, $lists['items']);
+    if (!$lError) {
+        $items = $lists['items'];
+        while($lists['item_total'] > $page * $items_per_page)
+        {
+            $page++;
+            $lists = $private->lists($page, $items_per_page);
+            $items = array_merge($items, $lists['items']);
+        }
+
+        if(!$items && ($_GET['action'] != 'save') && !$lError)
+        {
+            $config["Error"]["Description"] = '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">You do not have any <b>Private Cloud servers</b>. Please create it before continue.</span></p>';
+             foreach ($config as $key => $value) {
+              if($key != 'Username' && $key != 'Password' && $key != 'Error') {
+                  unset($config[$key]);
+              }
+          }
+          $lError = TRUE;
+        }
+
+        if (!$lError) {
+            foreach($items as $item)
+            {
+                $product->defaultConfig['Parent']['options'][$item['uniq_id']] = $item['domain'];
+                $product->defaultConfig['AvailableParents']['options'][$item['uniq_id']] = $item['domain'];
+            }
+
+            $config['Parent Server']['Options'] = $product->defaultConfig['Parent']['options'];
+            $config['Available Parents']['Options'] = $product->defaultConfig['AvailableParents']['options'];
+
+
+            if (($_GET['action'] != 'save') && !$lError) {
+                foreach ($config as $key => $value) {
+                    if($key == 'Error') {
+                        unset($config[$key]);
+                    }
+                }
+            }
+        }
     }
 
-    if(!$items && $_GET['action'] != 'save')
-    {
-        $product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
-        echo $product->renderConfigOptions();
-        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">You do not have any <b>Private Cloud servers</b>. Please create it before continue.</span></p>';
-        return array();
-    }
-
-    foreach($items as $item)
-    {
-        $product->defaultConfig['Parent']['options'][$item['uniq_id']] = $item['domain'];
-        $product->defaultConfig['AvailableParents']['options'][$item['uniq_id']] = $item['domain'];
-    }
-
-    if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php' && $_GET['action'] != 'save')
-    {
-        echo '<script type="text/javascript">
-                jQuery(function(){
-                    jQuery(".load-configuration").click(function(event){
-                        event.preventDefault();
-                        if($("#conf-dialog").is(":data(dialog)"))
-                        {
-                            $("#conf-dialog").dialog("destroy");
-                        }
-                        $("#conf-dialog").attr("title", $(this).html());
-                        $("#conf-dialog").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWebPrivateParent/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>");
-                        $("#conf-dialog").dialog({minWidth: 650});
-
-                        val = $(this).parent().find("input").val();
-                        jQuery.post("configproducts.php?action=edit&id='.$_REQUEST['id'].'&conf_id="+val,jQuery(this).attr("href"), function(data){
-                            $("#conf-dialog").html(data);
-                        });
-                    });
-                });
-              </script>
-              <div id="conf-dialog" style="display:none;" title="">
-              </div>';
-    }
-
-    $newVersion = LiquidWebPrivateParent_getLatestVersion();
-    if($newVersion && $_GET['action'] != 'save')
-    {
-        echo '<p style="text-align: center;" class="infobox op_version">
-            <span style="font-weight: bold">New version of Liquid Web Private Cloud module is available!</span>
-            <span style="font-weight: bold"><br />Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span>
-         </p>';
-    }
-    if($_GET['action'] != 'save') {
-        echo $product->renderConfigOptions();
-    }
-
-    $templates   = LiquidWebPrivateParent_loadTemplates();
-	$xmlTemplate = $product->xmlTemplateConfigs;
-
-	$jsTplParams = array(
-		'templates' => array(
-			'templates_info' => $xmlTemplate,
-			'templates'		 => $templates,
-		)
-	);
-    if($_GET['action'] != 'save') {
-        echo "<script type='text/javascript'>".LiquidWebPrivateParent_loadAsset('js/ProductConfigure.tpl.js', $jsTplParams)."</script>";
-    }
-
-    return array();
+    return $config;
 }
+
 
 function LiquidWebPrivateParent_CreateAccount($params)
 {
@@ -585,41 +429,41 @@ function LiquidWebPrivateParent_CreateAccount($params)
     $diskspace          =   LiquidWebPrivateParent_getOption('Diskspace', $params);
     $vcpu               =   LiquidWebPrivateParent_getOption('VCPU', $params);
 
-	if(isset($params['customfields']['Clone From Server']) && $params['customfields']['Clone From Server']){
+    if(isset($params['customfields']['Clone From Server']) && $params['customfields']['Clone From Server']){
 
-		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-   		$allHosting = StormOnDemand_Helper::getAllLiquidWebUniqIds($params['clientsdetails']['userid']);
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+        $allHosting = StormOnDemand_Helper::getAllLiquidWebUniqIds($params['clientsdetails']['userid']);
 
-		if(empty($allHosting)){
-			return "Wrong uniq_id to clone";
-		}
+        if(empty($allHosting)){
+            return "Wrong uniq_id to clone";
+        }
 
-		$fme = false;
-		foreach($allHosting as $cUniq){
-			if(strcmp($cUniq, $params['customfields']['Clone From Server']) === 0){
-				$fme = true;
-				break;
-			}
-		}
+        $fme = false;
+        foreach($allHosting as $cUniq){
+            if(strcmp($cUniq, $params['customfields']['Clone From Server']) === 0){
+                $fme = true;
+                break;
+            }
+        }
 
-		if(!$fme){
-			return "Wrong uniq_id to clone";
-		}
+        if(!$fme){
+            return "Wrong uniq_id to clone";
+        }
 
-	    //load server class
-		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	    $server = new StormOnDemandStormServer($username, $password);
+        //load server class
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+        $server = new StormOnDemandStormServer($username, $password);
 
-		$ret = $server->cloneServer($params['customfields']['Clone From Server'],$hostname,$params['password'], $parent);
+        $ret = $server->cloneServer($params['customfields']['Clone From Server'],$hostname,$params['password'], $parent);
 
-	    //has error?
-	    if($error = $server->getError()){
-	        return $error;
-	    }
+        //has error?
+        if($error = $server->getError()){
+            return $error;
+        }
 
-		$txt = StormOnDemand_Helper::addUniqIdToCustomFields($params['serviceid'],$ret['uniq_id']);
-		return "success";
-	}
+        $txt = StormOnDemand_Helper::addUniqIdToCustomFields($params['serviceid'],$ret['uniq_id']);
+        return "success";
+    }
 
     if($auto_parent && $selected_parents)
     {
@@ -817,7 +661,7 @@ function LiquidWebPrivateParent_ClientAreaCustomButtonArray()
                 {
                     $params['configoptions'][$optionname] = $row['optname'];
                 }
-            break;
+                break;
 
             case 3:
             case 4:
@@ -913,12 +757,12 @@ function LiquidWebPrivateParent_clientReboot($params)
                 $vars['info'] = 'Rebooting machine';
                 header("Location: clientarea.php?action=productdetails&id=".$params['serviceid']."&success=".$vars['info']);
             }
-        break;
+            break;
     }
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
     $vars['custom_template'] = $customConfig['custom_template'];
     $vars['storm_links']    =  LiquidWebPrivateParent_ClientAreaCustomButtonArray();
@@ -990,12 +834,12 @@ function LiquidWebPrivateParent_ClientShutdown($params)
                 $vars['info'] = 'Shutting down machine';
                 header("Location: clientarea.php?action=productdetails&id=".$params['serviceid']."&success=".$vars['info']);
             }
-        break;
+            break;
     }
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
     $vars['custom_template'] = $customConfig['custom_template'];
     $vars['storm_links'] =  LiquidWebPrivateParent_ClientAreaCustomButtonArray();
@@ -1071,12 +915,12 @@ function LiquidWebPrivateParent_ClientStart($params)
                 $vars['info'] = 'Starting machine';
                 header("Location: clientarea.php?action=productdetails&id=".$params['serviceid']."&success=".$vars['info']);
             }
-        break;
+            break;
     }
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
     $vars['custom_template'] = $customConfig['custom_template'];
     $vars['subpage'] = dirname(__FILE__).DS.'clientarea'.DS.'start.tpl';
@@ -1169,9 +1013,9 @@ function LiquidWebPrivateParent_ChangePackage($params)
     $firewall = new StormOnDemandNetworkFirewall($username, $password, 'bleed');
 
     if($Firewall == '0'){
-      $firewall->update($uniq_id);
+        $firewall->update($uniq_id);
     }else{
-      $firewall->update($uniq_id,'basic',array());
+        $firewall->update($uniq_id,'basic',array());
     }
 
 
@@ -1219,7 +1063,7 @@ function LiquidWebPrivateParent_ClientArea($params)
     $row2 = mysql_fetch_assoc($q2);
 
     if($monitoring == null){
-      $monitoring = $row2['configoption14'];
+        $monitoring = $row2['configoption14'];
     }
 
     if(isset($_REQUEST['stormajax']))
@@ -1234,7 +1078,7 @@ function LiquidWebPrivateParent_ClientArea($params)
                     return;
                 }
                 echo $status['status'];
-            break;
+                break;
 
             case 'bandwidth_graph':
                 require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandMonitoringBandwidth.php';
@@ -1243,7 +1087,7 @@ function LiquidWebPrivateParent_ClientArea($params)
                 $graph = $bandwidth->graph($uniq_id, $width = 510, $height = 100, $_REQUEST['frequency'], 1);
                 header('Content-type: '.$graph['content_type']);
                 echo base64_decode($graph['content']);
-            break;
+                break;
 
             case 'bandwidth_stats':
                 require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandMonitoringBandwidth.php';
@@ -1254,7 +1098,7 @@ function LiquidWebPrivateParent_ClientArea($params)
                 $smarty->assign('stats', $stats);
                 $tpl = $smarty->fetch(dirname(__FILE__).DS.'clientarea'.DS.'subviews'.DS.'bandwidth.tpl');
                 echo $tpl;
-            break;
+                break;
 
             case 'load_graph':
                 require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandMonitoringLoad.php';
@@ -1263,7 +1107,7 @@ function LiquidWebPrivateParent_ClientArea($params)
                 $graph = $load->graph($uniq_id, $width = 510, $height = 100, $_REQUEST['stat'] = 'load5', $_REQUEST['duration'], 1);
                 header('Content-type: '.$graph['content_type']);
                 echo base64_decode($graph['content']);
-            break;
+                break;
 
             case 'load_stats':
                 require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandMonitoringLoad.php';
@@ -1275,7 +1119,7 @@ function LiquidWebPrivateParent_ClientArea($params)
                 $smarty->assign('stats', $stats);
                 $tpl = $smarty->fetch(dirname(__FILE__).DS.'clientarea'.DS.'subviews'.DS.'load.tpl');
                 echo $tpl;
-            break;
+                break;
 
             case 'history':
                 $history = $server->history($uniq_id, 5, 1);
@@ -1284,7 +1128,7 @@ function LiquidWebPrivateParent_ClientArea($params)
                 $smarty->assign('params', $params);
                 $tpl = $smarty->fetch(dirname(__FILE__).DS.'clientarea'.DS.'subviews'.DS.'history.tpl');
                 echo $tpl;
-            break;
+                break;
         }
         die();
     }
@@ -1524,7 +1368,7 @@ function LiquidWebPrivateParent_AdminServicesTabFields($params)
             foreach($items as $item)
             {
                 if($item['deprecated'] == 1)
-                    continue;
+                continue;
 
                 echo '<tr>
                         <td>'.$item['description'].'</td>
@@ -1817,71 +1661,71 @@ function LiquidWebPrivateParent_IPManagement($params)
         switch($_REQUEST['modaction'])
         {
             case 'add':
-                    if((int)$_REQUEST['ip_amount'] <= 0)
+                if((int)$_REQUEST['ip_amount'] <= 0)
+                {
+                    $vars['error'] = "Invalid amount";
+                    break;
+                }
+
+                if($ipcount)
+                {
+                    $ret = $ipmanagement->lists($uniq_id);
+                    $ips = count($ret['items']);
+                    if($ips + $_REQUEST['ip_amount'] > $ipcount)
                     {
-                        $vars['error'] = "Invalid amount";
+                        $vars['error'] = "Too many IP's. Cannon add more";
                         break;
                     }
+                }
 
-                    if($ipcount)
-                    {
-                        $ret = $ipmanagement->lists($uniq_id);
-                        $ips = count($ret['items']);
-                        if($ips + $_REQUEST['ip_amount'] > $ipcount)
-                        {
-                            $vars['error'] = "Too many IP's. Cannon add more";
-                            break;
-                        }
-                    }
-
-                    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-                    $server = new StormOnDemandStormServer($username, $password, 'bleed');
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+                $server = new StormOnDemandStormServer($username, $password, 'bleed');
 
 
-                    $status = $server->status($uniq_id);
-                    if($status['running'][0]['status'] == 'Adding IPs')
-                    {
-                        $vars['error'] = 'Adding new IP in progress. Cannot add more';
-                        break;
-                    }
+                $status = $server->status($uniq_id);
+                if($status['running'][0]['status'] == 'Adding IPs')
+                {
+                    $vars['error'] = 'Adding new IP in progress. Cannot add more';
+                    break;
+                }
 
-                    $ipmanagement->add($uniq_id, $_REQUEST['ip_amount']);
-                    if($error = $ipmanagement->getError())
-                    {
-                        $vars['error'] = $error;
-                    }
-                    else
-                    {
-                        $vars['info'] = 'Adding new IP in progress';
-                    }
+                $ipmanagement->add($uniq_id, $_REQUEST['ip_amount']);
+                if($error = $ipmanagement->getError())
+                {
+                    $vars['error'] = $error;
+                }
+                else
+                {
+                    $vars['info'] = 'Adding new IP in progress';
+                }
                 break;
 
             case 'remove':
-                    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-                    $server = new StormOnDemandStormServer($username, $password, 'bleed');
-                    $status = $server->status($uniq_id);
-                    if($status['running'][0]['status'] == 'Removing IP')
-                    {
-                        $vars['error'] = 'Deleting IP in progress. Cannot delete now';
-                        break;
-                    }
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+                $server = new StormOnDemandStormServer($username, $password, 'bleed');
+                $status = $server->status($uniq_id);
+                if($status['running'][0]['status'] == 'Removing IP')
+                {
+                    $vars['error'] = 'Deleting IP in progress. Cannot delete now';
+                    break;
+                }
 
-                    $ipmanagement->remove($uniq_id, $_REQUEST['ip']);
-                    if($error = $ipmanagement->getError())
-                    {
-                        $vars['error'] = $error;
-                    }
-                    else
-                    {
-                        $vars['info'] = 'Deleting IP in progress.';
-                    }
+                $ipmanagement->remove($uniq_id, $_REQUEST['ip']);
+                if($error = $ipmanagement->getError())
+                {
+                    $vars['error'] = $error;
+                }
+                else
+                {
+                    $vars['info'] = 'Deleting IP in progress.';
+                }
                 break;
         }
     }
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
     $vars['custom_template'] = $customConfig['custom_template'];
 
@@ -1926,22 +1770,22 @@ function LiquidWebPrivateParent_Backups($params)
         switch($_REQUEST['modaction'])
         {
             case 'restore':
-                    $backup->restore($uniq_id, $_REQUEST['backup_id']);
-                    if($error = $backup->getError())
-                    {
-                        $vars['error'] = $error;
-                    }
-                    else
-                    {
-                        $vars['info'] = 'IP';
-                    }
+                $backup->restore($uniq_id, $_REQUEST['backup_id']);
+                if($error = $backup->getError())
+                {
+                    $vars['error'] = $error;
+                }
+                else
+                {
+                    $vars['info'] = 'IP';
+                }
                 break;
         }
     }
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
     $vars['custom_template'] = $customConfig['custom_template'];
 
@@ -1998,46 +1842,46 @@ function LiquidWebPrivateParent_Restore($params)
     require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
     $image = new StormOnDemandStormImage($username, $password, 'bleed');
 
-	// Get all user uniq_id
+    // Get all user uniq_id
     require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$rAllUniqsId  = StormOnDemand_Helper::getAllLiquidWebUniqIds($params['clientsdetails']['userid']);
+    $rAllUniqsId  = StormOnDemand_Helper::getAllLiquidWebUniqIds($params['clientsdetails']['userid']);
 
     $page = 1;
     $images = array();
     $ret = $image->lists(20, $page);
-	if(isset($ret['items']) && !empty($ret['items'])){
-		foreach($ret['items'] as $item){
-			if(in_array($item['source_uniq_id'], $rAllUniqsId) !== false){
-				$images []= $item;
-			}
-		}
-	}
+    if(isset($ret['items']) && !empty($ret['items'])){
+        foreach($ret['items'] as $item){
+            if(in_array($item['source_uniq_id'], $rAllUniqsId) !== false){
+                $images []= $item;
+            }
+        }
+    }
 
     while(isset($ret['page_num']) && $ret['page_num'] < $ret['page_total'])
     {
         $ret = $image->lists(20, ++$page);
-		if(!empty($ret['items'])){
-			foreach($ret['items'] as $item){
-				if(in_array($item['source_uniq_id'], $rAllUniqsId) !== false){
-					$images []= $item;
-				}
-			}
-		}
+        if(!empty($ret['items'])){
+            foreach($ret['items'] as $item){
+                if(in_array($item['source_uniq_id'], $rAllUniqsId) !== false){
+                    $images []= $item;
+                }
+            }
+        }
     }
     $vars['images'] = $images;
 
-	//Servers
+    //Servers
     require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
     $apiServer = new StormOnDemandStormServer($username, $password);
 
-	$vars['servers'] 		= StormOnDemand_Helper::getAllLiquidWebHosting($params['clientsdetails']['userid']);
-	if(!empty($vars['servers'])){
-		foreach($vars['servers'] as $k=> $server){
-			if(strcmp($uniq_id, $server['uniq_id']) === 0){
-				unset($vars['servers'][$k]);
-			}
-		}
-	}
+    $vars['servers'] 		= StormOnDemand_Helper::getAllLiquidWebHosting($params['clientsdetails']['userid']);
+    if(!empty($vars['servers'])){
+        foreach($vars['servers'] as $k=> $server){
+            if(strcmp($uniq_id, $server['uniq_id']) === 0){
+                unset($vars['servers'][$k]);
+            }
+        }
+    }
 
     //update
     if(isset($_POST['modaction']))
@@ -2072,67 +1916,67 @@ function LiquidWebPrivateParent_Restore($params)
                         }
                         break;
 
-					case 'server':
+                    case 'server':
 
-						if(!isset($_REQUEST['server_id']) || !preg_match('/^[a-zA-Z0-9]{1,}$/D', $_REQUEST['server_id'])){
-							$vars['error'] = "Please select server id";
-						}
+                        if(!isset($_REQUEST['server_id']) || !preg_match('/^[a-zA-Z0-9]{1,}$/D', $_REQUEST['server_id'])){
+                            $vars['error'] = "Please select server id";
+                        }
 
-					    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-						$rAllUniqsId  = StormOnDemand_Helper::getAllLiquidWebUniqIds($params['clientsdetails']['userid']);
+                        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+                        $rAllUniqsId  = StormOnDemand_Helper::getAllLiquidWebUniqIds($params['clientsdetails']['userid']);
 
-						if(empty($rAllUniqsId)){
-							$vars['error'] = "Wrong uniq_id";
-						}
+                        if(empty($rAllUniqsId)){
+                            $vars['error'] = "Wrong uniq_id";
+                        }
 
-						$ckeck = false;
-						foreach($rAllUniqsId as $uniq){
-							if(strcmp($uniq, $_REQUEST['server_id']) === 0 && strcmp($uniq_id, $_REQUEST['server_id']) !== 0){
-								$check = true;
-								break;
-							}
-						}
+                        $ckeck = false;
+                        foreach($rAllUniqsId as $uniq){
+                            if(strcmp($uniq, $_REQUEST['server_id']) === 0 && strcmp($uniq_id, $_REQUEST['server_id']) !== 0){
+                                $check = true;
+                                break;
+                            }
+                        }
 
-						if(!$check){
-							$vars['error'] =  "Wrong uniq_id";
-						}
+                        if(!$check){
+                            $vars['error'] =  "Wrong uniq_id";
+                        }
 
-						$apiServer->update($uniq_id, array(
+                        $apiServer->update($uniq_id, array(
 							'domain' => 'whmcsdel-'.$params['domain']
-						));
+                        ));
 
                         if($error = $apiServer->getError()){
-                        	$vars['error'] =  'Cannot restore: '.$error;
+                            $vars['error'] =  'Cannot restore: '.$error;
                         }else{
-	                        $parent = StormOnDemandPrivateParent_getOption('Parent', $params);
-							$result = $apiServer->cloneServer($_REQUEST['server_id'],$params['domain'],$params['password'],$parent);
+                            $parent = StormOnDemandPrivateParent_getOption('Parent', $params);
+                            $result = $apiServer->cloneServer($_REQUEST['server_id'],$params['domain'],$params['password'],$parent);
 
-	                        if($error = $apiServer->getError()){
-	                        	$vars['error'] =  $error;
-								$apiServer->update($uniq_id, array(
+                            if($error = $apiServer->getError()){
+                                $vars['error'] =  $error;
+                                $apiServer->update($uniq_id, array(
 									'domain' => $params['domain']
-								));
-							}else{
-								StormOnDemand_Helper::addUniqIdToCustomFields($params['serviceid'], $result['uniq_id']);
+                                ));
+                            }else{
+                                StormOnDemand_Helper::addUniqIdToCustomFields($params['serviceid'], $result['uniq_id']);
 
-								$apiServer->destroy($uniq_id);
-		                        if($error = $apiServer->getError()){
-		                        	$vars['error'] =  $error;
-								}else{
-		                        	$vars['info'] = 'Restoring from server. Please wait';
-								}
-							}
+                                $apiServer->destroy($uniq_id);
+                                if($error = $apiServer->getError()){
+                                    $vars['error'] =  $error;
+                                }else{
+                                    $vars['info'] = 'Restoring from server. Please wait';
+                                }
+                            }
                         }
-						break;
+                        break;
                 }
                 break;
         }
     }
 
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
     $vars['custom_template'] = $customConfig['custom_template'];
     $vars['storm_links']    =  LiquidWebPrivateParent_ClientAreaCustomButtonArray();
@@ -2164,9 +2008,9 @@ function LiquidWebPrivateParent_History($params)
     $server = new StormOnDemandStormServer($username, $password, 'bleed');
 
     if(isset($_REQUEST['page']))
-        $page = $_REQUEST['page'];
+    $page = $_REQUEST['page'];
     else
-        $page = 1;
+    $page = 1;
 
     $ret = $server->history($uniq_id, 20, $page);
 
@@ -2176,9 +2020,9 @@ function LiquidWebPrivateParent_History($params)
     $vars['page_total'] = $ret['page_total'];
 
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
     $vars['custom_template'] = $customConfig['custom_template'];
     $vars['storm_links']    =  LiquidWebPrivateParent_ClientAreaCustomButtonArray();
@@ -2196,162 +2040,162 @@ function LiquidWebPrivateParent_History($params)
 
 function LiquidWebPrivateParent_BlockStorage($params){
 
-	$vars		=   array(); //vars for template
+    $vars		=   array(); //vars for template
     $username   =   LiquidWebPrivateParent_getOption('Username', $params);
     $password   =   LiquidWebPrivateParent_getOption('Password', $params);
 
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandConnection.php';
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Storage.php';
-  require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandConnection.php';
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Storage.php';
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
 
-	$storageService = new StormOnDemand_Storage($username,$password);
+    $storageService = new StormOnDemand_Storage($username,$password);
 
-	$user_id = null;
-	try{
-		$user_id = $params['clientsdetails']['userid'];
-		if(!$user_id){
-			throw new Exception;
-		}
-	}catch(Exception $e){
-		return "User identificator doesn\'t exists";
-	}
+    $user_id = null;
+    try{
+        $user_id = $params['clientsdetails']['userid'];
+        if(!$user_id){
+            throw new Exception;
+        }
+    }catch(Exception $e){
+        return "User identificator doesn\'t exists";
+    }
 
-	$hosting_id = null;
-	try{
-		$hosting_id = (int) $params['serviceid'];
-		if(!$hosting_id){
-			throw new Exception;
-		}
-	}catch(Exception $e){
-		return 'Hosting identificator is empty';
-	}
+    $hosting_id = null;
+    try{
+        $hosting_id = (int) $params['serviceid'];
+        if(!$hosting_id){
+            throw new Exception;
+        }
+    }catch(Exception $e){
+        return 'Hosting identificator is empty';
+    }
 
-	if(LiquidWebPrivateParent_validateArray($_GET, array(
-		array(
+    if(LiquidWebPrivateParent_validateArray($_GET, array(
+    array(
 			'field' => 'ajaxaction',
 			'preg'	=> '/^[a-z]{1,10}$/D',
-		),
-		array(
+    ),
+    array(
 			'field' => 'uid',
 			'preg'	=> '/^[a-zA-Z0-9]{1,10}$/D',
-		),
-		array(
+    ),
+    array(
 			'field' => 'id',
 			'preg'  => '/^[0-9]{1,}$/D',
-		),
-	))){
+    ),
+    ))){
 
-		$response = array(
+        $response = array(
 			'type' => 'success',
 			'data' => array(),
-		);
+        );
 
-		$userSBSProductQuery = ModuleInformationClient::mysql_safequery('SELECT  hosting.id AS hosting_id,hosting.orderid as hosting_order_id, hosting.domain as hosting_domain,customvalues.value AS custom_uniq_id, hosting.domain as hosting_domain
+        $userSBSProductQuery = ModuleInformationClient::mysql_safequery('SELECT  hosting.id AS hosting_id,hosting.orderid as hosting_order_id, hosting.domain as hosting_domain,customvalues.value AS custom_uniq_id, hosting.domain as hosting_domain
 																		 FROM tblhosting AS hosting
 																		 JOIN tblcustomfields AS customfields 		ON 	hosting.packageid 	= customfields.relid
 																		 JOIN tblcustomfieldsvalues as customvalues ON 	customfields.id 	= customvalues.fieldid
 																		 											AND hosting.id  		= customvalues.relid
 																		 WHERE hosting.userid = ? AND (customfields.fieldname = "uniq_id" OR customfields.fieldname = "uniq_id|Uniq ID") AND customvalues.value = ? LIMIT 1', array(
-			 $user_id,
-			 $_GET['uid'],
-		));
-		$userSBSProduct = mysql_fetch_assoc($userSBSProductQuery);
-		if(!$userSBSProduct){
-			 $response['type'] = 'error';
-		 	 $response['data'] = array(
+        $user_id,
+        $_GET['uid'],
+        ));
+        $userSBSProduct = mysql_fetch_assoc($userSBSProductQuery);
+        if(!$userSBSProduct){
+            $response['type'] = 'error';
+            $response['data'] = array(
 				   	'error' => 'Wrong uniq_id',
-			);
-		}
+            );
+        }
 
-		$soadUserProduct = array();
-		$hostings = StormOnDemand_Helper::getAllLiquidWebHosting($user_id);
-		if(!empty($hostings)){
-			foreach($hostings as $hosting){
-				if($hosting['hosting_id'] === $hosting_id){
-					$soadUserProduct = $hosting;
-				}
-			}
-		}else{
-			return 'Hosting uniq_key doesn\'t exists';
-		}
+        $soadUserProduct = array();
+        $hostings = StormOnDemand_Helper::getAllLiquidWebHosting($user_id);
+        if(!empty($hostings)){
+            foreach($hostings as $hosting){
+                if($hosting['hosting_id'] === $hosting_id){
+                    $soadUserProduct = $hosting;
+                }
+            }
+        }else{
+            return 'Hosting uniq_key doesn\'t exists';
+        }
 
-		if(strcmp($_GET['ajaxaction'], 'attach') === 0){
+        if(strcmp($_GET['ajaxaction'], 'attach') === 0){
 
-			if($soadUserProduct){
-				$apiRet = $storageService->attach($soadUserProduct['uniq_id'], $_GET['uid']);
-	            if($error = $storageService->getError()){
-				   $response['type'] = 'error';
-				   $response['data'] = array(
+            if($soadUserProduct){
+                $apiRet = $storageService->attach($soadUserProduct['uniq_id'], $_GET['uid']);
+                if($error = $storageService->getError()){
+                    $response['type'] = 'error';
+                    $response['data'] = array(
 				   	'error' => 'Cannot attach volume',
-				   );
-	            }else{
-				   $response['data'] = array(
+                    );
+                }else{
+                    $response['data'] = array(
 				   	'msg' => 'Volume attached',
-				   );
-	            }
-			}else{
-				   $response['type'] = 'error';
-				   $response['data'] = array(
+                    );
+                }
+            }else{
+                $response['type'] = 'error';
+                $response['data'] = array(
 				   	'error' => "Cannot find hosting",
-				   );
-			}
-		}else if(strcmp($_GET['ajaxaction'], 'detach') === 0){
-			$apiRet = $storageService->detach($soadUserProduct['uniq_id'], $_GET['uid']);
-	        if($error = $storageService->getError()){
-				   $response['type'] = 'error';
-				   $response['data'] = array(
+                );
+            }
+        }else if(strcmp($_GET['ajaxaction'], 'detach') === 0){
+            $apiRet = $storageService->detach($soadUserProduct['uniq_id'], $_GET['uid']);
+            if($error = $storageService->getError()){
+                $response['type'] = 'error';
+                $response['data'] = array(
 				   	'error' => "Cannot detach volume",
-				   );
-	        }else{
-				$response['data'] = array(
+                );
+            }else{
+                $response['data'] = array(
 				   	'msg' => 'Volume detached',
-				);
-	        }
-		}
+                );
+            }
+        }
 
 
-		ob_clean();
-		echo json_encode($response);
-		die();
-	}
+        ob_clean();
+        echo json_encode($response);
+        die();
+    }
 
 
-	//get hosting uniq_id key
-	$hostings = StormOnDemand_Helper::getAllLiquidWebHosting($user_id);
-	if(!empty($hostings)){
-		foreach($hostings as $hosting){
-			if($hosting['hosting_id'] === $hosting_id){
-				$hostingUniqKey = $hosting;
-			}
-		}
-	}else{
-		return 'Hosting uniq_key doesn\'t exists';
-	}
+    //get hosting uniq_id key
+    $hostings = StormOnDemand_Helper::getAllLiquidWebHosting($user_id);
+    if(!empty($hostings)){
+        foreach($hostings as $hosting){
+            if($hosting['hosting_id'] === $hosting_id){
+                $hostingUniqKey = $hosting;
+            }
+        }
+    }else{
+        return 'Hosting uniq_key doesn\'t exists';
+    }
 
-	if(!$hostingUniqKey){
-		return 'Hosting uniq_key doesn\'t exists';
-	}
+    if(!$hostingUniqKey){
+        return 'Hosting uniq_key doesn\'t exists';
+    }
 
-	//get all SBSModule products
-	$sbsProductsIds = array();
-	$sbsQuery       = ModuleInformationClient::mysql_safequery('SELECT id FROM tblproducts WHERE servertype = ?', array(StormOnDemand_Helper::LiquidWebSBSLiquidWebServerType));
+    //get all SBSModule products
+    $sbsProductsIds = array();
+    $sbsQuery       = ModuleInformationClient::mysql_safequery('SELECT id FROM tblproducts WHERE servertype = ?', array(StormOnDemand_Helper::LiquidWebSBSLiquidWebServerType));
 
-	$sbsProducts    = array();
+    $sbsProducts    = array();
 
-	while($row = mysql_fetch_assoc($sbsQuery)){
-		$sbsProducts []= $row;
-	}
+    while($row = mysql_fetch_assoc($sbsQuery)){
+        $sbsProducts []= $row;
+    }
 
-	if($sbsProducts){
-		foreach($sbsProducts as $val){
-			$sbsProductsIds []= $val['id'];
-		}
-	}
-  $op_pid = join(',',$sbsProductsIds);
-	//get all user SBS products with uniq_id from order
-	$sbsUserProducts 	 = array();
-	$sbsUQuery           = ModuleInformationClient::mysql_safequery('SELECT hosting.id AS hosting_id,hosting.orderid as hosting_order_id, hosting.domain as hosting_domain,customvalues.value AS uniq_id, hosting.domain as hosting_domain, productinfo.name as productinfo_name
+    if($sbsProducts){
+        foreach($sbsProducts as $val){
+            $sbsProductsIds []= $val['id'];
+        }
+    }
+    $op_pid = join(',',$sbsProductsIds);
+    //get all user SBS products with uniq_id from order
+    $sbsUserProducts 	 = array();
+    $sbsUQuery           = ModuleInformationClient::mysql_safequery('SELECT hosting.id AS hosting_id,hosting.orderid as hosting_order_id, hosting.domain as hosting_domain,customvalues.value AS uniq_id, hosting.domain as hosting_domain, productinfo.name as productinfo_name
 																	 FROM tblhosting AS hosting
 																	 JOIN tblcustomfields AS customfields ON hosting.packageid = customfields.relid
 																	 JOIN tblcustomfieldsvalues as customvalues ON 	customfields.id 	= customvalues.fieldid
@@ -2361,101 +2205,101 @@ function LiquidWebPrivateParent_BlockStorage($params){
 																	 	   AND hosting.userid = '.(int)$user_id.'
 																	 	   AND (customfields.fieldname = "uniq_id" OR customfields.fieldname = "uniq_id|Uniq ID")');
 
-	while($row = mysql_fetch_assoc($sbsUQuery)){
-		$sbsUserProducts []= $row;
-	}
+    while($row = mysql_fetch_assoc($sbsUQuery)){
+        $sbsUserProducts []= $row;
+    }
 
 
 
-	$sbsProductsDetails = array();
-	if(!empty($sbsUserProducts)){
-		foreach($sbsUserProducts as $sbs){
+    $sbsProductsDetails = array();
+    if(!empty($sbsUserProducts)){
+        foreach($sbsUserProducts as $sbs){
 
-			if(!$sbs['uniq_id']){
-				continue;
-			}
+            if(!$sbs['uniq_id']){
+                continue;
+            }
 
-			$_det = $storageService->details($sbs['uniq_id']);
+            $_det = $storageService->details($sbs['uniq_id']);
 
-			if($_det){
-				$_det['system_config'] = $sbs;
-				$sbsProductsDetails []= $_det;
-			}
-		}
-	}
+            if($_det){
+                $_det['system_config'] = $sbs;
+                $sbsProductsDetails []= $_det;
+            }
+        }
+    }
 
 
-	$avSbs = array();
-	if(!empty($sbsProductsDetails)){
-		foreach($sbsProductsDetails as $sbs){
-			if((int)$sbs['cross_attach']){
-				if(!empty($sbs['attachedTo'])){
+    $avSbs = array();
+    if(!empty($sbsProductsDetails)){
+        foreach($sbsProductsDetails as $sbs){
+            if((int)$sbs['cross_attach']){
+                if(!empty($sbs['attachedTo'])){
 
-					$assigned = false;
-					foreach($sbs['attachedTo'] as $sbsHosting){
-						if(strcmp($sbsHosting['resource'], $hostingUniqKey['uniq_id']) === 0){
-							$avSbs []= array(
+                    $assigned = false;
+                    foreach($sbs['attachedTo'] as $sbsHosting){
+                        if(strcmp($sbsHosting['resource'], $hostingUniqKey['uniq_id']) === 0){
+                            $avSbs []= array(
 								'status' => 'Assigned',
 								'is_assigned' => 1,
 								'sbs'	 => $sbs,
-							);
+                            );
 
-							$assigned = true;
-							break;
-						}
-					}
+                            $assigned = true;
+                            break;
+                        }
+                    }
 
-					if($assigned){
-						continue;
-					}else{
-						$avSbs []= array(
+                    if($assigned){
+                        continue;
+                    }else{
+                        $avSbs []= array(
 							'status' => 'Not Assigned',
 							'is_assigned' => 0,
 							'sbs'	 => $sbs,
-						);
-					}
-				}else{
-					$avSbs []= array(
+                        );
+                    }
+                }else{
+                    $avSbs []= array(
 						'status' => 'Not Assigned',
 						'is_assigned' => 0,
 						'sbs'	 => $sbs,
-					);
-				}
-			}else{
-				if(!empty($sbs['attachedTo'])){
+                    );
+                }
+            }else{
+                if(!empty($sbs['attachedTo'])){
 
-					$_hosting = array_shift($sbs['attachedTo']);
-					if(strcmp($_hosting['resource'], $hostingUniqKey['uniq_id']) === 0){
-						$sbs['attachedTo'] []= $_hosting;
-						$avSbs []= array(
+                    $_hosting = array_shift($sbs['attachedTo']);
+                    if(strcmp($_hosting['resource'], $hostingUniqKey['uniq_id']) === 0){
+                        $sbs['attachedTo'] []= $_hosting;
+                        $avSbs []= array(
 							'status' => 'Assigned',
 							'is_assigned' => 1,
 							'sbs'	 => $sbs,
-						);
-					}
+                        );
+                    }
 
-				}else{
-					$avSbs []= array(
+                }else{
+                    $avSbs []= array(
 						'status' => 'Not Assigned',
 						'is_assigned' => 0,
 						'sbs'	 => $sbs,
-					);
-				}
-			}
-		}
-	}
+                    );
+                }
+            }
+        }
+    }
 
-	//getting custom configurations
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-	$customConfig = StormOnDemand_Helper::getCustomConfigValues();
+    //getting custom configurations
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
+    $customConfig = StormOnDemand_Helper::getCustomConfigValues();
 
-	$vars['custom_template']		 = $customConfig['custom_template'];
-	$vars['sbs']		 = $avSbs;
-	$vars['subpage']	 = dirname(__FILE__).DS.'clientarea'.DS.'blockstorage.tpl';
-	$vars['request_uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-	if($aPos = strpos($vars['request_uri'], 'ajaxaction')){
-		$vars['request_uri'] = substr($vars['request_uri'],0, $aPos - 6);
-	}
+    $vars['custom_template']		 = $customConfig['custom_template'];
+    $vars['sbs']		 = $avSbs;
+    $vars['subpage']	 = dirname(__FILE__).DS.'clientarea'.DS.'blockstorage.tpl';
+    $vars['request_uri'] = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    if($aPos = strpos($vars['request_uri'], 'ajaxaction')){
+        $vars['request_uri'] = substr($vars['request_uri'],0, $aPos - 6);
+    }
     $vars['storm_links']    =  LiquidWebPrivateParent_ClientAreaCustomButtonArray();
     $vars['loadBootstrap']  =  LiquidWebPrivateParent_lookForBootstrap();
     $pagearray = array(
@@ -2463,7 +2307,7 @@ function LiquidWebPrivateParent_BlockStorage($params){
         'breadcrumb'    =>  ' > <a href="#" onclick="return false;">Block Storage</a>',
         'vars'          =>  $vars,
     );
-	return $pagearray;
+    return $pagearray;
 }
 
 
@@ -2593,61 +2437,61 @@ function LiquidWebPrivateParent_getLatestVersion()
 
 function LiquidWebPrivateParent_loadAsset($assetPath, $vars = array())
 {
-	$str = '';
-	if(file_exists(dirname(__FILE__).DS.'assets'.DS.$assetPath)){
-		$str = file_get_contents(dirname(__FILE__).DS.'assets'.DS.$assetPath);
+    $str = '';
+    if(file_exists(dirname(__FILE__).DS.'assets'.DS.$assetPath)){
+        $str = file_get_contents(dirname(__FILE__).DS.'assets'.DS.$assetPath);
 
-		if(!empty($vars)){
-			foreach($vars as $k => $v){
+        if(!empty($vars)){
+            foreach($vars as $k => $v){
 
-				if(is_array($v)){
-					$v = json_encode($v);
-				}
+                if(is_array($v)){
+                    $v = json_encode($v);
+                }
 
-				$str = str_replace('{$'.$k.'}', $v,$str);
-			}
-		}
+                $str = str_replace('{$'.$k.'}', $v,$str);
+            }
+        }
 
-	}
-	return $str;
+    }
+    return $str;
 }
 
 function LiquidWebPrivateParent_loadTemplates(){
 
-	$dirToTemplates = dirname(__FILE__).DS.'assets'.DS.'templates';
-	$templates 	    = array();
+    $dirToTemplates = dirname(__FILE__).DS.'assets'.DS.'templates';
+    $templates 	    = array();
 
-	if(is_dir($dirToTemplates)){
-	   if ($handle = opendir($dirToTemplates)) {
-		    while (false !== ($entry = readdir($handle))) {
-		        if ($entry != "." && $entry != "..") {
-					$xml = simplexml_load_file($dirToTemplates.DS.$entry);
-					$tpl = json_decode(json_encode($xml), TRUE);
+    if(is_dir($dirToTemplates)){
+        if ($handle = opendir($dirToTemplates)) {
+            while (false !== ($entry = readdir($handle))) {
+                if ($entry != "." && $entry != "..") {
+                    $xml = simplexml_load_file($dirToTemplates.DS.$entry);
+                    $tpl = json_decode(json_encode($xml), TRUE);
 
-					if(isset($tpl['visible']) && (bool)$tpl['visible'] === true){
-						$templates []= $tpl;
-					}
-		        }
-		    }
-    	    closedir($handle);
-		}
-	   return $templates;
-	}
-	return array();
+                    if(isset($tpl['visible']) && (bool)$tpl['visible'] === true){
+                        $templates []= $tpl;
+                    }
+                }
+            }
+            closedir($handle);
+        }
+        return $templates;
+    }
+    return array();
 }
 
 
 function LiquidWebPrivateParent_validateArray($array, $pregs){
 
-	foreach($pregs as $k => $v){
+    foreach($pregs as $k => $v){
 
-		if(!isset($array[$v['field']])){
-			return false;
-		}
+        if(!isset($array[$v['field']])){
+            return false;
+        }
 
-		if(!preg_match($v['preg'],$array[$v['field']])){
-			return false;
-		}
-	}
-	return true;
+        if(!preg_match($v['preg'],$array[$v['field']])){
+            return false;
+        }
+    }
+    return true;
 }

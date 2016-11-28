@@ -68,12 +68,12 @@ if(!class_exists('StormOnDemand_Product'))
                 if($ret)
                 {
                     $json['status']     =   1;
-                    $json['message']    =   'Custom Fields Generated';   
+                    $json['message']    =   'Custom Fields Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
                 }
                 else
                 {
                     $json['status']     =   0;
-                    $json['message']    =   'Custom Fields Already Generated'; 
+                    $json['message']    =   'Custom Fields Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
                 }
 
                 echo json_encode($json);
@@ -89,13 +89,13 @@ if(!class_exists('StormOnDemand_Product'))
                 if($ret)
                 {
                     $json['status']     =   1;
-                    $json['message']    =   'Configurable Options Generated';   
+                    $json['message']    =   'Configurable Options Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
                 }
                 else
                 {
                     $json['status']     =   0;
-                    $json['message']    =   'Configurable Options Already Generated'; 
-                } 
+                    $json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
+                }
 
                 echo json_encode($json);
                 die();
@@ -106,7 +106,7 @@ if(!class_exists('StormOnDemand_Product'))
          * @param type $customconfigoption
          */
         public function saveConfigOptions($customconfigoption)
-        { 
+        {
             $this->clearConfig();
 
             foreach ($customconfigoption as $k => $v)
@@ -164,7 +164,7 @@ if(!class_exists('StormOnDemand_Product'))
             }else{
                 return true;
             }
-            
+
         }
 
         /**
@@ -501,11 +501,6 @@ if(!class_exists('StormOnDemand_Product'))
                                 }
                                 $i++;
                             }
-
-                            /*echo '<pre>';
-                            echo '<pre>';
-                            print_r($groups);
-                            die(print_r($options));*/
 
                             $countFields = 0;
                             foreach ($options as $k => $option)

@@ -383,7 +383,7 @@ class StormBilling
         }
 
         //From Version 2.0.0
-        if($version < 201)
+        if($version < 120)
         {
             mysql_safequery("ALTER TABLE `StormBilling_updates` ADD COLUMN `rel_id` VARCHAR(128) DEFAULT '0'");
             mysql_safequery("ALTER TABLE `StormBilling_updates` DROP INDEX hosting_id");
@@ -391,18 +391,18 @@ class StormBilling
             mysql_safequery("ALTER TABLE `StormBilling_updates` ADD INDEX `rel_id`(`rel_id`)");
         }
 
-        if($version < 205)
+        if($version < 120)
         {
             $this->installSubmodules();
             $this->upgradeSubmodules();
         }
 
-        if($version < 206)
+        if($version < 120)
         {
             mysql_safequery("ALTER TABLE `StormBilling_autosuspend` ADD COLUMN `email_sent` DATETIME");
         }
 
-        if($version < 240)
+        if($version < 121)
         {
             mysql_safequery("CREATE TABLE `StormBilling_customconfig` (
         						`id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -474,6 +474,33 @@ class StormBilling
                              )
                              ENGINE=InnoDB;");
         }
+        if($version < 122)
+        {
+            $rows = mysql_get_array("SELECT product_id, setting, value FROM mg_LiquidWebPrivateParentProduct WHERE product_id in (SELECT id FROM tblproducts where servertype='LiquidWebPrivateParent')");
+            foreach($rows  as $set) {
+                $settings[$set['product_id']][$set['setting']] = $set['value'];
+            }
+
+            foreach($settings  as $id=>$data) {
+                 $qry = "UPDATE tblproducts SET ";
+                    $qry .= " configoption5='".$data['Parent']."'";
+                    $qry .= ", configoption6='".$data['AvailableParents']."'";
+                    $qry .= ", configoption8='".$data['Template']."'";
+				    $qry .= ", configoption10='".$data['Memory']."'";
+					$qry .= ", configoption11='".$data['Diskspace']."'";
+					$qry .= ", configoption12='".$data['VCPU']."'";
+					$qry .= ", configoption13='".$data['Backup Plan']."'";
+					$qry .= ", configoption14='".$data['Backup Quota']."'";
+					$qry .= ", configoption17='".$data['Maximum Number of IPs']."'";
+					$qry .= ", configoption18='".$data['Bandwidth Quota']."'";
+					$qry .= ", configoption19='".($data['Monitoring'] == '1' ? 'on' : '')."'";
+					$qry .= ", configoption20='".($data['Firewall'] == '1' ? 'on' : '')."'";
+					$qry .= ", configoption21='".($data['IPs Management'] == '1' ? 'on' : '')."'";
+                    $qry .= " WHERE id=".$id;
+                mysql_safequery($qry);
+            }
+        }
+
 
         /**
          * @warning This function will add or REMOVE columns from database.

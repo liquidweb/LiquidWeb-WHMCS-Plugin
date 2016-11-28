@@ -282,6 +282,19 @@ if(!class_exists('StormOnDemand_Helper'))
             $qry .= ", servertype='" . self::LiquidWebPPLiquidWebServerType."'";
 		    $qry .= ", configoption1='".$_SESSION['api_username']."'";
 		    $qry .= ", configoption2='".$_SESSION['api_password']."'";
+            $qry .= ", configoption5='".$data['Parent']."'";
+            $qry .= ", configoption8='".$data['Template']."'";
+            $qry .= ", configoption10='".$data['Memory']."'";
+            $qry .= ", configoption11='".$data['Diskspace']."'";
+            $qry .= ", configoption12='".$data['VCPU']."'";
+            $qry .= ", configoption13='".$data['Backup Plan']."'";
+            $qry .= ", configoption14='".$data['Backup Quota']."'";
+            $qry .= ", configoption16='1'";
+            $qry .= ", configoption17='".$data['Maximum Number of IPs']."'";
+            $qry .= ", configoption18='".$data['Bandwidth Quota']."'";
+            $qry .= ", configoption19='".($data['Monitoring'] == '1' ? 'on' : '')."'";
+            $qry .= ", configoption20='".($data['Firewall'] == '1' ? 'on' : '')."'";
+            $qry .= ", configoption21='".($data['IPs Management'] == '1' ? 'on' : '')."'";
 
             mysql_safequery($qry);
 		    $last_record_id = mysql_insert_id();

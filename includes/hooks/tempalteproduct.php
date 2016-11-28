@@ -95,7 +95,7 @@ function TemplateProduct_ProductEdit($params)
       $i=0;
       foreach($confoptionsarraylower as $kay => $value){
         $i++;
-        $value['name'] = 'packageconfigoption['.$i.']';
+        //$value['name'] = 'packageconfigoption['.$i.']';
         $confoptionsarraylower[$kay] = $value;
       }  
 
