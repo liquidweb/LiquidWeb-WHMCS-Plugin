@@ -35,10 +35,7 @@ if(!class_exists('ModuleInformationClient'))
         );
 
         //Server Location
-        //protected $url          =   'https://www.modulesgarden.com/manage/modules/addons/ModuleInformation/server.php';
-        protected $url          =   'https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php';
-        //protected $url          =   'https://api.github.com/repos/santhoshbsuvarna/test1/releases/latest';
-
+        protected $url          =   'https://whmcspluginstats.liquidweb.com:443/liquidwebwhmcsplugin/Webservice.php';
 
         //This name will be send to modulesgarden.com
         protected $module       =   '';
