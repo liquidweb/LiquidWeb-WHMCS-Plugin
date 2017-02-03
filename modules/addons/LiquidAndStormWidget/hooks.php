@@ -158,19 +158,19 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
     ob_start();
 
     $table = '<table width="100%" bgcolor="#cccccc" cellspacing="1" align="center"><tbody><tr bgcolor="#efefef" style="text-align:center;font-weight:bold;"><td>Product Name</td><td>Config ID</td><td>Available Zone</td></tr>';
-
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
     //load server class
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormServer.php';
+    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormServer.php';
 
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandNetworkZone.php';
 
     //load server helper class
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
+    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
 
     //Load API Class
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'class.ModuleInformationClient.php';
+    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'class.ModuleInformationClient.php';
 
+/*
     $query_mg_storm_on_demand_products = mysql_get_array("SELECT mg_storm_on_demand.hosting_id , mg_storm_on_demand.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id,tblproducts.name FROM mg_storm_on_demand
                                               LEFT JOIN tblhosting ON  mg_storm_on_demand.hosting_id = tblhosting.id
                                               LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
@@ -184,60 +184,73 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
                                               ORDER BY tblproducts.name;
                                              "
                                             );
+*/
+    $query_mg_storm_on_demand_products = mysql_get_array("tblproducts.configoption1, tblproducts.configoption2, tblproducts.configoption7, mg_storm_on_demand.hosting_id , mg_storm_on_demand.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id,tblproducts.name FROM mg_storm_on_demand
+                                              LEFT JOIN tblhosting ON  mg_storm_on_demand.hosting_id = tblhosting.id
+                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
+                                              WHERE domainstatus = 'Active';
+                                             "
+                                            );
+
+    $query_liquid_products = mysql_get_array("SELECT tblproducts.configoption1, tblproducts.configoption2, tblproducts.configoption7, mg_liquid_web.hosting_id , mg_liquid_web.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id,tblproducts.name FROM mg_liquid_web
+                                              LEFT JOIN tblhosting ON  mg_liquid_web.hosting_id = tblhosting.id
+                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
+                                              WHERE domainstatus = 'Active';
+                                             "
+                                            );
 
     $products = array_merge($query_mg_storm_on_demand_products, $query_liquid_products);
 
-    $existone = false;
-    foreach($products as $productDetails){
-      if($productDetails['domainstatus'] == 'Active'){
-        $existone = true;
-        $table .= '<tr bgcolor="#ffffff" style="text-align:center;"><td>'.$productDetails['name'].' - '.$productDetails['domain'].'</td>';
+    $get_alert = mysql_query("SELECT * FROM tbladdonmodules WHERE module = 'LiquidAndStormWidget' and setting='alert' LIMIT 1");
+    $alert = mysql_fetch_assoc($get_alert);
 
-        $q = mysql_query("SELECT * FROM tblproducts WHERE id = " . (int)$productDetails['packageid'] . " LIMIT 1");
-        $row = mysql_fetch_assoc($q);
+    if (count($products) > 0) {
+        foreach($products as $productDetails){
+          //if($productDetails['domainstatus'] == 'Active'){
+            $table .= '<tr bgcolor="#ffffff" style="text-align:center;"><td>'.$productDetails['name'].' - '.$productDetails['domain'].'</td>';
 
-        $get_alert = mysql_query("SELECT * FROM tbladdonmodules WHERE module = 'LiquidAndStormWidget' and setting='alert' LIMIT 1");
-        $alert = mysql_fetch_assoc($get_alert);
+            //$q = mysql_query("SELECT * FROM tblproducts WHERE id = " . (int)$productDetails['packageid'] . " LIMIT 1");
+            //$row = mysql_fetch_assoc($q);
 
-        $username = $row['configoption1'];
-        $password = $row['configoption2'];
-        //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
+            $username = $productDetails['configoption1'];
+            $password = $productDetails['configoption2'];
+            //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
 
-        $zoneSelected   = (int) $row['configoption4'];
-        $configSelected = (int) $row['configoption7']; // Id config
+            //$zoneSelected   = (int) $productDetails['configoption4'];
+            $configSelected = (int) $productDetails['configoption7']; // Id config
 
-        $table .= '<td>'.$configSelected.'</td>';
+            $table .= '<td>'.$configSelected.'</td>';
 
-        $config = new StormOnDemandStormConfig($username, $password);
-        $zone   = new StormOnDemandNetworkZone($username, $password);
 
-        $res = $config->ping();
+            $config = new StormOnDemandStormConfig($username, $password);
 
-        if(isset($res['ping']) && $res['ping'] != 'success')
-        {
-          $table .= '<td>Connect Error</td></tr>';
-        }else{
-            $avilablezones = $config->details($configSelected);
+            $res = $config->ping();
 
-          $avhtml ='';
-          if(count($avilablezones['zone_availability']) > 0){
-            foreach($avilablezones['zone_availability'] as $zoneid => $avilablezoneid){
-              $ret = $zone->details($zoneid);
-              $avhtml .= $ret['name'].' - '.$ret['region']['name'].'<br>';
+            if (isset($res['ping']) && $res['ping'] != 'success') {
+              $table .= '<td>Connect Error</td></tr>';
+            } else {
+                $avilablezones = $config->details($configSelected);
+
+                $avhtml ='';
+                if (count($avilablezones['zone_availability']) > 0){
+                    $zone   = new StormOnDemandNetworkZone($username, $password);
+                    foreach($avilablezones['zone_availability'] as $zoneid => $avilablezoneid){
+                        $ret = $zone->details($zoneid);
+                        $avhtml .= $ret['name'].' - '.$ret['region']['name'].'<br>';
+                    }
+                } else {
+                    $avhtml .= 'Out of stock';
+                }
+
+                if(count($avilablezones['zone_availability']) < (int)$alert['value']){
+                    $table .= '<td style="color:red;">'.$avhtml.'</td></tr>';
+                }else{
+                    $table .= '<td>'.$avhtml.'</td></tr>';
+                }
             }
-          }else{
-              $avhtml .= 'Out of stock';
-          }
-
-          if(count($avilablezones['zone_availability']) < (int)$alert['value']){
-            $table .= '<td style="color:red;">'.$avhtml.'</td></tr>';
-          }else{
-            $table .= '<td>'.$avhtml.'</td></tr>';
-          }
+          //}
         }
-      }
-    }
-    if($existone == false){
+    } else {
       $table .= '<tr bgcolor="#ffffff" style="text-align:center;"><td>No Products Exist</td></tr>';
     }
     $table .= '</tbody></table>';
@@ -297,8 +310,10 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
 
     require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormPrivateParent.php';
 
+
     $items = array();
     $content = '';
+
 
     foreach($details as $d)
     {
@@ -309,15 +324,11 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
 
         $lists = $private->lists($page, $items_per_page);
 
-        if(!$lists)
-        {
+        if (!$lists) {
             $content .= '<p style="color: red">Cannot Connect! '.$private->getError().'</p>';
-        }
-        else
-        {
+        } else {
             $items = array_merge($items, $lists['items']);
-            while($lists['item_total'] > $page * $items_per_page)
-            {
+            while($lists['item_total'] > $page * $items_per_page) {
                 $page++;
                 $lists = $private->lists($page, $items_per_page);
                 $items = array_merge($items, $lists['items']);
@@ -327,29 +338,23 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
 
     //Delete Doubled Serves
     $uniq = array();
-    foreach($items as $item)
-    {
+    foreach($items as $item) {
         $found = false;
-        foreach($uniq as $u)
-        {
-            if($item['accnt'] == $u['accnt'] && $item['uniq_id'] == $u['uniq_id'])
-            {
+        foreach($uniq as $u) {
+            if($item['accnt'] == $u['accnt'] && $item['uniq_id'] == $u['uniq_id']) {
                 $found = true;
                 break;
             }
         }
 
-        if(!$found)
-        {
+        if (!$found) {
             $uniq[] = $item;
         }
     }
 
-    if($uniq)
-    {
+    if ($uniq) {
         $content .= '<table style="width: 100%">';
-        foreach($uniq as $item)
-        {
+        foreach($uniq as $item) {
             $content .= '<tr>
                             <td><b>'.$item['domain'].'</b></td>
                             <td>'.$item['resources']['memory']['total'].' MB RAM</td>
@@ -384,9 +389,7 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
             $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
         }
         $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
-    }
-    else
-    {
+    } else {
         $content .= '<p style="text-align: center; font-weight: bold">You do not have any private servers in Storm On Demand or Liquid Web</p>
 
 
@@ -398,14 +401,16 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
                 }
                 $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
     }
+
     echo $table.'<hr />'.$content;
 
+/*
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'class.ModuleInformationClient.php';
 
-    if(file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.'moduleVersion.php')){
+    if (file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.'moduleVersion.php')) {
     require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'moduleVersion.php';
          define('STORM_SERVERS_WIDGET_VERSION', $moduleVersion);
-    }else{
+    } else {
          define('STORM_SERVERS_WIDGET_VERSION', 'Development Version');
     }
 
@@ -425,10 +430,10 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
 
 
     //Save current module version in database
-    if(isset($ret->tag_name)) {
+    if (isset($ret->tag_name)) {
         ModuleInformationClient::setLocalVersion($moduleName, $moduleVersion);
     }
-
+*/
     /*$hasModulesGardenWidget = mysql_query("SELECT a.id FROM tbladmins a
     WHERE a.id = ".(int)$_SESSION['adminid']." AND a.homewidgets LIKE '%GardenProductsWidget:true%'");
     //Check already existing modules
@@ -466,7 +471,7 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
         */
 
         //if($clientModules && !empty($clientModules))
-
+/*
         $localVersion = ModuleInformationClient::getLocalVersion('Liquid Web Storm Servers For WHMCS');
         if ($ret->tag_name > $localVersion)
         {
@@ -528,7 +533,7 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
                 $out = $out.'Goto Liquid Web Product Setup Wizard</a></div>';
 
             echo $out;
-        }
+        } */
     //}
 
     ob_end_flush();
@@ -544,7 +549,7 @@ function ZoneAvailability($vars) {
                         jQuery.post(document.location.toString(), "ZoneAvailabilityProducts=1&ajax=1", function(data){
                             $("#ZoneAvailability").html(data);
                         });
-                    }
+					}
 
                     jQuery(function(){
                         ZoneAvailability();
@@ -573,7 +578,7 @@ function LiquidAndStormWidget_hook_DailyCronJobPreEmail($vars){
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandNetworkZone.php';
 
     //load server helper class
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
+    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
 
     $outofstock      =  mysql_get_array("SELECT `name` FROM `tblproducts` WHERE `stockcontrol` = 'on' AND `qty` <= 0");
 

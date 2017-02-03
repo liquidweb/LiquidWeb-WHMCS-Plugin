@@ -85,16 +85,23 @@ if(!class_exists('StormOnDemand_Product'))
                 ob_clean();
                 $ret = $this->generateDefaultConfigurableOptions();
 
+                $q = mysql_safequery('SELECT * FROM tblproductconfiglinks WHERE pid = ?', array($_REQUEST['id']));
+                $row = mysql_fetch_assoc($q);
+
                 $json = array();
                 if($ret)
                 {
                     $json['status']     =   1;
-                    $json['message']    =   'Configurable Options Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
+                    //$json['message']    =   'Configurable Options Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
+                    $json['message']    =   'Configurable Options Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+
+
                 }
                 else
                 {
                     $json['status']     =   0;
-                    $json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
+                    //$json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
+                    $json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
                 }
 
                 echo json_encode($json);
@@ -171,93 +178,92 @@ if(!class_exists('StormOnDemand_Product'))
          * Generate Default Configurable Options
          */
         public function generateDefaultConfigurableOptions() {
-                    if ($this->hasConfigurableOptions()) {
-                            return false;
-                    }
-                    foreach ($this->defaultConfigurableOptions as $group) 
-            {
-                            //Create Group
-                            mysql_safequery('INSERT INTO tblproductconfiggroups(name,description) VALUES(?, ?)', array(
-                                    $group['title'],
-                                    $group['description']
-                            ));
-                            $group_id = mysql_insert_id();
-
-                            //Assign to product
-                            mysql_safequery('INSERT INTO tblproductconfiglinks(gid,pid) VALUES(?,?)', array($group_id, $this->id));
-
-                            foreach ($group['fields'] as $field_key => $field) {
-                                    switch ($field['type']){
-                                            case 'select': case 1: case 'dropdown':
-                                                    $field_type = 1; break;
-                                            case 'radio': case 2:
-                                                    $field_type = 2; break;
-                                            case 'yesno': case 3:
-                                                    $field_type = 3; break;
-                                            case 'quantity': case 4:
-                                                    $field_type = 4; break;
-                                            default:
-                                                    continue;
-                                    }
-
-                                    mysql_safequery('INSERT INTO tblproductconfigoptions(gid,optionname,optiontype,qtyminimum,qtymaximum,`order`,hidden) VALUES(?,?,?,?,?,0,0)', array(
-                                            $group_id,
-                                            $field_key . '|' . $field['title'],
-                                            $field_type,
-                                            isset($field['qtyminimum']) ? (int)$field['qtyminimum'] : 0,
-                                            isset($field['qtymaximum']) ? (int)$field['qtymaximum'] : 0,
-                                    ));
-
-                                    $config_id = mysql_insert_id();
-
-                                    //Insert options
-                                    foreach ($field['options'] as $option) 
-                                    {
-                                            mysql_safequery("INSERT INTO tblproductconfigoptionssub(configid,optionname,sortorder,hidden) VALUES(?,?,0,0)", array(
-                                                    $config_id,
-                                                    $option['value'] . '|' . $option['title'],
-                                                    isset($field['sortorder']) ? (int)$field['sortorder'] : 0,
-                                                    isset($field['hidden']) ? 'on' : '',
-                                            ));
-                                            $suboption_id = mysql_insert_id();
-
-                                            if (isset($field['options']['pricing']))
-                                            {
-                                                    foreach ($field['options']['pricing'] as $currency_id => $values){
-                                                            mysql_safequery('INSERT INTO `tblpricing` (`type`,`currency`,`relid`,`msetupfee`,`qsetupfee`,`ssetupfee`,`asetupfee`,`bsetupfee`,`tsetupfee`,`monthly`,`quarterly`,`semiannually`,`annually`,`biennially`,`triennially`) VALUES("configoptions",?,?,?,?,?,?,?,?,?,?,?,?,?,?)', array(
-                                                                    $currency_id,
-                                                                    $suboption_id,
-                                                                    isset($values['msetupfee'])		? (float)$values['msetupfee']	: 0,
-                                                                    isset($values['qsetupfee'])		? (float)$values['qsetupfee']	: 0,
-                                                                    isset($values['ssetupfee'])		? (float)$values['ssetupfee']	: 0,
-                                                                    isset($values['asetupfee'])		? (float)$values['asetupfee']	: 0,
-                                                                    isset($values['bsetupfee'])		? (float)$values['bsetupfee']	: 0,
-                                                                    isset($values['tsetupfee'])		? (float)$values['tsetupfee']	: 0,
-                                                                    isset($values['monthly'])		? (float)$values['monthly']		: 0,
-                                                                    isset($values['quarterly'])		? (float)$values['quarterly']	: 0,
-                                                                    isset($values['semiannually'])	? (float)$values['semiannually']: 0,
-                                                                    isset($values['annually'])		? (float)$values['annually']	: 0,
-                                                                    isset($values['biennially'])	? (float)$values['biennially']	: 0,
-                                                                    isset($values['triennially'])	? (float)$values['triennially'] : 0,
-                                                            ));
-                                                    }
-                                            }
-                                            else
-                                            {
-                                                $currencies = mysql_safequery("SELECT id FROM tblcurrencies");
-                                                while($currency = mysql_fetch_assoc($currencies))
-                                                {
-                                                    mysql_safequery("INSERT INTO `tblpricing` 
-                                                        ( `type` , `currency` , `relid` , `msetupfee` , `qsetupfee` , `ssetupfee` , `asetupfee` , `bsetupfee` , `tsetupfee` , `monthly` , `quarterly` , `semiannually` , `annually` , `biennially` , `triennially`)
-                                                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", array("configoptions", $currency['id'], $suboption_id,"0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00"));
-                                                }
-                                            } 
-                                    }
-                            }
-                    }
-
-                    return true;
+            if ($this->hasConfigurableOptions()) {
+                    return false;
             }
+
+            foreach ($this->defaultConfigurableOptions as $group) {
+                //Create Group
+
+                //$q = mysql_safequery('SELECT name FROM tblproducts WHERE id = ?', array($this->id));
+                //$row = mysql_fetch_assoc($q);
+
+                mysql_safequery('INSERT INTO tblproductconfiggroups(name,description) VALUES(?, ?)', array(
+                        $group['title'], // . ' for ' . $row['name'],
+                        $group['description']
+                ));
+                $group_id = mysql_insert_id();
+
+                //Assign to product
+                mysql_safequery('INSERT INTO tblproductconfiglinks(gid,pid) VALUES(?,?)', array($group_id, $this->id));
+
+                foreach ($group['fields'] as $field_key => $field) {
+                    switch ($field['type']){
+                        case 'select': case 1: case 'dropdown':
+                            $field_type = 1; break;
+                        case 'radio': case 2:
+                            $field_type = 2; break;
+                        case 'yesno': case 3:
+                            $field_type = 3; break;
+                        case 'quantity': case 4:
+                            $field_type = 4; break;
+                        default:
+                            continue;
+                    }
+
+                    mysql_safequery('INSERT INTO tblproductconfigoptions(gid,optionname,optiontype,qtyminimum,qtymaximum,`order`,hidden) VALUES(?,?,?,?,?,0,0)', array(
+                            $group_id,
+                            $field_key . '|' . $field['title'],
+                            $field_type,
+                            isset($field['qtyminimum']) ? (int)$field['qtyminimum'] : 0,
+                            isset($field['qtymaximum']) ? (int)$field['qtymaximum'] : 0,
+                    ));
+
+                    $config_id = mysql_insert_id();
+
+                    //Insert options
+                    foreach ($field['options'] as $option) {
+                        mysql_safequery("INSERT INTO tblproductconfigoptionssub(configid,optionname,sortorder,hidden) VALUES(?,?,0,0)", array(
+                            $config_id,
+                            $option['value'] . '|' . $option['title'],
+                            isset($field['sortorder']) ? (int)$field['sortorder'] : 0,
+                            isset($field['hidden']) ? 'on' : '',
+                        ));
+                        $suboption_id = mysql_insert_id();
+
+                        if (isset($field['options']['pricing'])) {
+                            foreach ($field['options']['pricing'] as $currency_id => $values){
+                                mysql_safequery('INSERT INTO `tblpricing` (`type`,`currency`,`relid`,`msetupfee`,`qsetupfee`,`ssetupfee`,`asetupfee`,`bsetupfee`,`tsetupfee`,`monthly`,`quarterly`,`semiannually`,`annually`,`biennially`,`triennially`) VALUES("configoptions",?,?,?,?,?,?,?,?,?,?,?,?,?,?)', array(
+                                    $currency_id,
+                                    $suboption_id,
+                                    isset($values['msetupfee'])		? (float)$values['msetupfee']	: 0,
+                                    isset($values['qsetupfee'])		? (float)$values['qsetupfee']	: 0,
+                                    isset($values['ssetupfee'])		? (float)$values['ssetupfee']	: 0,
+                                    isset($values['asetupfee'])		? (float)$values['asetupfee']	: 0,
+                                    isset($values['bsetupfee'])		? (float)$values['bsetupfee']	: 0,
+                                    isset($values['tsetupfee'])		? (float)$values['tsetupfee']	: 0,
+                                    isset($values['monthly'])		? (float)$values['monthly']		: 0,
+                                    isset($values['quarterly'])		? (float)$values['quarterly']	: 0,
+                                    isset($values['semiannually'])	? (float)$values['semiannually']: 0,
+                                    isset($values['annually'])		? (float)$values['annually']	: 0,
+                                    isset($values['biennially'])	? (float)$values['biennially']	: 0,
+                                    isset($values['triennially'])	? (float)$values['triennially'] : 0,
+                                ));
+                            }
+                        } else {
+                            $currencies = mysql_safequery("SELECT id FROM tblcurrencies");
+                            while($currency = mysql_fetch_assoc($currencies))
+                            {
+                                mysql_safequery("INSERT INTO `tblpricing`
+                                ( `type` , `currency` , `relid` , `msetupfee` , `qsetupfee` , `ssetupfee` , `asetupfee` , `bsetupfee` , `tsetupfee` , `monthly` , `quarterly` , `semiannually` , `annually` , `biennially` , `triennially`)
+                                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", array("configoptions", $currency['id'], $suboption_id,"0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00"));
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
 
         /**
          * Load Product Configuration
@@ -318,7 +324,7 @@ if(!class_exists('StormOnDemand_Product'))
         }
 
         /**
-         * 
+         *
          * @return type
          */
         public function hasAssignedServerGroup()
@@ -330,7 +336,7 @@ if(!class_exists('StormOnDemand_Product'))
 
 
         /**
-         * 
+         *
          * @return type
          */
         public function getParams()
@@ -468,7 +474,7 @@ if(!class_exists('StormOnDemand_Product'))
                                     $scripts    .=  '<script type="text/javascript">
                                                         jQuery(function(){
                                                            jQuery(".generate_custom_fields").click(function(event){
-                                                                    event.preventDefault(); 
+                                                                    event.preventDefault();
                                                                     $("#custom-dialog").attr("title", "Generating");
                                                                     $("#custom-dialog").html("<p style=\'text-align: center\'><img src=\'images/loading.gif\'></img><p>");
                                                                     $("#custom-dialog").dialog();
@@ -484,8 +490,8 @@ if(!class_exists('StormOnDemand_Product'))
                                                      </script>';
 
                                 }
-                                else 
-                                {                           
+                                else
+                                {
                                     $options[] = '
                                             <td class="fieldlabel mg">'.$config['title'].'</td>
                                             <td class="fieldarea mg">
@@ -537,7 +543,7 @@ if(!class_exists('StormOnDemand_Product'))
                                             }
                                             $str .= '</select>';
                                             return $str;
-                                    
+
                                     case 'select':
                                             $str = '<select name="customconfigoption['.$name.']" style="width:160px;">';
                                             foreach ($options as $k => $option){
@@ -561,7 +567,7 @@ if(!class_exists('StormOnDemand_Product'))
                                                     $str .= '<input type="radio" name="customconfigoption['.$name.']" value="'.$option.'" /> ' . $option;
                                             return $str;
 
-                                    case 'checkbox': 
+                                    case 'checkbox':
                                         return '<input type="checkbox"  name="customconfigoption['.$name.']" value="1"  '.($value ? ' checked="checked" ' : '').' /> '.$option;
 
                                     case 'empty':
