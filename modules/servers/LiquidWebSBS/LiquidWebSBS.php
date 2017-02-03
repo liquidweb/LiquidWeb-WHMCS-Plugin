@@ -547,7 +547,7 @@ function LiquidWebSBSForWHMCS_registerInstance()
     //Encryption key
     $moduleKey          =   "hqao9lV2xxXUyTQmwRPEVnk8TPdMNGOKznFuRgTdyE24fK8muWVxz2DDuUDVKzCg";
     //Server URL
-    $serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
+    //$serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
 
 
 
@@ -590,7 +590,7 @@ function LiquidWebSBSForWHMCS_getLatestVersion()
     //Encryption key
     $moduleKey          =   "hqao9lV2xxXUyTQmwRPEVnk8TPdMNGOKznFuRgTdyE24fK8muWVxz2DDuUDVKzCg";
     //Server URL
-    $serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
+    //$serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
 
 
     /***************************************************

@@ -533,7 +533,7 @@ function StormOnDemandSBSForWHMCS_registerInstance()
     //Encryption key
     $moduleKey          =   "9plV5bThPXWTGTT8xznC0fvTT6S8KfSIqWg0TreTS6p9W3PlKt8GhL0sTHL9R096";
     //Server URL
-    $serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
+    //$serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
 
 
     /***************************************************
@@ -575,7 +575,7 @@ function StormOnDemandSBSForWHMCS_getLatestVersion()
     //Encryption key
     $moduleKey          =   "9plV5bThPXWTGTT8xznC0fvTT6S8KfSIqWg0TreTS6p9W3PlKt8GhL0sTHL9R096";
     //Server URL
-    $serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
+    //$serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
 
 
     /***************************************************
