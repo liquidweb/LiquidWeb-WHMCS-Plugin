@@ -16,7 +16,8 @@ unzip master.zip
 cd LiquidWeb-WHMCS-Plugin-master/
 rsync -avH includes/ ../includes/
 rsync -avH modules/ ../modules/
-chown -R $user. /home/$user/public_html/$path/$to/$whmcs
+cd ..
+chown -R $user. .
 </pre>
 
 After you've extracted the files and placed them in the correct directories, login to the WHMCS admin section, hover over the "Setup" tab at the top of the page, then click on "Addon Modules". Click on the "Activate" button for "Storm on Demand Widget for WHMCS" as well as "Liquid Web Storm Servers Billing."
