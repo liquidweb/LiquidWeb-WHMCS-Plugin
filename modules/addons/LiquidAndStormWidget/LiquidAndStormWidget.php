@@ -194,12 +194,40 @@ function LiquidAndStormWidget_activate($params) {
       mysql_safequery("UPDATE `tbladdonmodules` SET value = ? WHERE setting = ?", array($template['id'],"emailtplid"));
     }
   }
+    $sql =   "CREATE TABLE IF NOT EXISTS `tblwidgetvpsdetails` (
+                  `id` int(10) NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
+                  `product_id` int(10) NOT NULL,
+                  `product_name` text NOT NULL,
+        		  `domain` text NOT NULL,
+        		  `package_id` int(10) NOT NULL,
+        		  `hosting_id` int(11) NOT NULL,
+        		  `configoption1` text NOT NULL,
+        		  `configoption2` text NOT NULL,
+        		  `configoption7` text NOT NULL,
+        		  `uniq_id` varchar(11) NOT NULL,
+        		  `is_zone_available` int(1) NOT NULL DEFAULT '0',
+        	   	  `zone_available` text NOT NULL
+    		  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    mysql_safequery($sql);
 
+    $sql =   "CREATE TABLE IF NOT EXISTS `tblwidgetppdetails` (
+            	`id` INT(10) NOT NULL AUTO_INCREMENT,
+            	`domain` TEXT NOT NULL,
+            	`total_memory` DOUBLE NOT NULL,
+            	`total_diskspace` DOUBLE NOT NULL,
+            	`used_memory` DOUBLE NOT NULL,
+            	`used_diskspace` DOUBLE NOT NULL,
+            	PRIMARY KEY (`id`)
+            )
+            ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    mysql_safequery($sql);
 }
 
 function LiquidAndStormWidget_deactivate() {
   $name = 'Liquid Web and Storm On Demand Alert';
   mysql_safequery("DELETE FROM `tblemailtemplates` WHERE `name` = ?", array($name));
+  mysql_safequery("DROP TABLE `tblwidgetdetails`");
+  mysql_safequery("DROP TABLE `tblwidgetppdetails`");
 }
 
 function LiquidAndStormWidget_output($params) {
@@ -207,6 +235,43 @@ function LiquidAndStormWidget_output($params) {
 }
 
 function LiquidAndStormWidget_upgrade($vars) {
+
+    logActivity(print_r($vars, true));
+
+    $version = (int)str_replace('.','', $vars['version']);
+    if($version < 100) {
+        $version *= 10;
+    }
+
+    if($version < 124) {
+        $sql =   "CREATE TABLE IF NOT EXISTS `tblwidgetvpsdetails` (
+                  `id` int(10) NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
+                  `product_id` int(10) NOT NULL,
+                  `product_name` text NOT NULL,
+    			  `domain` text NOT NULL,
+    			  `package_id` int(10) NOT NULL,
+    			  `hosting_id` int(11) NOT NULL,
+    			  `configoption1` text NOT NULL,
+    			  `configoption2` text NOT NULL,
+    			  `configoption7` text NOT NULL,
+    			  `uniq_id` varchar(11) NOT NULL,
+    			  `is_zone_available` int(1) NOT NULL DEFAULT '0',
+    		   	  `zone_available` text NOT NULL
+    			  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        mysql_safequery($sql);
+
+        $sql =   "CREATE TABLE IF NOT EXISTS `tblwidgetppdetails` (
+                	`id` INT(10) NOT NULL AUTO_INCREMENT,
+                	`domain` TEXT NOT NULL,
+                	`total_memory` DOUBLE NOT NULL,
+                	`total_diskspace` DOUBLE NOT NULL,
+                	`used_memory` DOUBLE NOT NULL,
+                	`used_diskspace` DOUBLE NOT NULL,
+                	PRIMARY KEY (`id`)
+                )
+                ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        mysql_safequery($sql);
+    }
 }
 
 

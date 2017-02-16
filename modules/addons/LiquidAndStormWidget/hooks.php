@@ -158,56 +158,25 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
     ob_start();
 
     $table = '<table width="100%" bgcolor="#cccccc" cellspacing="1" align="center"><tbody><tr bgcolor="#efefef" style="text-align:center;font-weight:bold;"><td>Product Name</td><td>Config ID</td><td>Available Zone</td></tr>';
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
+    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
     //load server class
     //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormServer.php';
 
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandNetworkZone.php';
+    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandNetworkZone.php';
 
     //load server helper class
-    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
 
     //Load API Class
     //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'class.ModuleInformationClient.php';
 
-/*
-    $query_mg_storm_on_demand_products = mysql_get_array("SELECT mg_storm_on_demand.hosting_id , mg_storm_on_demand.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id,tblproducts.name FROM mg_storm_on_demand
-                                              LEFT JOIN tblhosting ON  mg_storm_on_demand.hosting_id = tblhosting.id
-                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
-                                              ORDER BY tblproducts.name;
-                                             "
-                                            );
-
-    $query_liquid_products = mysql_get_array("SELECT mg_liquid_web.hosting_id , mg_liquid_web.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id,tblproducts.name FROM mg_liquid_web
-                                              LEFT JOIN tblhosting ON  mg_liquid_web.hosting_id = tblhosting.id
-                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
-                                              ORDER BY tblproducts.name;
-                                             "
-                                            );
-*/
-    $query_mg_storm_on_demand_products = mysql_get_array("tblproducts.configoption1, tblproducts.configoption2, tblproducts.configoption7, mg_storm_on_demand.hosting_id , mg_storm_on_demand.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id,tblproducts.name FROM mg_storm_on_demand
-                                              LEFT JOIN tblhosting ON  mg_storm_on_demand.hosting_id = tblhosting.id
-                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
-                                              WHERE domainstatus = 'Active';
-                                             "
-                                            );
-
-    $query_liquid_products = mysql_get_array("SELECT tblproducts.configoption1, tblproducts.configoption2, tblproducts.configoption7, mg_liquid_web.hosting_id , mg_liquid_web.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id,tblproducts.name FROM mg_liquid_web
-                                              LEFT JOIN tblhosting ON  mg_liquid_web.hosting_id = tblhosting.id
-                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
-                                              WHERE domainstatus = 'Active';
-                                             "
-                                            );
-
-    $products = array_merge($query_mg_storm_on_demand_products, $query_liquid_products);
+    $products = mysql_get_array("SELECT * FROM tblwidgetvpsdetails");
 
     $get_alert = mysql_query("SELECT * FROM tbladdonmodules WHERE module = 'LiquidAndStormWidget' and setting='alert' LIMIT 1");
     $alert = mysql_fetch_assoc($get_alert);
 
     if (count($products) > 0) {
         foreach($products as $productDetails){
-          //if($productDetails['domainstatus'] == 'Active'){
-            $table .= '<tr bgcolor="#ffffff" style="text-align:center;"><td>'.$productDetails['name'].' - '.$productDetails['domain'].'</td>';
+            $table .= '<tr bgcolor="#ffffff" style="text-align:center;"><td>'.$productDetails['product_name'].' - '.$productDetails['domain'].'</td>';
 
             //$q = mysql_query("SELECT * FROM tblproducts WHERE id = " . (int)$productDetails['packageid'] . " LIMIT 1");
             //$row = mysql_fetch_assoc($q);
@@ -220,189 +189,78 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
             $configSelected = (int) $productDetails['configoption7']; // Id config
 
             $table .= '<td>'.$configSelected.'</td>';
+            //$config = new StormOnDemandStormConfig($username, $password);
 
+			if($productDetails['is_zone_available'] < (int)$alert['value']){
+				$table .= '<td style="color:red;">'.$productDetails['zone_available'].'</td></tr>';
+			}else{
+				$table .= '<td>'.$productDetails['zone_available'].'</td></tr>';
+			}
 
-            $config = new StormOnDemandStormConfig($username, $password);
-
-            $res = $config->ping();
-
-            if (isset($res['ping']) && $res['ping'] != 'success') {
-              $table .= '<td>Connect Error</td></tr>';
-            } else {
-                $avilablezones = $config->details($configSelected);
-
-                $avhtml ='';
-                if (count($avilablezones['zone_availability']) > 0){
-                    $zone   = new StormOnDemandNetworkZone($username, $password);
-                    foreach($avilablezones['zone_availability'] as $zoneid => $avilablezoneid){
-                        $ret = $zone->details($zoneid);
-                        $avhtml .= $ret['name'].' - '.$ret['region']['name'].'<br>';
-                    }
-                } else {
-                    $avhtml .= 'Out of stock';
-                }
-
-                if(count($avilablezones['zone_availability']) < (int)$alert['value']){
-                    $table .= '<td style="color:red;">'.$avhtml.'</td></tr>';
-                }else{
-                    $table .= '<td>'.$avhtml.'</td></tr>';
-                }
-            }
-          //}
         }
     } else {
       $table .= '<tr bgcolor="#ffffff" style="text-align:center;"><td>No Products Exist</td></tr>';
     }
     $table .= '</tbody></table>';
 
-    $tables = array
-    (
-        'mg_LiquidWebPrivateParentProduct',
-        'mg_StormOnDemandPrivateParentProduct'
-    );
 
-    $fields = array();
-    foreach($tables as $op_table)
-    {
-        $q = mysql_query(
-            "SELECT ".$op_table.".* "
-            . "FROM ".$op_table." "
-            . "LEFT JOIN "
-                . "tblproducts "
-            . "ON "
-                .$op_table.".product_id = tblproducts.id "
-            . "WHERE "
-                . "(".$op_table.".setting = 'Username' ". "OR ".$op_table.".setting = 'Password') "
-            . "AND "
-                . "tblproducts.id IS NOT NULL "
-            . "AND "
-                . "(tblproducts.servertype = 'LiquidWebPrivateParent' OR tblproducts.servertype = 'StormOnDemandPrivateParent')"
-        );
+    //PP Data
+    $ppData = mysql_get_array("SELECT * FROM tblwidgetppdetails");
 
-        if($q && mysql_num_rows($q))
-        {
-            while($row = mysql_fetch_assoc($q))
-            {
-                $fields[$row['product_id']][$row['setting']] = $row['value'];
+    if (count($ppData) > 0) {
+    	if ($ppData[0]['id'] ==  '0') {
+    		$content .= '<p style="color: red">Cannot Connect! '.$ppData[0]['domain'].'</p>';
+    	} else {
+            $content .= '<table style="width: 100%">';
+            foreach($ppData as $item) {
+                $content .= '<tr>
+                                <td><b>'.$item['domain'].'</b></td>
+                                <td>'.$item['total_memory'].' MB RAM</td>
+                                <td>'.$item['total_diskspace'].' GB Disk</td>
+                             </tr>
+                             <tr>
+                                <td rowspan="2">Used</td>
+                                <td>'.$item['used_memory'].' MB - '.number_format(($item['used_memory'] / $item['total_memory']) * 100, 2).'%</td>
+                                <td>'.$item['used_diskspace'].' GB - '.number_format(($item['used_diskspace'] / $item['total_diskspace']) * 100, 2).'%</td>
+                             </tr>
+                             <tr>
+                                <td>
+                                    <div style="width: 95%; height: 10px; border: 1px #000 solid; border-radius: 2px">
+                                        <div style="background-color: '.((($item['used_memory'] / $item['total_memory']) * 100)> 90 ? '#FF1111' : '#178DBE').'; height: 10px; width: '.number_format(($item['used_memory'] / $item['total_memory']) * 100).'%"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="width: 95%; height: 10px; border: 1px #000 solid; border-radius: 2px">
+                                        <div style="background-color: '.((($item['used_diskspace'] / $item['total_diskspace']) * 100)> 90 ? '#FF1111' : '#178DBE').'; height: 10px; width: '.number_format(($item['used_diskspace'] / $item['total_diskspace']) * 100).'%"></div>
+                                    </div>
+                                </td>
+                             </tr>
+                             <tr><td colspan="3" style="height: 10px"></td></tr>';
             }
-        }
-    }
 
-    $details = array();
+            $content .= '</table>
 
-    foreach($fields as $product_id => $field)
-    {
-        $found = false;
-        foreach($details as $d)
-        {
-            if($d['Username'] == $field['Username'] && $field['Password'] == $d['Password'])
-            {
-                $found = true;
-                break;
+            <div align="right"; class="widget-footer">';
+            if (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES')){
+                $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm" style="color:#fff; background-color:#333333">';
+            } else {
+                $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
             }
-        }
-
-        if(!$found)
-        {
-            $details[$product_id] = $field;
-        }
-    }
-
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormPrivateParent.php';
-
-
-    $items = array();
-    $content = '';
-
-
-    foreach($details as $d)
-    {
-        $private = new StormOnDemandStormPrivateParent($d['Username'], $d['Password'], 'bleed');
-
-        $page = 1;
-        $items_per_page = 250;
-
-        $lists = $private->lists($page, $items_per_page);
-
-        if (!$lists) {
-            $content .= '<p style="color: red">Cannot Connect! '.$private->getError().'</p>';
-        } else {
-            $items = array_merge($items, $lists['items']);
-            while($lists['item_total'] > $page * $items_per_page) {
-                $page++;
-                $lists = $private->lists($page, $items_per_page);
-                $items = array_merge($items, $lists['items']);
-            }
-        }
-    }
-
-    //Delete Doubled Serves
-    $uniq = array();
-    foreach($items as $item) {
-        $found = false;
-        foreach($uniq as $u) {
-            if($item['accnt'] == $u['accnt'] && $item['uniq_id'] == $u['uniq_id']) {
-                $found = true;
-                break;
-            }
-        }
-
-        if (!$found) {
-            $uniq[] = $item;
-        }
-    }
-
-    if ($uniq) {
-        $content .= '<table style="width: 100%">';
-        foreach($uniq as $item) {
-            $content .= '<tr>
-                            <td><b>'.$item['domain'].'</b></td>
-                            <td>'.$item['resources']['memory']['total'].' MB RAM</td>
-                            <td>'.$item['resources']['diskspace']['total'].' GB Disk</td>
-                         </tr>
-                         <tr>
-                            <td rowspan="2">Used</td>
-                            <td>'.$item['resources']['memory']['used'].' MB - '.number_format(($item['resources']['memory']['used'] / $item['resources']['memory']['total']) * 100, 2).'%</td>
-                            <td>'.$item['resources']['diskspace']['used'].' GB - '.number_format(($item['resources']['diskspace']['used'] / $item['resources']['diskspace']['total']) * 100, 2).'%</td>
-                         </tr>
-                         <tr>
-                            <td>
-                                <div style="width: 95%; height: 10px; border: 1px #000 solid; border-radius: 2px">
-                                    <div style="background-color: '.((($item['resources']['memory']['used'] / $item['resources']['memory']['total']) * 100)> 90 ? '#FF1111' : '#178DBE').'; height: 10px; width: '.number_format(($item['resources']['memory']['used'] / $item['resources']['memory']['total']) * 100).'%"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div style="width: 95%; height: 10px; border: 1px #000 solid; border-radius: 2px">
-                                    <div style="background-color: '.((($item['resources']['diskspace']['used'] / $item['resources']['diskspace']['total']) * 100)> 90 ? '#FF1111' : '#178DBE').'; height: 10px; width: '.number_format(($item['resources']['diskspace']['used'] / $item['resources']['diskspace']['total']) * 100).'%"></div>
-                                </div>
-                            </td>
-                         </tr>
-                         <tr><td colspan="3" style="height: 10px"></td></tr>';
-        }
-
-        $content .= '</table>
-
-        <div align="right"; class="widget-footer">';
-        if (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES')){
-            $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm" style="color:#fff; background-color:#333333">';
-        } else {
-            $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
-        }
-        $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
+            $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
+    	}
     } else {
-        $content .= '<p style="text-align: center; font-weight: bold">You do not have any private servers in Storm On Demand or Liquid Web</p>
+    	$content .= '<p style="text-align: center; font-weight: bold">You do not have any private servers in Storm On Demand or Liquid Web</p>
 
-
-                <div align="right"; class="widget-footer">';
-                if (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES')){
-                    $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm" style="color:#fff; background-color:#333333">';
-                } else {
-                    $content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
-                }
-                $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
+    	<div align="right"; class="widget-footer">';
+    	if (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES')){
+    			$content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm" style="color:#fff; background-color:#333333">';
+    	} else {
+    			$content = $content.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
+    	}
+    	$content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
     }
-
     echo $table.'<hr />'.$content;
+
 
 /*
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'class.ModuleInformationClient.php';
@@ -758,6 +616,197 @@ function LiquidAndStormWidget_hook_DailyCronJobPreEmail($vars){
   }
 }
 
+function LiquidAndStormWidget_hook_WidgetDetails() {
+
+
+    $sql =   "CREATE TABLE IF NOT EXISTS `tblwidgetvpsdetails` (
+              `id` int(10) NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
+              `product_id` int(10) NOT NULL,
+              `product_name` text NOT NULL,
+			  `domain` text NOT NULL,
+			  `package_id` int(10) NOT NULL,
+			  `hosting_id` int(11) NOT NULL,
+			  `configoption1` text NOT NULL,
+			  `configoption2` text NOT NULL,
+			  `configoption7` text NOT NULL,
+			  `uniq_id` varchar(11) NOT NULL,
+			  `is_zone_available` int(1) NOT NULL DEFAULT '0',
+		   	  `zone_available` text NOT NULL
+			  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    mysql_safequery($sql);
+
+    $sql =   "CREATE TABLE IF NOT EXISTS `tblwidgetppdetails` (
+            	`id` INT(10) NOT NULL AUTO_INCREMENT,
+            	`domain` TEXT NOT NULL,
+            	`total_memory` DOUBLE NOT NULL,
+            	`total_diskspace` DOUBLE NOT NULL,
+            	`used_memory` DOUBLE NOT NULL,
+            	`used_diskspace` DOUBLE NOT NULL,
+            	PRIMARY KEY (`id`)
+            )
+            ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    mysql_safequery($sql);
+
+
+    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
+    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandNetworkZone.php';
+
+    $query_mg_storm_on_demand_products = mysql_get_array("SELECT tblproducts.configoption1, tblproducts.configoption2, tblproducts.configoption7, mg_storm_on_demand.hosting_id , mg_storm_on_demand.uniq_id ,tblhosting.id ,tblhosting.packageid , tblhosting.domain, tblhosting.domainstatus,tblproducts.id as productsid,tblproducts.name, tblcustomfieldsvalues.value as 'hostname'
+    										  FROM mg_storm_on_demand
+                                              LEFT JOIN tblhosting ON  mg_storm_on_demand.hosting_id = tblhosting.id
+                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
+											  LEFT join tblcustomfieldsvalues on tblhosting.id = tblcustomfieldsvalues.relid
+											  LEFT join tblcustomfields on tblcustomfields.id = tblcustomfieldsvalues.fieldid
+											  WHERE domainstatus = 'Active' and tblcustomfields.fieldname = 'Create my VPS with following host name'"
+                                            );
+
+
+    $query_liquid_products = mysql_get_array("SELECT tblproducts.configoption1, tblproducts.configoption2, tblproducts.configoption7, mg_liquid_web.hosting_id , mg_liquid_web.uniq_id ,tblhosting.id, tblhosting.packageid, tblhosting.domain, tblhosting.domainstatus,tblproducts.id as productsid,tblproducts.name, tblcustomfieldsvalues.value as 'hostname'
+    										  FROM mg_liquid_web
+                                              LEFT JOIN tblhosting ON  mg_liquid_web.hosting_id = tblhosting.id
+                                              LEFT JOIN tblproducts ON  tblhosting.packageid = tblproducts.id
+											  LEFT join tblcustomfieldsvalues on tblhosting.id = tblcustomfieldsvalues.relid
+											  LEFT join tblcustomfields on tblcustomfields.id = tblcustomfieldsvalues.fieldid
+                                              WHERE domainstatus = 'Active' and tblcustomfields.fieldname = 'Create my VPS with following host name'"
+                                            );
+
+    $products = array_merge($query_mg_storm_on_demand_products, $query_liquid_products);
+	mysql_query("TRUNCATE TABLE tblwidgetvpsdetails");
+    if (count($products) > 0) {
+        foreach($products as $productDetails){
+
+            $username = $productDetails['configoption1'];
+            $password = $productDetails['configoption2'];
+            $configSelected = (int) $productDetails['configoption7']; // Id config
+
+            $config = new StormOnDemandStormConfig($username, $password);
+
+            $res = $config->ping();
+
+            if (isset($res['ping']) && $res['ping'] != 'success') {
+
+            } else {
+                $avilablezones = $config->details($configSelected);
+                $avhtml ='';
+
+                if (count($avilablezones['zone_availability']) > 0){
+                    $zone   = new StormOnDemandNetworkZone($username, $password);
+                    foreach($avilablezones['zone_availability'] as $zoneid => $avilablezoneid){
+                        $ret = $zone->details($zoneid);
+                        $avhtml .= $ret['name'].' - '.$ret['region']['name'].'<br>';
+                    }
+                } else {
+                    $avhtml .= 'Out of stock';
+                }
+                $host_name = ($productDetails['domain'] == '' ? $productDetails['hostname'] : $productDetails['domain']);
+				mysql_query("INSERT INTO tblwidgetvpsdetails (product_id, product_name, domain, package_id, hosting_id, configoption1, configoption2, configoption7, uniq_id, is_zone_available, zone_available) VALUES (".(int) $productDetails['productsid'].", '".$productDetails['name']."', '".$host_name."', ".(int)$productDetails['packageid'].", ".(int)$productDetails['hosting_id'].", ".(int) $productDetails['configoption1'].", ".(int) $productDetails['configoption2'].", ".(int) $productDetails['configoption7'].", ".(int) $productDetails['uniq_id'].", ".count($avilablezones['zone_availability']).", '". $avhtml."')");
+            }
+        }
+    }
+
+    //PP data
+    $tables = array
+    (
+        'mg_LiquidWebPrivateParentProduct',
+        'mg_StormOnDemandPrivateParentProduct'
+    );
+
+    $fields = array();
+    foreach($tables as $op_table) {
+        $q = mysql_query(
+            "SELECT ".$op_table.".* "
+            . "FROM ".$op_table." "
+            . "LEFT JOIN "
+                . "tblproducts "
+            . "ON "
+                .$op_table.".product_id = tblproducts.id "
+            . "WHERE "
+                . "(".$op_table.".setting = 'Username' ". "OR ".$op_table.".setting = 'Password') "
+            . "AND "
+                . "tblproducts.id IS NOT NULL "
+            . "AND "
+                . "(tblproducts.servertype = 'LiquidWebPrivateParent' OR tblproducts.servertype = 'StormOnDemandPrivateParent')"
+        );
+
+        if($q && mysql_num_rows($q)) {
+            while($row = mysql_fetch_assoc($q)) {
+                $fields[$row['product_id']][$row['setting']] = $row['value'];
+            }
+        }
+    }
+
+    $details = array();
+
+    foreach($fields as $product_id => $field) {
+        $found = false;
+        foreach($details as $d) {
+            if($d['Username'] == $field['Username'] && $field['Password'] == $d['Password']) {
+                $found = true;
+                break;
+            }
+        }
+
+        if(!$found) {
+            $details[$product_id] = $field;
+        }
+    }
+
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormPrivateParent.php';
+
+    $items = array();
+
+    foreach($details as $d) {
+        $private = new StormOnDemandStormPrivateParent($d['Username'], $d['Password'], 'bleed');
+
+        $page = 1;
+        $items_per_page = 250;
+
+        $lists = $private->lists($page, $items_per_page);
+
+        if (!$lists) {
+            $recs['domain'] = 'Cannot Connect! '.$private->getError();
+						mysql_query("INSERT INTO tblwidgetppdetails (id, domain) VALUES (0,'".$recs['domain']."')");
+        } else {
+            $items = array_merge($items, $lists['items']);
+            while($lists['item_total'] > $page * $items_per_page) {
+                $page++;
+                $lists = $private->lists($page, $items_per_page);
+                $items = array_merge($items, $lists['items']);
+            }
+        }
+    }
+
+    //Delete Doubled Serves
+    $uniq = array();
+    foreach($items as $item) {
+        $found = false;
+        foreach($uniq as $u) {
+            if($item['accnt'] == $u['accnt'] && $item['uniq_id'] == $u['uniq_id']) {
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            $uniq[] = $item;
+        }
+    }
+
+	mysql_query("TRUNCATE TABLE tblwidgetppdetails");
+    if ($uniq) {
+        foreach($uniq as $item) {
+					$recs['domain'] = $item['domain'];
+					$recs['total_memory'] = $item['resources']['memory']['total'];
+					$recs['total_diskspace'] = $item['resources']['diskspace']['total'];
+					$recs['used_memory'] = $item['resources']['memory']['used'];
+					$recs['used_diskspace'] = $item['resources']['diskspace']['used'];
+
+					mysql_query("INSERT INTO tblwidgetppdetails (domain, total_memory, total_diskspace, used_memory, used_diskspace) VALUES ('".$recs['domain']."', ".$recs['total_memory'].", ".$recs['total_diskspace'].", ".$recs['used_memory'].", ".$recs['used_diskspace'].")");
+        }
+    }
+}
+
 
 add_hook("DailyCronJobPreEmail", 1, "LiquidAndStormWidget_hook_DailyCronJobPreEmail");
 add_hook("AdminHomeWidgets", 1, "ZoneAvailability");
+add_hook("AfterCronJob", 1, "LiquidAndStormWidget_hook_WidgetDetails");

@@ -1334,7 +1334,6 @@ function LiquidWeb_CreateAccount($params)
 
 	    //save uniq_id to database. We need it!
 	    mysql_query("REPLACE INTO mg_liquid_web (`hosting_id`, `uniq_id`) VALUES ('".$params['serviceid']."', '".$ret['uniq_id']."')") or die(mysql_error());
-
 	}else{
 	    //check bandwidth quota
 	    $configuration = LiquidWeb_ConfigOptions();
