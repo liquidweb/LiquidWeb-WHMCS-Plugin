@@ -32,6 +32,12 @@ if(file_exists(dirname(__FILE__).DS.'moduleVersion.php')){
      define('STORM_ON_DEMAND_SBS_VERSION', 'Development Version');
 }
 
+function StormOnDemandSBS_MetaData()
+{
+    return array(
+        'DisplayName' => '(Deprecated) StormOnDemandSBS ',
+    );
+}
 function StormOnDemandSBS_checkConnection()
 {
     $q = mysql_query("SELECT * FROM tblproducts WHERE id = " . (int)$_REQUEST['id'] . " LIMIT 1");
@@ -56,15 +62,15 @@ function StormOnDemandSBS_checkConnection()
             }
             if($_GET['action'] != 'save'){
                 echo '<p style="text-align: center;" class="errorbox">
-                    <span style="font-weight: bold">Authorization error. Please check username and password.</span>
+                    <span style="font-weight: bold">Deprecated! </span><br/><br/>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. <br/>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
                  </p>';
             }
 
             return false;
         }
         if($_GET['action'] != 'save'){
-            echo '<p style="text-align: center;" class="infobox">
-                    <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
+            echo '<p style="text-align: center;" class="errorbox">
+                    <span style="font-weight: bold">Deprecated! </span><br/><br/>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. <br/>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
                  </p>';
         }
     }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'clientsservices.php') !== false){
@@ -351,10 +357,10 @@ function StormOnDemandSBS_ConfigOptions($loadValuesFromServer = true) {
     {
         foreach ($config as $key => $value)
         {
-            if($key != 'Username' && $key != 'Password')
-            {
+            //if($key != 'Username' && $key != 'Password')
+            //{
                 unset($config[$key]);
-            }
+            //}
         }
 
         return $config;

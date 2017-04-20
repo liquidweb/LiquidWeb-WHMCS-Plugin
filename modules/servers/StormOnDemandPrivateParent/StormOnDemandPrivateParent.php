@@ -22,6 +22,13 @@ require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOn
 //Product Class
 require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemandPrivateParentProduct.php';
 
+function StormOnDemandPrivateParent_MetaData()
+{
+    return array(
+        'DisplayName' => '(Deprecated) StormOnDemandPrivateParent ',
+    );
+}
+
 function StormOnDemandPrivateParent_ConfigOptions()
 {
 	if(isset($_REQUEST['id']) && $_REQUEST['id'] && preg_match('/^[0-9]{1,}$/D', $_REQUEST['id'])){
@@ -439,11 +446,17 @@ function StormOnDemandPrivateParent_ConfigOptions()
     //Is set?
     if((!$username || !$password) && $_GET['action'] != 'save')
     {
-        $product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
+        /*$product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
         echo $product->renderConfigOptions();
         echo '<p style="text-align: center;" class="infobox">
                 <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
-             </p>';
+             </p>';*/
+
+        echo '<p style="text-align: center;" class="errorbox">
+           <span style="font-weight: bold">Deprecated! </span><br/><br/>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. <br/>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+         </p>';
+
+
         return array();
     }
 
@@ -458,9 +471,14 @@ function StormOnDemandPrivateParent_ConfigOptions()
 
     if(!$lists  && $_GET['action'] != 'save')
     {
-        $product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
+        /*$product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
         echo $product->renderConfigOptions();
-        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">'.$private->getError().'</span></p>';
+        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">'.$private->getError().'</span></p>';*/
+
+        echo '<p style="text-align: center;" class="errorbox">
+           <span style="font-weight: bold">Deprecated! </span><br/><br/>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. <br/>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+         </p>';
+
         return array();
     }
 
@@ -474,9 +492,14 @@ function StormOnDemandPrivateParent_ConfigOptions()
 
     if(!$items  && $_GET['action'] != 'save')
     {
-        $product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
+        /*$product->defaultConfig = array_slice($product->defaultConfig, 0, 3, true);
         echo $product->renderConfigOptions();
-        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">You do not have any <b>Private Cloud servers</b>. Please create it before continue.</span></p>';
+        echo '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">You do not have any <b>Private Cloud servers</b>. Please create it before continue.</span></p>';*/
+
+        echo '<p style="text-align: center;" class="errorbox">
+           <span style="font-weight: bold">Deprecated! </span><br/><br/>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. <br/>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+         </p>';
+
         return array();
     }
 

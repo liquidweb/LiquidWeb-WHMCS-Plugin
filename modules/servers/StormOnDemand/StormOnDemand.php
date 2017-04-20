@@ -15,6 +15,13 @@ if(file_exists(dirname(__FILE__).DS.'moduleVersion.php')){
      define('STORM_ON_DEMAND_VERSION', 'Development Version');
 }
 
+function StormOnDemand_MetaData()
+{
+    return array(
+        'DisplayName' => '(Deprecated) StormOnDemand ',
+    );
+}
+
 function StormOnDemand_checkConnection()
 {
     if(strpos($_SERVER['SCRIPT_FILENAME'], 'configproducts.php') !== false)
@@ -39,7 +46,7 @@ function StormOnDemand_checkConnection()
             }
             if($_GET['action'] != 'save'){
                 echo '<p style="text-align: center;" class="errorbox">
-                    <span style="font-weight: bold">Authorization error. Please check username and password.</span>
+                    <span style="font-weight: bold">Deprecated! </span><br/><br/>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. <br/>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
                  </p>';
             }
 
@@ -52,8 +59,8 @@ function StormOnDemand_checkConnection()
             return false;
         }
         if($_GET['action'] != 'save'){
-            echo '<p style="text-align: center;" class="infobox">
-                    <span style="font-weight: bold">Please enter your API User username in "Username" field and your API User password in "Password".</span>
+                echo '<p style="text-align: center;" class="errorbox">
+                   <span style="font-weight: bold">Deprecated! </span><br/><br/>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. <br/>Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
                  </p>';
         }
     }elseif(strpos($_SERVER['SCRIPT_FILENAME'], 'orders.php') !== false){
@@ -1360,7 +1367,6 @@ function StormOnDemand_ConfigOptions()
             'name'       => 'packageconfigoption['.(array_search('Image', $configFormKeys)+1).']',
         ),
     );
-
     if (!empty($templates)) {
 
         if (empty($zoneResults)) {
@@ -1445,7 +1451,7 @@ function StormOnDemand_ConfigOptions()
     {
         foreach ($config as $key => $value)
         {
-            if($key != 'Username' && $key != 'Password')
+            //if($key != 'Username' && $key != 'Password')
             {
                 unset($config[$key]);
             }
