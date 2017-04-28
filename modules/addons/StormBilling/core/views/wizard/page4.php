@@ -54,8 +54,10 @@ if ((isset($_SESSION['api_username'])) && (isset($_SESSION['api_password']))){
             click: function() {
             	val = $(this).parent().find("input[name='zone-id']:checked").val();
             	name = $(this).parent().find("input[name='zone-id']:checked").attr("data-zone-name");
-            	$('#setup_lw_zonecode').val(val).trigger('change');
-            	$('#zone_name').html(name);
+				if(val != '' && val > 0) {
+					$('#setup_lw_zonecode').val(val).trigger('change');
+					$('#zone_name').html(name);
+				}
             	$('#setup_lw_ostemplates').val('0').trigger('change');
             	$('#setup_lw_ostemplates_name').html('Please Select OS Template');
             	$("#setup_lw_ostemplates_name").css("color", "#CC0000");
@@ -126,8 +128,14 @@ if ((isset($_SESSION['api_username'])) && (isset($_SESSION['api_password']))){
             click: function() {
             	val = $(this).parent().find("input[name='config-id']:checked").val();
             	name = $(this).parent().find("input[name='config-id']:checked").attr("data-VPSType-name");
+				price = $(this).parent().find("input[name='config-id']:checked").attr("data-VPSType-price");
             	$('#setup_lw_vpstype').val(val).trigger('change');
-            	$('#vpstype_name').html(name);
+				if (price != '') {
+					var vpstype = name + ' / $' + price;
+				} else {
+					var vpstype = name ;
+				}
+            	$('#vpstype_name').html(vpstype);
             	$("#vpstype_name").css("color", "#4c4c4c");
             	$(this).dialog('close');
             }
@@ -139,7 +147,7 @@ if ((isset($_SESSION['api_username'])) && (isset($_SESSION['api_password']))){
             }
         }},
         open: function(event, ui) {
-            $('#load-storm-vpstypes').load(location+'&ajaxload=vpstypes&conf_id='+$('#setup_lw_vpstype').val()+'&zone='+$('#setup_lw_zonecode').val(), function() {
+		      $('#load-storm-vpstypes').load(location+'&ajaxload=vpstypes&conf_id='+$('#setup_lw_vpstype').val()+'&zone='+$('#setup_lw_zonecode').val(), function() {
               //
             });
           }
@@ -171,19 +179,19 @@ if ((isset($_SESSION['api_username'])) && (isset($_SESSION['api_password']))){
 function showTemplates()
 {
     $("#load-storm-templates").dialog('open');
-    $("#load-storm-templates").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>.");
+    $("#load-storm-templates").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
 }
 
 function showZone()
 {
     $("#load-storm-zones").dialog('open');
-    $("#load-storm-zones").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>.");
+    $("#load-storm-zones").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
 }
 
 function showVPSType()
 {
     $("#load-storm-vpstypes").dialog('open');
-    $("#load-storm-vpstypes").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>.");
+    $("#load-storm-vpstypes").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
 }
 
 function submitForm(action) {
@@ -299,10 +307,7 @@ function submitForm(action) {
 			<tbody>
 				<tr>
 					<td class="fieldlabel" width="10%;" >
-					    <select name="setup_lw_price_type" id="setup_lw_price_type" style="width: 150px;">
-    						<option value="<?php echo 'perentage';?>" <?php if ($row['price_type']=='perentage') {echo 'selected';}?>><?php echo MG_Language::translate('Percentage');?></option>
-    						<option value="<?php echo 'fixed';?>" <?php if ($row['price_type']=='fixed') {echo 'selected';}?>><?php echo MG_Language::translate('Fixed');?></option>
-    					</select>
+					    <?php echo MG_Language::translate('Fixed');?>
     				</td>
 					<td class="fieldarea" width="10%;" style="text-align: left;">
 						<?php $price = $row['price'];

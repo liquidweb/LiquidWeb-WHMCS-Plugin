@@ -1,4 +1,15 @@
 <?php
+require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
+$product 	  = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
+$product_ret  = $product->details(null,'SS.VPS');
+
+foreach ($product_ret['options'] as $optn) {
+	foreach ($optn['values'] as $values) {			
+		$arr_prices = $values['prices'];					
+		$arr_product_price[$values['value']] = 	$arr_prices[1]['month'];							
+	}		
+}
+
 //ajax call
 if (isset($_REQUEST['ajaxload'])) {
     if ($_REQUEST['ajaxload'] == 'zone') {
@@ -201,6 +212,7 @@ if (isset($_REQUEST['ajaxload'])) {
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Server Type</th>
+					<th style="width: 80px">Price($)</th>
                     <th style="width: 80px">VCPU</th>
                     <th style="width: 80px">Disk</th>
                     <th style="width: 80px">Memory</th>
@@ -214,11 +226,12 @@ if (isset($_REQUEST['ajaxload'])) {
 			   !isset($item['zone_availability'][$zoneSelected]) ||
 			   !$item['zone_availability'][$zoneSelected]){
 			    	continue;
-			    }
-
+			    }			
+			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
             echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$item['vcpu'].' CPUs</td>
+                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
+                    <td>'.$product_price.'</td>
+					<td>'.$item['vcpu'].' CPUs</td>
                     <td>'.$item['disk'].'</td>
                     <td>'.$item['memory'].'</td>
                   </tr>';
@@ -231,6 +244,7 @@ if (isset($_REQUEST['ajaxload'])) {
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Server Type</th>
+					<th style="width: 80px">Price($)</th>
                     <th style="width: 80px">VCPU</th>
                     <th style="width: 80px">Disk</th>
                     <th style="width: 80px">Memory</th>
@@ -244,10 +258,13 @@ if (isset($_REQUEST['ajaxload'])) {
 			   !$item['zone_availability'][$zoneSelected]){
 			    	continue;
 			    }
-
+			
+			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
+			
             echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$item['vcpu'].' CPUs</td>
+                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
+                    <td>'.$product_price.'</td>
+					<td>'.$item['vcpu'].' CPUs</td>
                     <td>'.$item['disk'].'</td>
                     <td>'.$item['memory'].'</td>
                   </tr>';
@@ -260,6 +277,7 @@ if (isset($_REQUEST['ajaxload'])) {
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Server Type</th>
+					<th style="width: 50px">Price</th>
                     <th style="width: 50px">Speed</th>
                     <th style="width: 40px">CPUs</th>
                     <th style="width: 45px">Cores</th>
@@ -279,10 +297,11 @@ if (isset($_REQUEST['ajaxload'])) {
 			   !$item['zone_availability'][$zoneSelected]){
 			    	continue;
 			    }
-
+			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
             echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$item['cpu_speed'].'</td>
+                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
+                    <td>'.$product_price.'</td>
+					<td>'.$item['cpu_speed'].'</td>
                     <td>'.$item['cpu_count'].'</td>
                     <td>'.$item['cpu_cores'].'</td>
                     <td>'.$item['ram_total'].'</td>
@@ -414,7 +433,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
                     StormOnDemand_Helper::saveConfigs($api_user);
                 } else {
                     $_REQUEST['pg'] = $_POST['wiz_page'];
-                    print_error('Invalid API credentials.XXXX');
+                    print_error('Invalid API credentials.');
                 }
             } else {
                 $_REQUEST['pg'] = $_POST['wiz_page'];
@@ -450,7 +469,8 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
         $data['name'] = $_POST['setup_lw_productname'];
         $data['description'] = $_POST['setup_lw_description'];
 
-        if ($_POST['setup_lw_price_type'] == 'perentage') {
+		
+        /*if ($_POST['setup_lw_price_type'] == 'perentage') {
     		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
 
     		$product 	  = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
@@ -499,7 +519,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
                 $price = $price + ($arr_price['ExtraIp']['1'][$zone['region']['id']] * $xtraips);
             }
             $price = $price + ($price*$_POST['setup_lw_price']*0.01);
-        }
+        }*/
 
         require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
 		$new_pid = StormOnDemand_Helper::saveSSDVPSConfigurations($data);
@@ -673,19 +693,25 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
         $config = new StormOnDemandStormConfig($_SESSION['api_username'], $_SESSION['api_password'], 'bleed');
 
         $ret = $config->details($row['configoption7']);
-
+		
         if($error = $config->getError()) {
             $vpstype[0] = 'ERROR';
             die();
         }
-        $vpstype[$ret['id']] = $ret['description'];
 
-
-		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
+		/*require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
 
 		$product 	  = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
-		$product_ret = $product->details(null,'SS.VPS');
-
+		$product_ret = $product->details(null,'SS.VPS');*/
+		
+		$product_price = $arr_product_price[$ret['id']] != '' ? $arr_product_price[$ret['id']] : '';
+		if ($product_price != '') {
+			$vpstype[$ret['id']] = $ret['description'].' / $'.$product_price;
+		} else {
+			$vpstype[$ret['id']] = $ret['description'];
+		}
+		
+		
         // Get backup quota
         if ($product_ret && !empty($product_ret['options'])) {
             foreach ($product_ret['options'] as $kOpt => $vOpt) {
@@ -781,8 +807,8 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             $dropdown .= "</select>";
 
             //Get Product Details
-            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
-            $product = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
+            /*require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
+            $product = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');*/
 
             $result = $product->details(null,'SS.PP');
 
@@ -876,17 +902,17 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
         $backupPlans[2] = Array('name'=>'daily','value'=>'Daily');*/
 
         //Fetch Backup Plan
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
+        /*require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
 		$product 	  = new StormOnDemandProduct($_SESSION['api_username'], $_SESSION['api_password'], 'bleed');
 		//$productLists = $product->details(null,'SS.PP');
-        $productLists = $product->details(null,'SS.VPS');
+        $productLists = $product->details(null,'SS.VPS');*/
 		$backupQuota[0] = array(
 			'description' => 'NO BACKUP',
 			'value'		  => '0'
 		);
 		// Get backup quota
-		if($productLists && !empty($productLists['options'])){
-			foreach($productLists['options'] as $kOpt => $vOpt){
+		if($product_ret && !empty($product_ret['options'])){
+			foreach($product_ret['options'] as $kOpt => $vOpt){
 				if(strcmp($vOpt['key'],'LiquidWebBackupPlan') === 0){
 
 					if(!empty($vOpt['values'])){
@@ -920,8 +946,8 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
 		// Get bandwidth options
 		$bandwidthQuota = array();
 
-		if($productLists && !empty($productLists['options'])){
-			foreach($productLists['options'] as $kOpt => $vOpt){
+		if($product_ret && !empty($product_ret['options'])){
+			foreach($product_ret['options'] as $kOpt => $vOpt){
 				if(strcmp($vOpt['key'],'Bandwidth') === 0){
 
 					if(!empty($vOpt['values'])){
