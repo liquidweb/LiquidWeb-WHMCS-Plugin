@@ -41,3 +41,19 @@ The above commands, in order of execution, will change directory to the Main WHM
 This plugin is provided as-is and does not carry any warranty nor does it include any form of support. Bugs and Issues with the plugin can be reported via the Issue tracker built into GitHub and they will be addressed in a timely manner.
 
 Any managed Liquid Web customers experiencing immediate issues can feel free to contact our Heroic Support® via [Call, Email or LiveChat](https://www.liquidweb.com/support/).
+
+## License
+
+Copyright 2017 Liquid Web
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
