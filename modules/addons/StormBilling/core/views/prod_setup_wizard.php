@@ -4,10 +4,10 @@ $product 	  = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_
 $product_ret  = $product->details(null,'SS.VPS');
 
 foreach ($product_ret['options'] as $optn) {
-	foreach ($optn['values'] as $values) {			
-		$arr_prices = $values['prices'];					
-		$arr_product_price[$values['value']] = 	$arr_prices[1]['month'];							
-	}		
+	foreach ($optn['values'] as $values) {
+		$arr_prices = $values['prices'];
+		$arr_product_price[$values['value']] = 	$arr_prices[1]['month'];
+	}
 }
 
 //ajax call
@@ -226,7 +226,7 @@ if (isset($_REQUEST['ajaxload'])) {
 			   !isset($item['zone_availability'][$zoneSelected]) ||
 			   !$item['zone_availability'][$zoneSelected]){
 			    	continue;
-			    }			
+			    }
 			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
             echo '<tr style="border-top: 1px solid  #efefef">
                     <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
@@ -258,9 +258,9 @@ if (isset($_REQUEST['ajaxload'])) {
 			   !$item['zone_availability'][$zoneSelected]){
 			    	continue;
 			    }
-			
+
 			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
-			
+
             echo '<tr style="border-top: 1px solid  #efefef">
                     <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
                     <td>'.$product_price.'</td>
@@ -469,7 +469,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
         $data['name'] = $_POST['setup_lw_productname'];
         $data['description'] = $_POST['setup_lw_description'];
 
-		
+
         /*if ($_POST['setup_lw_price_type'] == 'perentage') {
     		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
 
@@ -693,7 +693,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
         $config = new StormOnDemandStormConfig($_SESSION['api_username'], $_SESSION['api_password'], 'bleed');
 
         $ret = $config->details($row['configoption7']);
-		
+
         if($error = $config->getError()) {
             $vpstype[0] = 'ERROR';
             die();
@@ -703,15 +703,15 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
 
 		$product 	  = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
 		$product_ret = $product->details(null,'SS.VPS');*/
-		
+
 		$product_price = $arr_product_price[$ret['id']] != '' ? $arr_product_price[$ret['id']] : '';
 		if ($product_price != '') {
 			$vpstype[$ret['id']] = $ret['description'].' / $'.$product_price;
 		} else {
 			$vpstype[$ret['id']] = $ret['description'];
 		}
-		
-		
+
+
         // Get backup quota
         if ($product_ret && !empty($product_ret['options'])) {
             foreach ($product_ret['options'] as $kOpt => $vOpt) {
@@ -978,13 +978,3 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
 	<div class="overlay hide"></div>
 </div><!-- end of CONTENT -->
 
-<!-- Le javascript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-
-<script src="'.$ASSETS_DIR.'/js/jquery.js"></script>
-<script src="'.$ASSETS_DIR.'/js/jquery-ui-1.9.1.custom.min.js"></script>
-<script src="'.$ASSETS_DIR.'/js/bootstrap.js"></script>
-
-<script src="'.$ASSETS_DIR.'/js/application.js"></script>
-<script src="'.$ASSETS_DIR.'/js/modulesgarden.js"></script>

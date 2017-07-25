@@ -1,5 +1,4 @@
 <?php
-
 echo
 '
     <div id="mg-content" class="right">
@@ -105,24 +104,8 @@ if($errors)
 }
 
 echo $CONTENT;
-
-echo '
+?>
         </div><!-- end of INNER -->
         <div class="overlay hide">
         </div>
     </div><!-- end of CONTENT -->
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-
-    <script src="'.$ASSETS_DIR.'/js/jquery.js"></script>
-    <script src="'.$ASSETS_DIR.'/js/jquery-ui-1.9.1.custom.min.js"></script>
-    <script src="'.$ASSETS_DIR.'/js/bootstrap.js"></script>
-
-    <script src="'.$ASSETS_DIR.'/js/application.js"></script>
-    <script src="'.$ASSETS_DIR.'/js/modulesgarden.js"></script>
-
-
-';
-?>

@@ -16,18 +16,7 @@ echo '<div class="border-box">
 if($disabled)
 {
     echo '<h2>'.MG_Language::translate('Enable Billing').'</h2>';
-    echo '<script type="text/javascript">
-            jQuery(function(){
-                jQuery("#enable_module").change(function(){
-                    if($(this).val() == "---")
-                    {
-                        return false;
-                    }
-                    document.location = "addonmodules.php?module=StormBilling&modpage=configuration&modsubpage=edit&auto_enable=1&id="+$(this).val();
-                });
-            });
-          </script>
-
+    echo '
         <form action="" method="post" class="form-horizontal form-low">
         <input type="hidden" value="enable" name="modaction" />
         <div class="border-box">
@@ -45,7 +34,17 @@ if($disabled)
                 </div>
             </div>
          </div>
-      </form>';
+      </form>
+
+	  <script type="text/javascript">
+        $("#enable_module").change(function(){
+            if($(this).val() == "---") {
+                return false;
+            }
+            document.location = "addonmodules.php?module=StormBilling&modpage=configuration&modsubpage=edit&auto_enable=1&id="+$(this).val();
+        });
+      </script>
+      ';
 }
 
 

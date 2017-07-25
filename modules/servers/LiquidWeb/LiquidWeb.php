@@ -1372,6 +1372,22 @@ function LiquidWeb_CreateAccount($params)
 	    if($error = $server->getError())
 	    {
 	        return $error;
+	    } else {
+	        for ($i = 0; $i < 5; $i++) {
+                $dtl = $server->details($ret['uniq_id']);
+                if ($dtl['ip'] == '127.0.0.1') {
+                    usleep(30000000);// 30 seconds
+                } else {
+                    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
+                    $command = 'UpdateClientProduct';
+                    $postData = array(
+                        'serviceid' => $params['serviceid'],
+                        'dedicatedip' => $dtl['ip'],
+                    );
+                    $results = localAPI($command, $postData, StormOnDemand_Helper::getAdmin());
+                    break;
+                }
+            }
 	    }
 	    //save uniq_id to database. We need it!
 	    mysql_query("REPLACE INTO mg_liquid_web (`hosting_id`, `uniq_id`) VALUES ('".$params['serviceid']."', '".$ret['uniq_id']."')") or die(mysql_error());
