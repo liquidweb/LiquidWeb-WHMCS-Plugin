@@ -459,6 +459,21 @@ function LiquidWebPrivateParent_CreateAccount($params)
         //has error?
         if($error = $server->getError()){
             return $error;
+	    } else {
+	        for ($i = 0; $i < 5; $i++) {
+                $dtl = $server->details($ret['uniq_id']);
+                if ($dtl['ip'] == '127.0.0.1') {
+                    usleep(30000000);// 30 seconds
+                } else {
+                    $command = 'UpdateClientProduct';
+                    $postData = array(
+                        'serviceid' => $params['serviceid'],
+                        'dedicatedip' => $dtl['ip'],
+                    );
+                    $results = localAPI($command, $postData, StormOnDemand_Helper::getAdmin());
+                    break;
+                }
+            }
         }
 
         $txt = StormOnDemand_Helper::addUniqIdToCustomFields($params['serviceid'],$ret['uniq_id']);
@@ -572,6 +587,21 @@ function LiquidWebPrivateParent_CreateAccount($params)
     if($error)
     {
         return $error;
+	} else {
+		for ($i = 0; $i < 5; $i++) {
+			$dtl = $server->details($ret['uniq_id']);
+			if ($dtl['ip'] == '127.0.0.1') {
+				usleep(30000000);// 30 seconds
+			} else {
+				$command = 'UpdateClientProduct';
+				$postData = array(
+					'serviceid' => $params['serviceid'],
+					'dedicatedip' => $dtl['ip'],
+				);
+				$results = localAPI($command, $postData, StormOnDemand_Helper::getAdmin());
+				break;
+			}
+		}
     }
 
     //Save Uniq ID

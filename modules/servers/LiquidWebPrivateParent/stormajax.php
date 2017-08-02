@@ -122,8 +122,8 @@ if (isset($_REQUEST['modaction']) && ($_REQUEST['modaction'] == 'generate_config
     //Get Parents
     $selected_parents = $product->getConfig('AvailableParents');
 
-    if($selected_parents == null){
-        $selected_parents = $product->getConfig('Parent');
+    if(count($selected_parents) == 0){
+        $selected_parents = array($product->getConfig('Parent'));
     }
 
     require_once $roopath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormPrivateParent.php';
