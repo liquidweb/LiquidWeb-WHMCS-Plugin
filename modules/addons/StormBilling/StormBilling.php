@@ -32,7 +32,7 @@ function StormBilling_config()
 
     if($newVersion && $script == 'configaddonmods.php')
     {
-        $description .=  '<p><span class="label closed">New version</span> of  Liquid Web Storm Servers Billing is available! <span><br>Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span></p>';
+        $description .=  '<p><span class="label closed">New version</span> of  Liquid Web Cloud Servers Billing is available! <span><br>Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span></p>';
     }
 
     return array
@@ -97,10 +97,10 @@ function StormBilling_sidebar($vars)
     $version = $vars['version'];
     $LANG = $vars['_lang'];
 
-    $sidebar = '<span class="header"><img src="images/icons/addonmodules.png" class="absmiddle" width="16" height="16" />Liquid Web Storm Servers</span>
+    $sidebar = '<span class="header"><img src="images/icons/addonmodules.png" class="absmiddle" width="16" height="16" />Liquid Web Cloud Servers</span>
                 <ul class="menu">
                     <li><a href="addonmodules.php?module=StormBilling&action=setup">Product Setup Wizard</a></li>
-                    <li><a href="addonmodules.php?module=StormBilling&action=billing">Storm Servers Billing</a></li>
+                    <li><a href="addonmodules.php?module=StormBilling&action=billing">Cloud Servers Billing</a></li>
                     <li><a href="addonmodules.php?module=StormBilling&action=config">Configuration</a></li>
                     <li></li>
                     <li></li>
@@ -128,7 +128,7 @@ function StormBilling_registerInstance()
      *              EDIT ME
      ***************************************************/
     //Set up name for your module.
-    $moduleName         =   'Storm Servers Billing For WHMCS';
+    $moduleName         =   'Cloud Servers Billing For WHMCS';
     //Set up module version. You should change module version every time after updating source code.
     $moduleVersion      =   STORM_SERVERS_BILLING_VERSION;
     //Encryption key
@@ -158,7 +158,7 @@ function StormBilling_getLatestVersion()
      *              EDIT ME
      ***************************************************/
     //Set up name for your module.
-    $moduleName         =   'Storm Servers Billing For WHMCS';
+    $moduleName         =   'Cloud Servers Billing For WHMCS';
     //Set up module version. You should change module version every time after updating source code.
     $moduleVersion      =   STORM_SERVERS_BILLING_VERSION;
     //Encryption key

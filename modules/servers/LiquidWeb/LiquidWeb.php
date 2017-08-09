@@ -208,7 +208,7 @@ function LiquidWeb_ConfigOptions()
 
         echo '<div id="storm-config-tabs">';
         echo '<ul>
-                <li><a href="#storm-config-tab-storm">Storm Servers</a></li>
+                <li><a href="#storm-config-tab-storm">Cloud Servers</a></li>
                 <li><a href="#storm-config-tab-ssd">SSD Servers</a></li>
                 <li><a href="#storm-config-tab-bare-metal">Bare Metal Servers</a></li>
               </ul>';

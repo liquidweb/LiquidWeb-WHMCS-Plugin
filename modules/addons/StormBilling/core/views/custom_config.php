@@ -25,7 +25,7 @@ if(isset($_REQUEST['savecustomconfig'])) {
     	<div id="top-bar">
 
         	<div id="module-name">
-            	<h2>Liquid Web Custom Configuration</h2>
+            	<h2>Custom Configuration</h2>
             </div>
             <!--<div class="clear"></div>-->
             <a class="slogan" href="http://www.liquidweb.com" target="_blank" alt="Liquid Web">

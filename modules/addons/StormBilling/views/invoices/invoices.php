@@ -4,7 +4,7 @@
 echo '<div class="border-box">
         <div class="control-group">
             <strong>Awaiting Invoice</strong> means, that it will be not generated until you will confirm that manually.<br />
-            This is the best way to avoid any unwanted invoices for your clients and test the possibilities of <strong>StormBilling</strong> module. <br /><br />
+            This is the best way to avoid any unwanted invoices for your clients and test the possibilities of <strong>Cloud Billing</strong> module. <br /><br />
             To enable this feature, please edit your Products in <a href="addonmodules.php?module=StormBilling&modpage=configuration">Configuration</a> page and disable "Autogenerate Invoice" option.
         </div>
       </div>';
@@ -47,7 +47,7 @@ else
                     </form>
                 </td>
               </tr>';
-    } 
+    }
     echo '</tbody>
         </table>';
     echo '<div class="pagination pagination-right">'.$pagination->getPagination().'</div>';

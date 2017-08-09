@@ -180,7 +180,7 @@ function LiquidWebSSL_ConfigOptions()
     if($newVersion && $script == 'configproducts.php' && $_GET['action'] != 'save')
     {
         echo '<p style="text-align: center;" class="infobox op_version">
-            <span style="font-weight: bold">New version of Storm On Demand module is available!</span>
+            <span style="font-weight: bold">New version of Liquid Web module is available!</span>
             <span style="font-weight: bold"><br />Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span>
          </p>';
     }

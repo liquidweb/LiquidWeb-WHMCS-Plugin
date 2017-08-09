@@ -67,7 +67,7 @@ if (isset($_REQUEST['ajaxload'])) {
         $ret = $template->lists();
 
         if ($error = $template->getError()) {
-            logModuleCall('StormOnDemand','ConfigOptions',$template->getLastRequest(),'',$template->getLastResponse(),array());
+            logModuleCall('LiquidWeb','ConfigOptions',$template->getLastRequest(),'',$template->getLastResponse(),array());
 
             echo '<p style="color: red">'.$error.'</p>';
             die();
@@ -117,7 +117,7 @@ if (isset($_REQUEST['ajaxload'])) {
         $ret = $template->lists();
 
         if ($error = $template->getError()) {
-            logModuleCall('StormOnDemand','ConfigOptions',$template->getLastRequest(),'',$template->getLastResponse(),array());
+            logModuleCall('LiquidWeb','ConfigOptions',$template->getLastRequest(),'',$template->getLastResponse(),array());
 
             echo '<p style="color: red">'.$error.'</p>';
             die();
@@ -202,7 +202,7 @@ if (isset($_REQUEST['ajaxload'])) {
 
         echo '<div id="storm-config-tabs">';
         echo '<ul id="menus">
-                <li><a href="#storm-config-tab-storm">Storm Servers</a></li>
+                <li><a href="#storm-config-tab-storm">Cloud Servers</a></li>
                 <li><a href="#storm-config-tab-ssd">SSD Servers</a></li>
                 <li><a href="#storm-config-tab-bare-metal">Bare Metal Servers</a></li>
               </ul>';
@@ -324,7 +324,7 @@ if (isset($_REQUEST['ajaxload'])) {
 <div id="mg-content" class="right">
     <div id="top-bar">
         <div id="module-name">
-        	<h2>Liquid Web Product Setup</h2>
+        	<h2>Product Setup</h2>
         </div>
 
         <!--<div class="clear"></div>-->

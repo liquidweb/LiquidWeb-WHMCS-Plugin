@@ -22,7 +22,7 @@ if($disabled)
         <div class="border-box">
 
             <div class="control-group">
-                <label class="control-label">'.MG_Language::translate('Enable StormBilling for: ').'</label>
+                <label class="control-label">'.MG_Language::translate('Enable CloudBilling for: ').'</label>
                 <div class="controls">
                     <select name="module" id="enable_module">
                         <option value="---">---</option>';

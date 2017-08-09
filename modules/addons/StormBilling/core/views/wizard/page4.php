@@ -179,19 +179,19 @@ if ((isset($_SESSION['api_username'])) && (isset($_SESSION['api_password']))){
 function showTemplates()
 {
     $("#load-storm-templates").dialog('open');
-    $("#load-storm-templates").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
+    $("#load-storm-templates").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWeb/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
 }
 
 function showZone()
 {
     $("#load-storm-zones").dialog('open');
-    $("#load-storm-zones").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
+    $("#load-storm-zones").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWeb/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
 }
 
 function showVPSType()
 {
     $("#load-storm-vpstypes").dialog('open');
-    $("#load-storm-vpstypes").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
+    $("#load-storm-vpstypes").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWeb/assets/images/admin/loading.gif\" alt=\"loading...\"/></p><p style=\"text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;\">Please note that this may take 30+ seconds to load all the data from our API.</p>");
 }
 
 function submitForm(action) {

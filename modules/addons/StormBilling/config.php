@@ -21,10 +21,10 @@
 class StormBilling
 {
     //Module Name
-    public $name = 'Liquid Web Storm Servers Billing';
+    public $name = 'Liquid Web Cloud Servers Billing';
 
     //System Name
-    public $system_name = 'Liquid Web Storm Servers Billing';
+    public $system_name = 'Liquid Web Cloud Servers Billing';
 
     //Module Description
     public $description = 'This module gives you possibility to bill your clients for usage of specific resources in the accounts.<br />';

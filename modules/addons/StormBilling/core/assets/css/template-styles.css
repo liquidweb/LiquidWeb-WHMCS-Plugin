@@ -86,11 +86,13 @@
 	   -moz-border-radius: 2px;	
 			border-radius: 2px;	
 }
+/*
 #mg-wrapper .shadow-inset, #mg-wrapper .slogan {
 	-webkit-box-shadow: 0 -2px 0 rgba(0,0,0, 0.3)inset;
 	   -moz-box-shadow: 0 -2px 0 rgba(0,0,0, 0.3)inset;
 	        box-shadow: 0 -2px 0 rgba(0,0,0, 0.3)inset;
 }
+*/
 /* =================================================
 	----------------- TYPOGRAPHY -----------------
 ==================================================== */
@@ -453,10 +455,10 @@
 ------------------------- */
 @media (min-width: 1200px) {
 	#mg-wrapper #top-nav {
-		margin: 6px 0 0 230px;
+		margin: 6px 0 0 350px;
 	}
 	#mg-wrapper #module-name {
-		width: 240px;
+		width: 360px;
 		position: absolute;
 		left: 30px;
 	}

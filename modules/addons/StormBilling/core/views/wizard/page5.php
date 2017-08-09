@@ -28,7 +28,7 @@ global $CONFIG;
 
 
     	<h2 class="section-heading">
-    		<i class="icon-tasks"></i>Liquid Web Storm Private Cloud configuration
+    		<i class="icon-tasks"></i>Private Cloud configuration
     	</h2>
 
 	<form id="setupWizPg5" action="addonmodules.php?module=StormBilling&action=setup&pg=5" method="post">
@@ -280,7 +280,7 @@ $(document).ready(function() {
 function showTemplates()
 {
     $("#load-storm-templates").dialog('open');
-    $("#load-storm-templates").html("<p style=\"text-align:center\"><img src=\"../modules/servers/StormOnDemand/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>.");
+    $("#load-storm-templates").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWeb/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>.");
 }
 
 function submitForm(action)

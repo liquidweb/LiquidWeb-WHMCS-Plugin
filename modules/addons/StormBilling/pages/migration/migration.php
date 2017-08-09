@@ -4,10 +4,10 @@ $q = mysql_safequery("
     SELECT
         BS.product_id
         ,BS.enable
-        ,BS.module 
+        ,BS.module
         ,P.name AS product_name
         ,G.name AS `group`
-    FROM 
+    FROM
         StormServersBilling_settings BS
     JOIN
         tblproducts P
@@ -15,9 +15,9 @@ $q = mysql_safequery("
             P.id = BS.product_id
     JOIN
         tblproductgroups G
-        ON 
+        ON
             G.id = P.gid
-    WHERE 
+    WHERE
         BS.enable = 1
         ");
 
@@ -29,5 +29,5 @@ while($row = mysql_fetch_assoc($q))
 
 if(!$avaible)
 {
-    addError(MG_Language::translate('You currently have no active products in Storm Servers Billing 1.x'));
+    addError(MG_Language::translate('You currently have no active products in Cloud Servers Billing 1.x'));
 }

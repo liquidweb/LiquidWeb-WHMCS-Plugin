@@ -137,11 +137,11 @@ EOT;
 
     if($newVersion && $script == 'configaddonmods.php')
     {
-        $description .=  '<p><span class="label closed">New version</span> of  Liquid Web Storm Servers Billing is available! <span><br>Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span></p>';
+        $description .=  '<p><span class="label closed">New version</span> of  Liquid Web Cloud Servers Billing is available! <span><br>Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span></p>';
     }
 
     $configarray = array(
-    "name"        => "Storm On Demand Widget For WHMCS",
+    "name"        => "Liquid Web Widget For WHMCS",
     "description" => $description,
     "version"     => STORM_SERVERS_WIDGET_VERSION,
     "author"      => '<a href="http://www.liquidweb.com" targer="_blank">Liquid Web</a>',
@@ -158,7 +158,7 @@ EOT;
 
 function LiquidAndStormWidget_activate($params) {
 
-  $name = 'Liquid Web Storm Servers For WHMCS';
+  $name = 'Liquid Web Cloud Servers For WHMCS';
   $template = mysql_get_row("SELECT * FROM `tblemailtemplates` WHERE `name` = ?", array( $name ));
   $template_module = mysql_get_row("SELECT * FROM `tbladdonmodules` WHERE `setting` = ?", array( "emailtplid" ));
   if($template == false){
@@ -224,7 +224,7 @@ function LiquidAndStormWidget_activate($params) {
 }
 
 function LiquidAndStormWidget_deactivate() {
-  $name = 'Liquid Web and Storm On Demand Alert';
+  $name = 'Liquid Web Alert';
   mysql_safequery("DELETE FROM `tblemailtemplates` WHERE `name` = ?", array($name));
   mysql_safequery("DROP TABLE `tblwidgetdetails`");
   mysql_safequery("DROP TABLE `tblwidgetppdetails`");
@@ -285,7 +285,7 @@ function LiquidWebStormServersForWHMCS_registerInstance()
      *              EDIT ME
      ***************************************************/
     //Set up name for your module.
-    $moduleName         =   "Liquid Web Storm Servers For WHMCS";
+    $moduleName         =   "Liquid Web Cloud Servers For WHMCS";
     //Set up module version. You should change module version every time after updating source code.
     $moduleVersion      =   STORM_SERVERS_WIDGET_VERSION;
     //Encryption key
@@ -328,7 +328,7 @@ function LiquidWebStormServersForWHMCS_getLatestVersion()
      *              EDIT ME
      ***************************************************/
     //Set up name for your module.
-    $moduleName         =   "Liquid Web Storm Servers For WHMCS";
+    $moduleName         =   "Liquid Web Cloud Servers For WHMCS";
     //Set up module version. You should change module version every time after updating source code.
     $moduleVersion      =   STORM_SERVERS_WIDGET_VERSION;
     //Encryption key

@@ -158,16 +158,6 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
     ob_start();
 
     $table = '<table width="100%" bgcolor="#cccccc" cellspacing="1" align="center"><tbody><tr bgcolor="#efefef" style="text-align:center;font-weight:bold;"><td>Product Name</td><td>Config ID</td><td>Available Zone</td></tr>';
-    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
-    //load server class
-    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormServer.php';
-
-    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandNetworkZone.php';
-
-    //load server helper class
-
-    //Load API Class
-    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'class.ModuleInformationClient.php';
 
     $products = mysql_get_array("SELECT * FROM tblwidgetvpsdetails");
 
@@ -178,19 +168,11 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
         foreach($products as $productDetails){
             $table .= '<tr bgcolor="#ffffff" style="text-align:center;"><td>'.$productDetails['product_name'].' - '.$productDetails['domain'].'</td>';
 
-            //$q = mysql_query("SELECT * FROM tblproducts WHERE id = " . (int)$productDetails['packageid'] . " LIMIT 1");
-            //$row = mysql_fetch_assoc($q);
-
             $username = $productDetails['configoption1'];
             $password = $productDetails['configoption2'];
-            //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
-
-            //$zoneSelected   = (int) $productDetails['configoption4'];
             $configSelected = (int) $productDetails['configoption7']; // Id config
 
             $table .= '<td>'.$configSelected.'</td>';
-            //$config = new StormOnDemandStormConfig($username, $password);
-
 			if($productDetails['is_zone_available'] < (int)$alert['value']){
 				$table .= '<td style="color:red;">'.$productDetails['zone_available'].'</td></tr>';
 			}else{
@@ -249,7 +231,7 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
             $content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
     	}
     } else {
-    	$content .= '<p style="text-align: center; font-weight: bold">You do not have any private servers in Storm On Demand or Liquid Web</p>
+    	$content .= '<p style="text-align: center; font-weight: bold">You do not have any private servers in Liquid Web</p>
 
     	<div align="right"; class="widget-footer">';
     	if (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES')){
@@ -260,139 +242,6 @@ if(isset($_SESSION['adminid']) && $_SESSION['adminid'] && isset($_REQUEST['ZoneA
     	$content = $content.'Goto Liquid Web Product Setup Wizard</a></div>';
     }
     echo $table.'<hr />'.$content;
-
-
-/*
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'class.ModuleInformationClient.php';
-
-    if (file_exists(dirname(__FILE__).DIRECTORY_SEPARATOR.'moduleVersion.php')) {
-    require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'moduleVersion.php';
-         define('STORM_SERVERS_WIDGET_VERSION', $moduleVersion);
-    } else {
-         define('STORM_SERVERS_WIDGET_VERSION', 'Development Version');
-    }
-
-    //Set up name for your module.
-    $moduleName         =   'Liquid Web Storm Servers For WHMCS';
-    //Set up module version. You should change module version every time after updating source code.
-    $moduleVersion      =   STORM_SERVERS_WIDGET_VERSION;
-    //Encryption key
-    $moduleKey          =   'geBrbObvFPJHzHtTq9dRvl60DFnOyN5oUdZsVROMWps7bnhvUg7KFSDl65I23euI';
-
-    //Create Client Class
-    $client = new ModuleInformationClient($moduleName, $moduleKey);
-
-    //Try to register current instance
-    $ret = $client->registerModuleInstance($moduleVersion,  $_SERVER['SERVER_ADDR'], $_SERVER['SERVER_NAME']);
-    $ret = json_decode($ret);
-
-
-    //Save current module version in database
-    if (isset($ret->tag_name)) {
-        ModuleInformationClient::setLocalVersion($moduleName, $moduleVersion);
-    }
-*/
-    /*$hasModulesGardenWidget = mysql_query("SELECT a.id FROM tbladmins a
-    WHERE a.id = ".(int)$_SESSION['adminid']." AND a.homewidgets LIKE '%GardenProductsWidget:true%'");
-    //Check already existing modules
-    if(!mysql_num_rows($hasModulesGardenWidget))
-    {*/
-        //Get Available products
-        /*
-        $ret = $client->getAvailableProducts();
-
-        //Any errors?
-        if($ret === false)
-        {
-            echo '<p style="text-align: center; color: #f00"><b>'.$client->getError().'</b></p>';
-            exit;
-        }
-
-
-        $clientModules = array();
-
-        foreach($ret->data->modules as $module)
-        {
-            if(!in_array($module->name, array('Liquid Web Storm Servers For WHMCS')))
-            {
-                continue;
-            }
-
-            $localVersion = ModuleInformationClient::getLocalVersion($module->name);
-
-            if($localVersion)
-            {
-                $module->local_version  =   $localVersion;
-                $clientModules[]        =   $module;
-            }
-        }
-        */
-
-        //if($clientModules && !empty($clientModules))
-/*
-        $localVersion = ModuleInformationClient::getLocalVersion('Liquid Web Storm Servers For WHMCS');
-        if ($ret->tag_name > $localVersion)
-        {
-            $out .= '<table style="width: 100%; margin-top: 10px">
-                <thead>
-                    <tr bgcolor="#efefef" style="text-align:center;font-weight:bold;">
-                        <th>Module Name</th>
-                        <th>Current Version</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>';
-
-                $out .= '<tr>
-                            <td>Liquid Web and Storm On Demand Package</td>
-                            <td>'.$localVersion.'</td>';
-
-                if($ret->tag_name == $localVersion)
-                {
-                    $out .= '<td>Up to date</td>';
-                }
-                else
-                {
-                    $out .= '<td>New version is available. <a style="color: #0A0" href="'.$ret->tarball_url.'">Check it!</a></td>';
-
-                    $out .= '<script type="text/javascript">
-                    $(function() {
-                        $("#dialog").dialog({
-                    		width: 600,
-                            modal: true,
-                            position: { my: "top", at: "top+150" }
-                        });
-                      });
-
-                    $( "#dialog" ).dialog( "open" );
-
-                      </script>
-
-
-                    <div id="dialog" title="Liquidweb">
-                    	<img style="position:absolute; right:8px; width:230px; height:70px;" src="../modules/addons/LiquidAndStormWidget/lw-logo.png" alt="Liquid Web">
-                    	<br/>
-                      	<p>New version of Liquid Web addon available. <br/><a href="'.$ret->tarball_url.'">Click here to download</a></p>
-                    </div>';
-
-                }
-
-                $out .=  '</tr>';
-
-                $out .= '   </tbody>
-                 </table>
-
-                <div align="right"; class="widget-footer">';
-                if (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES')){
-                    $out = $out.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm" style="color:#fff; background-color:#333333">';
-                } else {
-                    $out = $out.'<a href="addonmodules.php?module=StormBilling&action=setup" class="btn btn-sm">';
-                }
-                $out = $out.'Goto Liquid Web Product Setup Wizard</a></div>';
-
-            echo $out;
-        } */
-    //}
 
     ob_end_flush();
     exit;
@@ -416,7 +265,7 @@ function ZoneAvailability($vars) {
                </script>
                <div id="ZoneAvailability"></div>';
 
-    return array( 'title' => 'Liquid Web Storm Servers', 'content' => $content );
+    return array( 'title' => 'Liquid Web Cloud Servers', 'content' => $content );
 
 }
 
@@ -434,9 +283,6 @@ function LiquidAndStormWidget_hook_DailyCronJobPreEmail($vars){
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormServer.php';
 
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandNetworkZone.php';
-
-    //load server helper class
-    //require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
 
     $outofstock      =  mysql_get_array("SELECT `name` FROM `tblproducts` WHERE `stockcontrol` = 'on' AND `qty` <= 0");
 
@@ -461,7 +307,6 @@ function LiquidAndStormWidget_hook_DailyCronJobPreEmail($vars){
 
         $username = $row['configoption1'];
         $password = $row['configoption2'];
-        //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
 
         $liquid_configSelected = (int) $row['configoption7']; // Id config
 
@@ -528,7 +373,6 @@ function LiquidAndStormWidget_hook_DailyCronJobPreEmail($vars){
 
         $username = $row['configoption1'];
         $password = $row['configoption2'];
-        //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
 
         $storm_configSelected = (int) $row['configoption7']; // Id config
 
@@ -598,7 +442,7 @@ function LiquidAndStormWidget_hook_DailyCronJobPreEmail($vars){
         $admins = mysql_get_array("SELECT `id` FROM `tbladmins` WHERE `roleid` = ?", array($roleid));
 
         foreach($admins as $admin){
-          sendAdminMessage("Storm On Demand Widget For WHMCS",
+          sendAdminMessage("Liquid Web Widget For WHMCS",
                             array("liquid_product_exist"  =>$liquid_product_exist,
                                   "storm_product_exist"   =>$storm_product_exist,
                                   "liquid_product_array"  =>$liquid_product_array,

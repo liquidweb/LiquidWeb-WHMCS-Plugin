@@ -11,10 +11,10 @@ echo '<script type="text/javascript">
         jQuery(function(){
             jQuery(".btn-extended-pricing").click(function(event){
                 event.preventDefault();
-                
+
                 parent = jQuery(this).attr("data-parent");
                 children = jQuery(this).closest("table").find("tr[data-parent="+parent+"]");
-                
+
                 if(jQuery(this).hasClass("closed"))
                 {
                     jQuery(this).removeClass("closed");
@@ -27,7 +27,7 @@ echo '<script type="text/javascript">
                     jQuery(this).addClass("btn-info").removeClass("btn-success");
                     jQuery(children).addClass("hidden");
                 }
-                
+
                 /*next = jQuery(this).closest(".usage-records-line").next(".extended-pricing-line");
                 if(jQuery(next).hasClass("hidden"))
                 {
@@ -40,7 +40,7 @@ echo '<script type="text/javascript">
                     jQuery(next).addClass("hidden");
                 }*/
             });
-            
+
             jQuery("#get_module_description").change(function(){
                 val = $(this).val();
                 jQuery.post(window.location.href, "ajax=1&modaction=description&submodule="+val, function(data){
@@ -50,12 +50,12 @@ echo '<script type="text/javascript">
                     $("#module_resources").html(data);
                     reloadScripts();
                 });
-                
+
                 jQuery.post(window.location.href, "ajax=1&modaction=module_area&submodule="+val, function(data){
                     $("#module_area").html(data);
                 });
             });
-            
+
             jQuery("#bill_per_month_check").change(function(){
                 if(jQuery(this).is(":checked"))
                 {
@@ -67,7 +67,7 @@ echo '<script type="text/javascript">
                     jQuery("#bill_per_days_value").removeAttr("disabled");
                 }
             });
-            
+
             jQuery("#bill_on_invoice_generate").change(function(){
                 if(jQuery(this).is(":checked"))
                 {
@@ -83,7 +83,7 @@ echo '<script type="text/javascript">
                     jQuery("input[name=autogenerate_invoice]").removeAttr("disabled");
                 }
             });
-            
+
             jQuery("input[name=\'credit_billing[enable]\']").change(function(){
                 if(jQuery(this).is(":checked"))
                 {
@@ -95,9 +95,9 @@ echo '<script type="text/javascript">
                     $("#billing-settings input[type=checkbox]").removeAttr("disabled");
                 }
             });
-            
+
             jQuery("input[name=\'automation[autosuspend][enable]\']").change(function(){
-   
+
                 if(jQuery(this).is(":checked"))
                 {
                     $(".autosuspend").show();
@@ -113,10 +113,10 @@ echo '<script type="text/javascript">
             });
         });
       </script>';
- 
+
 echo '<div class="border-box">
         <div class="control-group">
-            You can simply enable StormBilling for this product by  configuring price for the following items.<br />
+            You can simply enable CloudBilling for this product by  configuring price for the following items.<br />
             <strong>Setting the following up will also bill existing accounts!</strong>
         </div>
       </div>';
@@ -149,7 +149,7 @@ echo '
                     <label class="control-label"><h3><strong>'.MG_Language::translate('Enable').'</strong></h3></label>
                     <div class="controls">
                         <input type="checkbox" name="enable_billing" id="enable_billing_check" '.($settings['enable'] == 1 || isset($_REQUEST['auto_enable']) ? 'checked' : '').' />
-                        <span class="help-inline">'.MG_Language::translate('Uncheck This Box to DISABLE StormBilling For This Product').'</span>
+                        <span class="help-inline">'.MG_Language::translate('Uncheck This Box to DISABLE CloudBilling For This Product').'</span>
                     </div>
                 </div>
                 ';
@@ -166,7 +166,7 @@ echo '
                             echo '<strong>'.$u.'</strong>';
                             break;
                         }
-                    } 
+                    }
                 }
                 else
                 {
@@ -293,7 +293,7 @@ echo '
                         <input class="span1" type="text" name="bill_duedate" id="bill_duedate_value" value="'.$settings['billing_settings']['billing_duedate'].'" />
                         <span class="help-inline">'.MG_Language::translate('Days (7 by default)').'</span>
                     </div>
-                </div> 
+                </div>
             </div>
             <!--<div id="automation-settings" class="tab-pane">
                 <div class="control-group">
@@ -316,7 +316,7 @@ echo '
                         <input class="span6" type="text" name="automation[autosuspend][message]" size="5"  value="'.$settings['billing_settings']['automation']['autosuspend']['message'].'" />
                         <span class="help-inline">'.MG_Language::translate('Set up reason for suspend action').'</span>
                     </div>
-                </div> 
+                </div>
 
             </div>-->
             <div id="module-settings" class="tab-pane '.(!$configuration && !$html_area ? 'hidden' : '').'">';
@@ -327,7 +327,7 @@ echo '
                 }
 
                 if($configuration)
-                { 
+                {
                     foreach($configuration as $name => $conf)
                     {
                         echo '<div class="control-group">
@@ -354,7 +354,7 @@ echo '
             echo '</div>';
         echo '
             </div>
-        </div>';    
+        </div>';
 
 echo '</div>';
 
@@ -401,7 +401,7 @@ echo '<table class="table">
                     </tr>
                     <tbody id="module_resources">';
                     foreach($resources as $k => $v)
-                    {         
+                    {
                         echo '<tr>
                     <td>'.MG_Language::translate($v['FriendlyName']).'&nbsp';
                                 if($v['Description'])
@@ -466,13 +466,13 @@ echo '<table class="table">
              echo '</td>';*/
 
                         echo '</tr>';
-                        
+
            /* if($v['ExtendedPricing'])
             {
                 $max = count($v['ExtendedPricing']);
                 $i = 1;
                 foreach($v['ExtendedPricing'] as $extendedPricing)
-                { 
+                {
                     echo '<tr class="extended-pricing-line hidden '.($i == $max ? 'last-line' : '').'" data-parent="'.$k.'">
                             <td>'.$extendedPricing['FriendlyName'].'</td>
                             <td><input style="width: 100px!important" type="text" name="resources['.$k.'][ExtendedPricing]['.$extendedPricing['Relid'].'][FreeLimit]" size="7" value="'.$extendedPricing['FreeLimit'].'" placeholder="'.MG_Language::translate('Use Default').'" />'.$v['Unit'].'</td>
@@ -482,7 +482,7 @@ echo '<table class="table">
                             <td></td>
                           </tr>';
                     $i++;
-                } 
+                }
             }*/
 
             if($v['Html'])
@@ -500,4 +500,4 @@ echo '<table class="table">
 
 echo '<button class="btn btn-success clearfix">'.MG_Language::translate('Save Changes').'</button>';
 
-echo '</form>'; 
+echo '</form>';
