@@ -21,7 +21,7 @@ if(!class_exists('StormOnDemandStormConfig'))
             $results = $this->__request('Storm/Config/list', $data, __METHOD__);
 
             //remove these servers from config list
-            $excludeCodes = array("1078","1079","1048","1065","1064","1073","1067","1066","1072","1074","1077","1076","1061","1075");
+            $excludeCodes = array("1078","1079","1048","1065","1064","1073","1067","1066","1072","1074","1077","1076","1061","1075","1264","1265","1266","1109");
 
             foreach ($results['items'] as $key => $value) {
                 if (in_array($value['id'], $excludeCodes)) {
