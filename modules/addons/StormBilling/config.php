@@ -33,7 +33,7 @@ class StormBilling
     public $version = STORM_SERVERS_BILLING_VERSION;
 
     //Module Author
-    public $author = '<a href="http://www.liquidweb.com" targer="_blank">Liquid Web</a>';
+    public $author = '<a href="http://www.liquidweb.com/partner-programs/reseller-hosting/" targer="_blank">Liquid Web</a>';
 
     //Default Page
     public $default_page = 'configuration';

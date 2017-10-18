@@ -47,10 +47,9 @@ if (!class_exists('StormOnDemandConnection')) {
             //Prepare data
             $this->username = $username;
             $this->password = $password;
-
             //Create curl with basic settings
             $this->ch = curl_init();
-            curl_setopt($this->ch, CURLOPT_USERPWD, $this->username . ':' . $this->password);
+            curl_setopt($this->ch, CURLOPT_USERPWD, "$username:$password");
             curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($this->ch, CURLOPT_HEADER, true);
             curl_setopt($this->ch, CURLINFO_HEADER_OUT, true);
@@ -105,9 +104,7 @@ if (!class_exists('StormOnDemandConnection')) {
             //header
             //run curl
             $ret = curl_exec($this->ch);
-
             $header = curl_getinfo($this->ch);
-
             $this->last_request = $data;
             $this->last_request_header = $header['request_header'];
 

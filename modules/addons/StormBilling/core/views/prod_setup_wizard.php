@@ -68,7 +68,6 @@ if (isset($_REQUEST['ajaxload'])) {
 
         if ($error = $template->getError()) {
             logModuleCall('LiquidWeb','ConfigOptions',$template->getLastRequest(),'',$template->getLastResponse(),array());
-
             echo '<p style="color: red">'.$error.'</p>';
             die();
         }
@@ -255,7 +254,8 @@ if (isset($_REQUEST['ajaxload'])) {
 			if(!isset($item['zone_availability']) 				 ||
 			   empty($item['zone_availability']) 				 ||
 			   !isset($item['zone_availability'][$zoneSelected]) ||
-			   !$item['zone_availability'][$zoneSelected]){
+			   !$item['zone_availability'][$zoneSelected]        ||
+			   $arr_product_price[$item['id']] == ''){
 			    	continue;
 			    }
 
@@ -328,7 +328,7 @@ if (isset($_REQUEST['ajaxload'])) {
         </div>
 
         <!--<div class="clear"></div>-->
-        <a class="slogan" href="http://www.liquidweb.com" target="_blank" alt="Liquid Web">
+        <a class="slogan" href="http://www.liquidweb.com/partner-programs/reseller-hosting/" target="_blank" alt="Liquid Web">
             <span class="lw-logo"></span>
         </a>
     </div><!-- end of TOP BAR -->
@@ -348,7 +348,6 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
 ?>
     <div class="inner">
     <?php
-
     //validate page 1
     if (isset($_POST['wiz_page']) && ($_POST['wiz_page'] == '1')){
         unset($_SESSION['setup_lw_ssd_vps']); unset($_SESSION['setup_lw_pri_cld']);
@@ -382,8 +381,8 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
     if (isset($_POST['wiz_page']) && ($_POST['wiz_page'] == '2')){
         if (((isset($_POST['wiz_page2_usertype'])) && ($_POST['wiz_page2_usertype'] == 'ACCOUNT'))){
             //validate
-            $username = $_POST['setup_lw_username'];
-            $password = $_POST['setup_lw_password'];
+            $username = html_entity_decode($_POST['setup_lw_username']);
+            $password = html_entity_decode($_POST['setup_lw_password']);
             require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
             $config = new StormOnDemandStormConfig($username, $password, 'bleed');
 
@@ -414,13 +413,13 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             }
         } elseif (((isset($_POST['wiz_page2_usertype'])) && ($_POST['wiz_page2_usertype'] == 'API'))) {
             //validate
-            $username = $_POST['setup_lw_username'];
-            $password = $_POST['setup_lw_password'];
+            $username = html_entity_decode($_POST['setup_lw_username']);
+            $password = html_entity_decode($_POST['setup_lw_password']);
 
             require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
             $config = new StormOnDemandStormConfig($username, $password, 'bleed');
-
             $res = $config->ping();
+
             if (isset($res['ping']) && $res['ping'] = 'success') {
                 $res = $config->userDetails($username);
                 if (isset($res['active']) && $res['active'] = '1') {

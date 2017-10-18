@@ -34,7 +34,6 @@ if(!class_exists('StormOnDemandStormConfig'))
         public function ping()
         {
             $results = $this->__request('Utilities/Info/ping','', __METHOD__);
-
             return $results;
         }
 

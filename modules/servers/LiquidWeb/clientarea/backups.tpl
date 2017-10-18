@@ -11,7 +11,6 @@
      </script>
     {/literal}
 {/if}
-{$template}
 <table class="table table-framed table table-condensed" style="width: 100%">
     <thead>
         <tr>

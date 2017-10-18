@@ -58,7 +58,7 @@ if($TOP_MENU)
 echo '
 
             <!--<div class="clear"></div>-->
-        <a class="slogan" href="http://www.liquidweb.com" target="_blank" alt="Liquid Web">
+        <a class="slogan" href="http://www.liquidweb.com/partner-programs/reseller-hosting/" target="_blank" alt="Liquid Web">
             <span class="lw-logo"></span>
         </a>
         </div><!-- end of TOP BAR -->

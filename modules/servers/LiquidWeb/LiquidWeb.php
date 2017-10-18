@@ -555,7 +555,6 @@ function LiquidWeb_ConfigOptions()
         require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
         $zone = new StormOnDemandNetworkZone($username, $password);
 
-
         //Templates
         $configurable_options[0] = array
         (
@@ -938,102 +937,7 @@ function LiquidWeb_ConfigOptions()
         ) ENGINE = MyISAM") or die(mysql_error());
 
     //Base config
-   $config                 =   array
-    (
-        'Username'          =>  array
-        (
-            'Type'          =>  'text',
-            'Size'          =>  '25',
-        ),
-        'Password'          =>  array
-        (
-            'Type'          =>  'password',
-            'Size'          =>  '25'
-        ),
-
-        'Default Configurable Options'       =>  array
-        (
-            'Type'          =>  '',
-            'Description'   =>  '<a id="generate-storm-confoption" href="stormajax=generate-confoption" class="load-configuration">Generate Default Configurable Options</a>'
-        ),
-        'Zone'              =>  array
-        (
-            'Type'          =>  'text',
-            'Size'          =>  '25',
-            'Default'	    =>  27
-        ),
-        //Just for defaults
-        'Template'          =>  array
-        (
-            'Type'          =>  'text',
-            'Size'          =>  '25',
-            'Description'   =>  '<a id="load-storm-template" href="stormajax=load-template" class="load-configuration">Load Template</a>'
-        ),
-        'Image'             =>  array
-        (
-            'Type'          =>  'text',
-            'Size'          =>  '25',
-            'Description'   =>  '<a id="load-storm-image" href="stormajax=load-image" class="load-configuration">Load Image</a>'
-        ),
-        'Config'            =>  array
-        (
-          'Type'            =>  'text',
-          'Size'            =>  '25',
-          'Description'     =>  '<a id="load-storm-config" href="stormajax=load-config" class="load-configuration">Load Config</a>'
-        ),
-        'Backup Enabled'    =>  array
-        (
-            'Type'          =>  'yesno'
-        ),
-        'Backup Plan'       =>  array
-        (
-            'Type'          =>  'dropdown',
-            'Options'       =>  'quota,daily',
-        ),
-        'Backup Quota'      =>  array
-        (/*
-            'Type'          =>  'text',
-            'Size'          =>  '25',*/
-            'Type'          =>  'dropdown',
-        ),
-        "Number of IP Addresses"       =>  array
-        (
-            'Type'          =>  'text',
-            'Size'          =>  '25',
-            'Default'       =>  1
-        ),
-        "Maximum IP Addresses"=>  array
-        (
-            'Type'          =>  'text',
-            'Size'          =>  '25',
-            'Default'       =>  8
-        ),
-        'Bandwidth Quota'   =>  array
-        (
-            'Type'          =>  'dropdown',
-            'Options'       =>  'Pay as You Go,250,500,1000,2000,4000',
-        ),
-        'Monitoring'        =>  array
-        (
-            'Type'          =>  'yesno',
-            'Description'   =>  'Check if you want to display monitoring in the clientarea'
-        ),
-        'Firewall'          =>  array
-        (
-            'Type'          =>  'yesno',
-            'Description'   =>  'Check if you want to enable firewall managing in the clientarea'
-        ),
-        "IPs Management"   =>  array
-        (
-            'Type'          =>  'yesno',
-            'Description'   =>  'Check if you want to enable IP managing in the clientarea'
-        ),
-        "Error"   =>  array
-        (
-            'Type'          =>  '',
-            'Description'   =>  '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">Authorization error. Please check username and password.</span></p>'
-        )
-    );
+    $config = getConfigFields();
 
 	//input keys
 	//id name form input =  packageconfigoption[array_search($inputName,$configFormKeys) + 1]
@@ -1052,6 +956,7 @@ function LiquidWeb_ConfigOptions()
                               );
 
 	$productQuery = ModuleInformationClient::mysql_safequery('SELECT * FROM tblproducts WHERE id = ? LIMIT 1', array($productId));
+
 	$productRow   = mysql_fetch_assoc($productQuery);
 
 	$bqName   = 'configoption'.(array_search('Backup Quota',$configFormKeys)+1);
@@ -1062,32 +967,36 @@ function LiquidWeb_ConfigOptions()
 	$jsTplParams['bandwidth_quota'] = ($productRow[$bndqName])?$productRow[$bndqName]:5000;
 
 	$zoneResults = array();
+
 	//get full zone name
 	if($productRow[$zoneName]){
+    	//if (isset($_REQUEST['action']) && ($_REQUEST['action'] == 'edit')) {
+    	    //only call from products edit page
 
-		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
+    		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
 
-		$zone 		 = new StormOnDemandNetworkZone($productRow['configoption1'], $productRow['configoption2']);
-		$zoneResults = $zone->lists();
+    		$zone 		 = new StormOnDemandNetworkZone($productRow['configoption1'], $productRow['configoption2']);
+    		$zoneResults = $zone->lists();
 
-		if($zoneResults){
-			$productRow[$zoneName] = (int) $productRow[$zoneName];
-			if(isset($zoneResults['items']) && !empty($zoneResults['items'])){
-				foreach($zoneResults['items'] as $k => $v){
-					if((int)$v['id'] === $productRow[$zoneName]){
+    		if($zoneResults){
+    			$productRow[$zoneName] = (int) $productRow[$zoneName];
+    			if(isset($zoneResults['items']) && !empty($zoneResults['items'])){
+    				foreach($zoneResults['items'] as $k => $v){
+    					if((int)$v['id'] === $productRow[$zoneName]){
 
-						$zoneName = $v['name'];
-						if(isset($v['region']['name'])){
-							$zoneName .=' ('.$v['region']['name'].')';
-						}
+    						$zoneName = $v['name'];
+    						if(isset($v['region']['name'])){
+    							$zoneName .=' ('.$v['region']['name'].')';
+    						}
 
-						$jsTplParams['zone_name'] = $zoneName;
-						break;
-					}
-				}
-			}
-		}
-	}
+    						$jsTplParams['zone_name'] = $zoneName;
+    						break;
+    					}
+    				}
+    			}
+    		}
+    	//}
+    }
 
    $config['Zone']['Description'] = '<style type="text/css">input[name="packageconfigoption[4]"]{display:none;}</style><span id="zone_name">'.$jsTplParams['zone_name'].'</span>&nbsp;&nbsp;<a id="load-storm-zone" href="stormajax=load-zone" class="load-configuration">Load Zone</a>';
 
@@ -1181,10 +1090,14 @@ function LiquidWeb_ConfigOptions()
 	if(!empty($templates)){
 
 		if(empty($zoneResults)){
-			require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
 
-			$zone 		 = new StormOnDemandNetworkZone($productRow['configoption1'], $productRow['configoption2']);
-			$zoneResults = $zone->lists();
+        	//if (isset($_REQUEST['action']) && ($_REQUEST['action'] == 'edit')) {
+        	    //only call from products edit page
+
+    			require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
+    			$zone 		 = new StormOnDemandNetworkZone($productRow['configoption1'], $productRow['configoption2']);
+    			$zoneResults = $zone->lists();
+        	//}
 		}
 
 		if(isset($zoneResults['items']) && !empty($zoneResults['items'])){
@@ -3057,7 +2970,8 @@ function LiquidWeb_BlockStorage($params){
 
 function LiquidWeb_getOption($option, $params)
 {
-    $config = LiquidWeb_ConfigOptions();
+    //$config = LiquidWeb_ConfigOptions();
+    $config = getConfigFields();
 
     if(isset($params['configoptions'][$option]))
     {
@@ -3218,4 +3132,107 @@ function LiquidWeb_validateArray($array, $pregs){
 		}
 	}
 	return true;
+}
+
+
+function getConfigFields()
+{
+    //Base config
+   $config                 =   array
+    (
+        'Username'          =>  array
+        (
+            'Type'          =>  'text',
+            'Size'          =>  '25',
+        ),
+        'Password'          =>  array
+        (
+            'Type'          =>  'password',
+            'Size'          =>  '25'
+        ),
+
+        'Default Configurable Options'       =>  array
+        (
+            'Type'          =>  '',
+            'Description'   =>  '<a id="generate-storm-confoption" href="stormajax=generate-confoption" class="load-configuration">Generate Default Configurable Options</a>'
+        ),
+        'Zone'              =>  array
+        (
+            'Type'          =>  'text',
+            'Size'          =>  '25',
+            'Default'	    =>  27
+        ),
+        //Just for defaults
+        'Template'          =>  array
+        (
+            'Type'          =>  'text',
+            'Size'          =>  '25',
+            'Description'   =>  '<a id="load-storm-template" href="stormajax=load-template" class="load-configuration">Load Template</a>'
+        ),
+        'Image'             =>  array
+        (
+            'Type'          =>  'text',
+            'Size'          =>  '25',
+            'Description'   =>  '<a id="load-storm-image" href="stormajax=load-image" class="load-configuration">Load Image</a>'
+        ),
+        'Config'            =>  array
+        (
+          'Type'            =>  'text',
+          'Size'            =>  '25',
+          'Description'     =>  '<a id="load-storm-config" href="stormajax=load-config" class="load-configuration">Load Config</a>'
+        ),
+        'Backup Enabled'    =>  array
+        (
+            'Type'          =>  'yesno'
+        ),
+        'Backup Plan'       =>  array
+        (
+            'Type'          =>  'dropdown',
+            'Options'       =>  'quota,daily',
+        ),
+        'Backup Quota'      =>  array
+        (/*
+            'Type'          =>  'text',
+            'Size'          =>  '25',*/
+            'Type'          =>  'dropdown',
+        ),
+        "Number of IP Addresses"       =>  array
+        (
+            'Type'          =>  'text',
+            'Size'          =>  '25',
+            'Default'       =>  1
+        ),
+        "Maximum IP Addresses"=>  array
+        (
+            'Type'          =>  'text',
+            'Size'          =>  '25',
+            'Default'       =>  8
+        ),
+        'Bandwidth Quota'   =>  array
+        (
+            'Type'          =>  'dropdown',
+            'Options'       =>  'Pay as You Go,250,500,1000,2000,4000',
+        ),
+        'Monitoring'        =>  array
+        (
+            'Type'          =>  'yesno',
+            'Description'   =>  'Check if you want to display monitoring in the clientarea'
+        ),
+        'Firewall'          =>  array
+        (
+            'Type'          =>  'yesno',
+            'Description'   =>  'Check if you want to enable firewall managing in the clientarea'
+        ),
+        "IPs Management"   =>  array
+        (
+            'Type'          =>  'yesno',
+            'Description'   =>  'Check if you want to enable IP managing in the clientarea'
+        ),
+        "Error"   =>  array
+        (
+            'Type'          =>  '',
+            'Description'   =>  '<p style="text-align: center;" class="errorbox"><span style="font-weight: bold">Authorization error. Please check username and password.</span></p>'
+        )
+    );
+    return $config;
 }
