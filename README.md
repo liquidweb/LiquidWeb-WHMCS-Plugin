@@ -40,6 +40,8 @@ The above commands, in order of execution, will change directory to the Main WHM
 
 This plugin is provided as-is and does not carry any warranty nor does it include any form of support. Bugs and Issues with the plugin can be reported via the Issue tracker built into GitHub and they will be addressed in a timely manner.
 
+For detailed instructions on how to install, setup and use our plugin please see our [articles here](https://www.liquidweb.com/kb/using-whmcs-liquid-web-reseller-plugin/)! You will find a series of posts that detail the steps to get setup and create your first product! If you're looking for alternative installtion instructions please read [Liquid Web WHMCS Plugin Installation Methods](https://www.liquidweb.com/kb/whmcs-plugin-installation-methods/).
+
 Any managed Liquid Web customers experiencing immediate issues can feel free to contact our Heroic Support® via [Call, Email or LiveChat](https://www.liquidweb.com/support/).
 
 ## License
