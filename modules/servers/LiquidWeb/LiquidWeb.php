@@ -208,11 +208,12 @@ function LiquidWeb_ConfigOptions()
 
         echo '<div id="storm-config-tabs">';
         echo '<ul>
-                <li><a href="#storm-config-tab-storm">Cloud Servers</a></li>
+                <!-- <li><a href="#storm-config-tab-storm">Cloud Servers</a></li> -->
                 <li><a href="#storm-config-tab-ssd">SSD Servers</a></li>
                 <li><a href="#storm-config-tab-bare-metal">Bare Metal Servers</a></li>
               </ul>';
 
+/*              
         //Storm Servers
         echo '<div id="storm-config-tab-storm">';
         echo '<table class="datatable" style="width: 100%">
@@ -242,7 +243,7 @@ function LiquidWeb_ConfigOptions()
         }
         echo '</table>';
         echo '</div>';
-
+*/
         //SSD Servers
         echo '<div id="storm-config-tab-ssd">';
         echo '<table class="datatable" style="width: 100%">
