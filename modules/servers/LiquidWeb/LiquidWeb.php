@@ -598,6 +598,10 @@ function LiquidWeb_ConfigOptions()
             $configs = $ret['items'];
 
             foreach ($configs as $config) {
+                //skip storm servers
+                if ($config['category'] == 'storm') {
+                    continue;
+                }
                 if (!$config['available']) {
                     continue;
                 }
