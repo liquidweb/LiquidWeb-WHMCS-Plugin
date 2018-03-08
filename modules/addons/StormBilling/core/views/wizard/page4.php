@@ -118,7 +118,7 @@ if ((isset($_SESSION['api_username'])) && (isset($_SESSION['api_password']))){
         autoOpen: false,
         resizable: false,
         closeOnEscape: true,
-        width: 600,
+        width: 650,
         modal: true,
         position: { my: 'top', at: 'top+150' },
         title : 'Load VPS Types',

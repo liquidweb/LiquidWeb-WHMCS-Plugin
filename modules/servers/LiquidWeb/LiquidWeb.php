@@ -265,16 +265,16 @@ function LiquidWeb_ConfigOptions()
 
             echo '<tr style="border-top: 1px solid  #efefef">
                     <td><input class="storm-config" type="radio" name="config-id" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$item['vcpu'].' CPUs</td>
-                    <td>'.$item['disk'].'</td>
-                    <td>'.$item['memory'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['vcpu'].' CPUs</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['disk'].'GB</td>
+                    <td style="text-align:right; padding-right:8px;">'.round(($item['memory']/1024),1).'GB</td>
                   </tr>';
         }
         echo '</table>';
         echo '</div>';
 
         //Bare-Metal
-        echo '<div id="storm-config-tab-bare-metal">';
+        echo '<div id="storm-config-tab-bare-metal" style="font-size: 12px;">';
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Server Type</th>
@@ -300,14 +300,14 @@ function LiquidWeb_ConfigOptions()
 
             echo '<tr style="border-top: 1px solid  #efefef">
                     <td><input class="storm-config" type="radio" name="config-id" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$item['cpu_speed'].'</td>
-                    <td>'.$item['cpu_count'].'</td>
-                    <td>'.$item['cpu_cores'].'</td>
-                    <td>'.$item['ram_total'].'</td>
-                    <td>'.$item['disk_count'].'</td>
-                    <td>'.$item['disk_total'].'</td>
-                    <td>'.$item['disk_type'].'</td>
-                    <td>'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_speed'].'MHz</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_count'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_cores'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.round(($item['ram_total']/1024),1).'GB</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['disk_count'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['disk_total'].'GB</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['disk_type'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</td>
                   </tr>';
         }
         echo '</table>';

@@ -264,10 +264,10 @@ if (isset($_REQUEST['ajaxload'])) {
 
             echo '<tr style="border-top: 1px solid  #efefef">
                     <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$product_price.'</td>
-					<td>'.$item['vcpu'].' CPUs</td>
-                    <td>'.$item['disk'].'</td>
-                    <td>'.$item['memory'].'</td>
+                    <td style="text-align:right; padding-right:20px;">$'.$product_price.'</td>
+					<td style="text-align:right; padding-right:20px;">'.$item['vcpu'].' CPUs</td>
+                    <td style="text-align:right; padding-right:20px;">'.$item['disk'].'GB</td>
+                    <td style="text-align:right; padding-right:20px;">'.round(($item['memory']/1024),1).'GB</td>
                   </tr>';
         }
         echo '</table>';
@@ -301,15 +301,15 @@ if (isset($_REQUEST['ajaxload'])) {
 			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
             echo '<tr style="border-top: 1px solid  #efefef">
                     <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$product_price.'</td>
-					<td>'.$item['cpu_speed'].'</td>
-                    <td>'.$item['cpu_count'].'</td>
-                    <td>'.$item['cpu_cores'].'</td>
-                    <td>'.$item['ram_total'].'</td>
-                    <td>'.$item['disk_count'].'</td>
-                    <td>'.$item['disk_total'].'</td>
-                    <td>'.$item['disk_type'].'</td>
-                    <td>'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</td>
+                    <td style="text-align:right; padding-right:8px;">'.$product_price.'</td>
+					<td style="text-align:right; padding-right:8px;">'.$item['cpu_speed'].'MHz</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_count'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_cores'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.round(($item['ram_total']/1024),1).'GB</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['disk_count'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['disk_total'].'GB</td>
+                    <td style="text-align:right; padding-right:8px;">'.$item['disk_type'].'</td>
+                    <td style="text-align:right; padding-right:8px;">'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</td>
                   </tr>';
         }
         echo '</table>';
@@ -823,14 +823,25 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
                     $servertable .= "<div class='hidediv' id='".$divid."'><table class='datatable' border='1' style='border-collapse: collapse;'>";
                 }
 
-                $servertable .= "<tr><th></th><th>Server Type</th><th>Speed</th><th>CPUs</th><th>Cores</th><th>RAM</th><th>Disks</th><th>Size</th><th>Type</th><th>RAID</th><th>PRICE</th></tr>";
-                foreach($serverdetails as $sd) {
+                $servertable .= "<tr><th></th>
+                					<th width='28%'>Server Type</th>
+                					<th width='10%'>Speed</th>
+                					<th width='5%'>CPUs</th>
+                					<th width='5%'>Cores</th>
+                					<th width='10%'>RAM</th>
+                					<th width='5%'>Disks</th>
+                					<th width='8%'>Size</th>
+                					<th width='8%'>Type</th>
+                					<th width='8%'>RAID</th>
+                					<th width='13%'>PRICE</th>
+                				</tr>";
 
+                foreach($serverdetails as $sd) {
                     foreach ($sd['zone_availability'] as $key => $value) {
                         if ($key == $z['id'] && $value != 0) {
                             $price = $sd['prices'][$z['region']['id']]['month'];
                             $servertable .= "<tr>";
-                                $servertable .= "<td><input type='radio' name='server' id=". $sd['value']." onclick='setconfigid(this.id)'/></td><td>".$sd['cpu_description']."</td><td>".$sd['cpu_speed']."</td><td>".$sd['cpu_sockets']."</td><td>".$sd['cpu_cores']."</td><td>".$sd['memory']."</td><td>".$sd['disk_count']."</td><td>".$sd['disk_total']."</td><td>".$sd['disk_type']."</td><td>".'RAID'.$sd['raid_level']."</td><td>$".$price." / mo</td>";
+                                $servertable .= "<td><input type='radio' name='server' id=". $sd['value']." onclick='setconfigid(this.id)'/></td><td>".$sd['cpu_description']."</td><td>".$sd['cpu_speed']."MHz</td><td>".$sd['cpu_sockets']."</td><td>".$sd['cpu_cores']."</td><td>".round(($sd['memory']/1024),1)."GB</td><td>".$sd['disk_count']."</td><td>".$sd['disk_total']."GB</td><td>".$sd['disk_type']."</td><td>".'RAID'.$sd['raid_level']."</td><td>$".$price." / mo</td>";
                             $servertable .= "</tr>";
                         }
                     }

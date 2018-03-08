@@ -37,7 +37,7 @@ global $CONFIG;
         <input type="hidden" name="setup_lw_add_server_name" id="setup_lw_add_server_name" value="">
         <!--<input type="hidden" name="setup_lw_add_server_password" id="setup_lw_add_server_password" value="">-->
         <input type="hidden" name="setup_lw_add_server_configid" id="setup_lw_add_server_configid" value="">
-        <div id="load-storm-add-server" style="overflow-x: hidden; overflow-y: hidden;">
+        <div id="load-storm-add-server" style="overflow-x: hidden; overflow-y: hidden; font-size: 12px;">
             <div style="text-align: left; width: 100%;">
                 <? echo $servertypetable;?>
             </div>
