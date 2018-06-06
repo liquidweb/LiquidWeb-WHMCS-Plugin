@@ -1766,7 +1766,7 @@ function LiquidWeb_ClientArea($params)
 
     if(isset($_REQUEST['stormajax']))
     {
-        ob_clean();
+        // ob_clean();
         switch($_REQUEST['stormajax'])
         {
             case 'status':

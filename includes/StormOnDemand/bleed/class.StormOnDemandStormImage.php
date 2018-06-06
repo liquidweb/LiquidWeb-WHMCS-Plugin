@@ -8,8 +8,8 @@ if(!class_exists('StormOnDemandStormImage'))
     {
         public function create($uniq_id, $name)
         {
+            $data['name']   =   $name;
             $data['uniq_id']    =   $uniq_id;
-            $data['page_num']   =   $name;
 
             return $this->__request('Storm/Image/create', $data, __METHOD__);
         }

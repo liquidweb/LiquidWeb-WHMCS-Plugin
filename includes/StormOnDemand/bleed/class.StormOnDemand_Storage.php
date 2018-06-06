@@ -22,6 +22,8 @@
  * @author Pawel Kopec <pawelk@modulesgarden.com>
  */
 
+require_once 'class.StormOnDemandConnection.php';
+ 
 class StormOnDemand_Storage extends StormOnDemandConnection{
 
       public function setDebug($mode){

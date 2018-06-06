@@ -156,7 +156,7 @@ EOT;
     return $configarray;
 }
 
-function LiquidAndStormWidget_activate($params) {
+function LiquidAndStormWidget_activate() {
 
   $name = 'Liquid Web Cloud Servers For WHMCS';
   $template = mysql_get_row("SELECT * FROM `tblemailtemplates` WHERE `name` = ?", array( $name ));
