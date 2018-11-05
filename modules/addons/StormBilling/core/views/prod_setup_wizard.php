@@ -206,7 +206,7 @@ if (isset($_REQUEST['ajaxload'])) {
                 <li><a href="#storm-config-tab-bare-metal">Bare Metal Servers</a></li>
               </ul>';
 
-/*              
+/*
         //Storm Servers
         echo '<div id="storm-config-tab-storm">';
         echo '<table class="datatable" style="width: 100%">

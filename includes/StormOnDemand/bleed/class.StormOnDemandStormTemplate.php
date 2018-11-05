@@ -6,10 +6,13 @@ if(!class_exists('StormOnDemandStormTemplate'))
 {
     class StormOnDemandStormTemplate extends StormOnDemandConnection
     {
-        public function details($id)
+        public function details($id='',$template='')
         {
-            $data['id'] = $id;
-
+            if ($id == '') {
+                $data['template'] = $template;
+            } else {
+                $data['id'] = $id;
+            }
             return $this->__request('Storm/Template/details ', $data, __METHOD__);
         }
 

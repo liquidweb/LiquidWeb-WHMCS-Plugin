@@ -17,7 +17,7 @@ $password   =   $productRow['configoption2'];
 
 
 if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image') {
-    ob_clean();
+    //ob_clean();
     $conf_id = $_REQUEST['conf_id'];
 
     require_once $roopath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
@@ -63,7 +63,7 @@ if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image') {
             });
           </script>';
 } elseif (isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-template') {
-        ob_clean();
+        //ob_clean();
         $conf_id = $_REQUEST['conf_id'];
 
         require_once $roopath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';

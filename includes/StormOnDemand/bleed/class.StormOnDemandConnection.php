@@ -13,7 +13,7 @@ if (!class_exists('StormOnDemandConnection')) {
             'bleed' => 'https://api.stormondemand.com/bleed/'
         );
         //Default API Type
-        protected $api_version = 'v1';
+        protected $api_version = 'bleed';
         private $username = null;
         private $password = null;
         private $ch = null;
@@ -39,7 +39,7 @@ if (!class_exists('StormOnDemandConnection')) {
             }
         }
 
-        public function __construct($username, $password, $api = 'v1')
+        public function __construct($username, $password, $api = 'bleed')
         {
             //Set API Version
             $this->setAPIVersion($api);

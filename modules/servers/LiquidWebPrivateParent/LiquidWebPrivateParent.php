@@ -155,7 +155,7 @@ function LiquidWebPrivateParent_ConfigOptions()
      'Available Parents' => array
      (
     		'Type' => 'dropdown',
-            'Multiple' => TRUE,
+            //'Multiple' => TRUE,
     		'Options' => array()
      ),
      'Select Parent Automatically' => array
@@ -1098,7 +1098,7 @@ function LiquidWebPrivateParent_ClientArea($params)
 
     if(isset($_REQUEST['stormajax']))
     {
-        ob_clean();
+        //ob_clean();
         switch($_REQUEST['stormajax'])
         {
             case 'status':
