@@ -84,7 +84,7 @@ if (isset($_REQUEST['ajaxload'])) {
                     if ($item['deprecated'] == 1) {
                         continue;
                     }
-
+        
                     if (!isset($item['zone_availability']) ||
                          empty($item['zone_availability']) ||
                         !isset($item['zone_availability'][$zoneSelected]) ||
@@ -206,7 +206,7 @@ if (isset($_REQUEST['ajaxload'])) {
                 <li><a href="#storm-config-tab-bare-metal">Bare Metal Servers</a></li>
               </ul>';
 
-/*              
+/*
         //Storm Servers
         echo '<div id="storm-config-tab-storm">';
         echo '<table class="datatable" style="width: 100%">

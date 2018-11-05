@@ -155,7 +155,7 @@ function LiquidWebPrivateParent_ConfigOptions()
      'Available Parents' => array
      (
     		'Type' => 'dropdown',
-            'Multiple' => TRUE,
+            //'Multiple' => TRUE,
     		'Options' => array()
      ),
      'Select Parent Automatically' => array
@@ -1098,7 +1098,7 @@ function LiquidWebPrivateParent_ClientArea($params)
 
     if(isset($_REQUEST['stormajax']))
     {
-        ob_clean();
+        //ob_clean();
         switch($_REQUEST['stormajax'])
         {
             case 'status':
@@ -1382,6 +1382,13 @@ function LiquidWebPrivateParent_AdminServicesTabFields($params)
     elseif(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'storm-template')
     {
         ob_clean();
+
+        $hid_template = array('0');
+        $q = mysql_query("SELECT * FROM `StormBilling_customconfig` where `config_name` = 'wiz_pg_4_hide_from_tmplt_list'");
+        if(($res = mysql_fetch_assoc($q))) {
+            $hid_template = @explode(",", $res['config_value']);
+        }
+
         require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
         $template = new StormOnDemandStormTemplate($username, $password, 'bleed');
 
@@ -1397,13 +1404,16 @@ function LiquidWebPrivateParent_AdminServicesTabFields($params)
                     </tr>';
             foreach($items as $item)
             {
-                if($item['deprecated'] == 1)
-                continue;
-
-                echo '<tr>
-                        <td>'.$item['description'].'</td>
-                        <td><a style="float: right" href="stormajax=storm-template-restore&template_id='.$item['id'].'" class="btn btn-danger storm-restore">Restore</a></td>
-                      </tr>';
+                foreach ($hid_template as $tempid) {
+                    if ($tempid != $item['id']) {
+                        if($item['deprecated'] == 1)
+                            continue;
+                        echo '<tr>
+                                <td>'.$item['description'].'</td>
+                                <td><a style="float: right" href="stormajax=storm-template-restore&template_id='.$item['id'].'" class="btn btn-danger storm-restore">Restore</a></td>
+                            </tr>';
+                    }
+                }
             }
             echo '<tfoot>
                     <tr>

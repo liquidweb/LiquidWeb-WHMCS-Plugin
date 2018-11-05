@@ -500,6 +500,12 @@ class StormBilling
                 mysql_safequery($qry);
             }
         }
+        if($version < 133)
+        {
+            mysql_safequery("insert into StormBilling_customconfig (config_name,config_value)
+            						values ('wiz_pg_4_hide_from_tmplt_list', '152')
+									ON DUPLICATE KEY UPDATE config_value='152'");
+        }
 
 
         /**

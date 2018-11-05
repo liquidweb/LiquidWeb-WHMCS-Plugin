@@ -155,7 +155,20 @@ function LiquidWeb_ConfigOptions()
 
 		if(isset($_REQUEST['zone']) && preg_match('/^[0-9]{1,}$/D', $_REQUEST['zone'])){
 			$zoneSelected = (int) intval($_REQUEST['zone']);
-		}
+        }
+        
+
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
+        $product 	  = new StormOnDemandProduct($username, $password);
+        $product_ret  = $product->details(null,'SS.VPS');
+        
+        foreach ($product_ret['options'] as $optn) {
+            foreach ($optn['values'] as $values) {
+                $arr_prices = $values['prices'];
+                $arr_product_price[$values['value']] = 	$arr_prices[1]['month'];
+            }
+        }
+
 
 	    $confs   = array();
 		$baCache = ModuleInformationClient::getWHMCSconfig(LiquidWebConfigName);
@@ -249,6 +262,7 @@ function LiquidWeb_ConfigOptions()
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Server Type</th>
+					<th style="width: 80px">Price($)</th>
                     <th style="width: 80px">VCPU</th>
                     <th style="width: 80px">Disk</th>
                     <th style="width: 80px">Memory</th>
@@ -259,12 +273,16 @@ function LiquidWeb_ConfigOptions()
 			if(!isset($item['zone_availability']) 				 ||
 			   empty($item['zone_availability']) 				 ||
 			   !isset($item['zone_availability'][$zoneSelected]) ||
-			   !$item['zone_availability'][$zoneSelected]){
+			   !$item['zone_availability'][$zoneSelected]        ||
+			   $arr_product_price[$item['id']] == ''){
 			    	continue;
-			    }
+                }
+                
+                $product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
 
             echo '<tr style="border-top: 1px solid  #efefef">
                     <td><input class="storm-config" type="radio" name="config-id" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
+                    <td style="text-align:right; padding-right:20px;">$'.$product_price.'</td>
                     <td style="text-align:right; padding-right:8px;">'.$item['vcpu'].' CPUs</td>
                     <td style="text-align:right; padding-right:8px;">'.$item['disk'].'GB</td>
                     <td style="text-align:right; padding-right:8px;">'.round(($item['memory']/1024),1).'GB</td>
@@ -351,6 +369,12 @@ function LiquidWeb_ConfigOptions()
 			$zoneSelected = (int) intval($_REQUEST['zone']);
 		}
 
+        $hid_template = array('0');
+        $q = mysql_query("SELECT * FROM `StormBilling_customconfig` where `config_name` = 'wiz_pg_4_hide_from_tmplt_list'");
+        if(($res = mysql_fetch_assoc($q))) {
+            $hid_template = @explode(",", $res['config_value']);
+        }
+
         require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
         $template = new StormOnDemandStormTemplate($username, $password);
         $ret = $template->lists();
@@ -366,23 +390,23 @@ function LiquidWeb_ConfigOptions()
                     <th>Template</th>
                 </tr>
               ';
-        foreach($ret['items'] as $item)
-        {
-            if($item['deprecated'] == 1)
-            {
-                continue;
-            }
-
-			if(!isset($item['zone_availability']) 				 ||
-			   empty($item['zone_availability']) 				 ||
-			   !isset($item['zone_availability'][$zoneSelected]) ||
-			   !$item['zone_availability'][$zoneSelected]){
-			    	continue;
-			    }
-
-            echo '<tr>
+        foreach($ret['items'] as $item) {
+            foreach ($hid_template as $tempid) {
+                if ($tempid != $item['id']) {
+                    if($item['deprecated'] == 1) {
+                        continue;
+                    }
+			        if (!isset($item['zone_availability']) 				 ||
+			            empty($item['zone_availability']) 				 ||
+			            !isset($item['zone_availability'][$zoneSelected]) ||
+			            !$item['zone_availability'][$zoneSelected]){
+			    	        continue;
+			        }
+                    echo '<tr>
                     <td><input class="storm-template" type="radio" name="template-id" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
                   </tr>';
+                }
+            }
         }
         echo '</table>';
         echo '<script type="text/javascript">
@@ -532,259 +556,642 @@ function LiquidWeb_ConfigOptions()
         $q = mysql_query("SELECT * FROM tblproducts WHERE id = ".(int)$_REQUEST['id']." LIMIT 1");
         $row = mysql_fetch_assoc($q);
 
+        $prod_name  =   $row['name'];
         $username   =   $row['configoption1'];
         $password   =   $row['configoption2'];
         //$password = StormOnDemand_Helper::encrypt_decrypt($row['configoption2']);
 
+       
         //Templates
         require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
         $template = new StormOnDemandStormTemplate($username, $password);
+        $tmptDtl = $template->details('',$row['configoption5']);
 
-        //Configs
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormConfig.php';
-        $config = new StormOnDemandStormConfig($username, $password);
 
-        //Images
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
-        $image = new StormOnDemandStormImage($username, $password);
+        if (strtoupper($tmptDtl['os']) == strtoupper('WINDOWS')) {
+            //Configs
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormConfig.php';
+            $config = new StormOnDemandStormConfig($username, $password);
 
-        //Server
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-        $server = new StormOnDemandStormServer($username, $password);
+            //Images
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
+            $image = new StormOnDemandStormImage($username, $password);
 
-        //Zones
-        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
-        $zone = new StormOnDemandNetworkZone($username, $password);
+            //Server
+            //require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+            //$server = new StormOnDemandStormServer($username, $password);
 
-        //Templates
-        $configurable_options[0] = array
-        (
-            'Name'      =>  'Template|VM Template',
-            'Type'      =>  'select',
-            'Values'    =>  array()
-        );
+            //Zones
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
+            $zone = new StormOnDemandNetworkZone($username, $password);
 
-        $ret = $template->lists();
-        if($error = $template->getError())
-        {
-            echo '<p style="color: red">'.$error.'</p>';
-            die();
-        }
+            //Products
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
+            $product 	  = new StormOnDemandProduct($username,$password);
 
-        foreach($ret['items'] as $item)
-        {
-            if($item['deprecated'] == 1)
+
+            //Templates
+            $configurable_options[0] = array
+            (
+                'Name'      =>  'Template|VM Template',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+
+            /*
+            $ret = $template->lists();
+            if($error = $template->getError())
             {
-                continue;
+                echo '<p style="color: red">'.$error.'</p>';
+                die();
             }
-            $configurable_options[0]['Values'][$item['name']] = $item['description'];
-        }
 
-        //Configs
-        $configurable_options[1] = array
-        (
-            'Name'      =>  'Config|VM Config',
-            'Type'      =>  'select',
-            'Values'    =>  array()
-        );
-
-        $page = 1;
-        $count = $config->lists('all', $page, 1);
-
-        if (isset($count['item_total']) && $count['item_total'] > 0)
-        {
-            $ret = $config->lists('all', $page, $count['item_total']);
-
-            $configs = $ret['items'];
-
-            foreach ($configs as $config) {
-                //skip storm servers
-                if ($config['category'] == 'storm') {
+            foreach($ret['items'] as $item)
+            {
+                if($item['deprecated'] == 1)
+                {
                     continue;
                 }
-                if (!$config['available']) {
+                if (strtoupper($tmptDtl['os']) == strtoupper($item['os'])) {
+                    $configurable_options[0]['Values'][$item['name']] = $item['description'];
+                }
+            }*/
+
+            //Configs
+            $configurable_options[1] = array
+            (
+                'Name'      =>  'Config|VM Config',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+
+            
+            /*$page = 1;
+            $count = $config->lists('all', $page, 1);
+
+            if (isset($count['item_total']) && $count['item_total'] > 0)
+            {
+                $ret = $config->lists('all', $page, $count['item_total']);
+
+                $configs = $ret['items'];
+
+                foreach ($configs as $config) {
+                    //skip storm servers
+                    if ($config['category'] == 'storm') {
+                        continue;
+                    }
+                    if (!$config['available']) {
+                        continue;
+                    }
+
+                    $configurable_options[1]['Values'][$config['id']] = $config['description'];
+                }
+            }*/
+
+            //Images
+            $configurable_options[2] = array
+            (
+                'Name'      =>  'Images|VM image',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+            $ret = $image->lists();
+            foreach($ret['items'] as $item)
+            {
+                if($item['deprecated'] == 1)
+                {
                     continue;
                 }
 
-                $configurable_options[1]['Values'][$config['id']] = $config['description'];
+                $configurable_options[2]['Values'][$item['id']] = $item['template_description'];
             }
-        }
 
-        //Images
-        $configurable_options[2] = array
-        (
-            'Name'      =>  'Images|VM image',
-            'Type'      =>  'select',
-            'Values'    =>  array()
-        );
-        $ret = $image->lists();
-        foreach($ret['items'] as $item)
-        {
-            if($item['deprecated'] == 1)
+            //Zones
+            $configurable_options[3] = array
+            (
+                'Name'      =>  'Zone|Zone',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+
+            $ret = $zone->lists();
+            foreach($ret['items'] as $item)
             {
-                continue;
+                $configurable_options[3]['Values'][$item['id']] = $item['region']['name'].' - '.$item['name'];
             }
 
-            $configurable_options[2]['Values'][$item['id']] = $item['template_description'];
+            //Backup
+            $configurable_options[4] = array
+            (
+                'Name'      =>  'Backup Enabled|Backup Enabled',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
+
+            //Backup Plan
+            $configurable_options[5] = array
+            (
+                'Name'      =>  'Backup Plan|Backup Plan',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    //'None' =>  'No Backups',
+                    'Quota' =>  'Quota',
+                    'Daily' =>  'Daily'
+                )
+            );
+
+            //Backup Quota
+            $configurable_options[6] = array
+            (
+                'Name'      =>  'Backup Quota|Backup Quota',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    '100'	=>	'100GB',
+                    '250'	=>	'250GB',
+                    '500'	=>	'500GB',
+                    '1000'	=>	'1000GB',
+                    '2000'	=>	'2000GB',
+                    '4000'	=>	'4000GB',
+                    '8000'	=>	'8000GB',
+                    '20000'	=>	'20000GB'
+                )
+            );
+
+            $arr_dbq = range(0,90);
+            unset($arr_dbq[0]);
+            //Daily Backup Quota
+            $configurable_options[7] = array
+            (
+                'Name'      =>  'Daily Backup Quota|Daily Backup Quota',
+                'Type'      =>  'select',
+                'Values'    =>  $arr_dbq
+            );
+
+            //Number of IPs
+            $configurable_options[8] = array
+            (
+                'Name'      =>  'Number of IP Addresses|Number of IP Addresses',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    '1'     =>  '1',
+                    '2'     =>  '2',
+                    '3'     =>  '3'
+                )
+            );
+
+            //Maximum IP Addresses
+            $configurable_options[9] = array
+            (
+                'Name'      =>  'Maximum IP Addresses|Maximum IP Addresses',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    '8'     =>  '8',
+                    '9'     =>  '9',
+                    '10'    =>  '10'
+                )
+            );
+
+            //Bandwidth Quota
+            $configurable_options[10] = array
+            (
+                'Name'      =>  'Bandwidth Quota|Bandwidth Quota',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    5000    =>  5000,
+                    6000    =>  6000,
+                    8000    =>  8000,
+                    10000   =>  10000,
+                    15000   =>  15000,
+                    20000   =>  20000
+                )
+            );
+
+            //Monitoring
+            $configurable_options[11] = array
+            (
+                'Name'      =>  'Monitoring|Monitoring',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
+
+            //Firewall
+            $configurable_options[12] = array
+            (
+                'Name'      =>  'Firewall|Firewall',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
+
+            //IPs Management
+            $configurable_options[13] = array
+            (
+                'Name'      =>  'IPs Management|IPs Management',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
+
+            $configurable_options[14] = array
+            (
+                'Name'      =>  'MsSQL|MS SQL',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    'None'  =>  'No SQL Server'
+                )
+            );
+
+            $configurable_options[15] = array
+            (
+                'Name'      =>  'WinAV|Anti Virus',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    'None'  =>  'No Anti-Virus'
+                )
+            );
+
+
+            //check config type
+            $serType = 'SS.VPS.WIN';
+            $configId = $row['configoption7'];
+            $configDtl = $config->details($configId);
+            if ($configDtl['category'] == 'bare-metal') {
+                $serType = 'SS.VM.WIN';
+            }
+
+            $productLists = $product->details(null,$serType);
+
+            if($productLists && !empty($productLists['options'])){
+                foreach($productLists['options'] as $kOpt => $vOpt){
+                    /* Get available Templates*/
+                    if(strcmp($vOpt['key'],'Template') === 0){
+                        if(!empty($vOpt['values'])){
+                            foreach($vOpt['values'] as $kVal => $vVal){
+
+                                /*if(!isset($vVal['zone_availability']) ||
+                                empty($vVal['zone_availability']) ||
+                                !isset($vVal['zone_availability'][$row['configoption4']]) ||
+                                !$vVal['zone_availability'][$row['configoption4']]){
+                                     continue;
+                                 }*/
+                                
+                                $configurable_options[0]['Values'][$vVal['value']] = $vVal['description'];
+                            }
+                        }
+                    }
+                    /* Get available Configs*/
+                    if(strcmp($vOpt['key'],'ConfigId') === 0){
+                        if(!empty($vOpt['values'])){
+                            foreach($vOpt['values'] as $kVal => $vVal){
+
+
+                                if(!isset($vVal['zone_availability']) ||
+                                empty($vVal['zone_availability']) ||
+                                !isset($vVal['zone_availability'][$row['configoption4']]) ||
+                                !$vVal['zone_availability'][$row['configoption4']]){
+                                     continue;
+                                }
+                                $configurable_options[1]['Values'][$vVal['value']] = $vVal['description'];
+                            }
+                        }
+                    }
+
+                    /* Get available Backup Plans */
+                    /*if(strcmp($vOpt['key'],'LiquidWebBackupPlan') === 0){
+                        if(!empty($vOpt['values'])){
+                            foreach($vOpt['values'] as $kVal => $vVal){
+                                $configurable_options[5]['Values'][$vVal['value']] = $vVal['description'];
+
+                                // Get available Backup Quota Plans 
+                                if(strcmp($vVal['value'],'Quota') === 0){
+                                    if(!empty($vVal['options'])){
+                                        foreach($vVal['options'] as $vkOpt => $vkVal){
+                                             if(strcmp($vkVal['key'], 'BackupQuota') === 0){
+                                                if(!empty($vkVal['values'])){
+                                                   foreach($vkVal['values'] as $kBack => $vBack){
+                                                     $configurable_options[6]['Values'][$vBack['value']] = $vBack['description'];
+                                                   }
+                                                }
+                                             }
+                                        }
+                                    }
+                                }
+
+                                // Get available Daily Backup Plans 
+                                if(strcmp($vVal['value'],'Daily') === 0){
+                                    if(!empty($vVal['options'])){
+                                        foreach($vVal['options'] as $vkOpt => $vkVal){
+                                             if(strcmp($vkVal['key'], 'BackupDay') === 0){
+                                                if(!empty($vkVal['values'])){
+                                                   foreach($vkVal['values'] as $kBack => $vBack){
+                                                     $configurable_options[7]['Values'][$vBack['value']] = $vBack['description'];
+                                                   }
+                                                }
+                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }*/
+                    // Get available Bandwidth 
+                    /*if(strcmp($vOpt['key'],'Bandwidth') === 0){
+                        if(!empty($vOpt['values'])){
+                            foreach($vOpt['values'] as $kVal => $vVal){
+                                $configurable_options[10]['Values'][$vVal['value']] = $vVal['description'];
+                            }
+                        }
+                    }*/
+                    // Get available MsSQL packages 
+                    if(strcmp($vOpt['key'],'MsSQL') === 0){
+                        if(!empty($vOpt['values'])){
+                            foreach($vOpt['values'] as $kVal => $vVal){
+                                $configurable_options[14]['Values'][$vVal['value']] = $vVal['description'];
+                            }
+                        }
+                    }
+                    /* Get available WinAV packages */
+                    if(strcmp($vOpt['key'],'WinAV') === 0){
+                        if(!empty($vOpt['values'])){
+                            foreach($vOpt['values'] as $kVal => $vVal){
+                                $configurable_options[15]['Values'][$vVal['value']] = $vVal['description'];
+                            }
+                        }
+                    }
+                }
+            }
+
+        } else {
+
+            //Configs
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormConfig.php';
+            $config = new StormOnDemandStormConfig($username, $password);
+
+            //Images
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
+            $image = new StormOnDemandStormImage($username, $password);
+
+            //Server
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+            $server = new StormOnDemandStormServer($username, $password);
+
+            //Zones
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
+            $zone = new StormOnDemandNetworkZone($username, $password);
+
+            $tmptDtl = $template->details('',$row['configoption5']);
+            
+            //Templates
+            $configurable_options[0] = array
+            (
+                'Name'      =>  'Template|VM Template',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+
+            $ret = $template->lists();
+            if($error = $template->getError())
+            {
+                echo '<p style="color: red">'.$error.'</p>';
+                die();
+            }
+
+            foreach($ret['items'] as $item)
+            {
+                if($item['deprecated'] == 1)
+                {
+                    continue;
+                }
+                if (strtoupper($tmptDtl['os']) == strtoupper($item['os'])) {
+                    $configurable_options[0]['Values'][$item['name']] = $item['description'];
+                }
+            }
+
+            //Configs
+            $configurable_options[1] = array
+            (
+                'Name'      =>  'Config|VM Config',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+
+            $page = 1;
+            $count = $config->lists('all', $page, 1);
+
+            if (isset($count['item_total']) && $count['item_total'] > 0)
+            {
+                $ret = $config->lists('all', $page, $count['item_total']);
+
+                $configs = $ret['items'];
+
+                foreach ($configs as $config) {
+                    //skip storm servers
+                    if ($config['category'] == 'storm') {
+                        continue;
+                    }
+                    if (!$config['available']) {
+                        continue;
+                    }
+
+                    $configurable_options[1]['Values'][$config['id']] = $config['description'];
+                }
+            }
+
+            //Images
+            $configurable_options[2] = array
+            (
+                'Name'      =>  'Images|VM image',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+            $ret = $image->lists();
+            foreach($ret['items'] as $item)
+            {
+                if($item['deprecated'] == 1)
+                {
+                    continue;
+                }
+
+                $configurable_options[2]['Values'][$item['id']] = $item['template_description'];
+            }
+
+            //Zones
+            $configurable_options[3] = array
+            (
+                'Name'      =>  'Zone|Zone',
+                'Type'      =>  'select',
+                'Values'    =>  array()
+            );
+
+            $ret = $zone->lists();
+            foreach($ret['items'] as $item)
+            {
+                $configurable_options[3]['Values'][$item['id']] = $item['region']['name'].' - '.$item['name'];
+            }
+
+            //Backup
+            $configurable_options[4] = array
+            (
+                'Name'      =>  'Backup Enabled|Backup Enabled',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
+
+            //Backup Plan
+            $configurable_options[5] = array
+            (
+                'Name'      =>  'Backup Plan|Backup Plan',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    'quota' =>  'Quota',
+                    'daily' =>  'Daily'
+                )
+            );
+
+            //Backup Quota
+            $configurable_options[6] = array
+            (
+                'Name'      =>  'Backup Quota|Backup Quota',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    '100'    =>  '100GB',
+                    '200'    =>  '200GB',
+                    '500'    =>  '500GB'
+                )
+            );
+
+            //Daily Backup Quota
+            $configurable_options[7] = array
+            (
+                'Name'      =>  'Daily Backup Quota|Daily Backup Quota',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    '1'    =>  '1',
+                    '2'    =>  '2',
+                    '3'    =>  '3',
+                    '4'    =>  '4',
+                    '5'    =>  '5'
+                )
+            );
+
+            //Number of IPs
+            $configurable_options[8] = array
+            (
+                'Name'      =>  'Number of IP Addresses|Number of IP Addresses',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    '1'     =>  '1',
+                    '2'     =>  '2',
+                    '3'     =>  '3'
+                )
+            );
+
+            //Maximum IP Addresses
+            $configurable_options[9] = array
+            (
+                'Name'      =>  'Maximum IP Addresses|Maximum IP Addresses',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    '8'     =>  '8',
+                    '9'     =>  '9',
+                    '10'    =>  '10'
+                )
+            );
+
+            //Bandwidth Quota
+            $configurable_options[10] = array
+            (
+                'Name'      =>  'Bandwidth Quota|Bandwidth Quota',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    5000    =>  5000,
+                    6000    =>  6000,
+                    8000    =>  8000,
+                    10000   =>  10000,
+                    15000   =>  15000,
+                    20000   =>  20000,
+                )
+            );
+
+            //Monitoring
+            $configurable_options[11] = array
+            (
+                'Name'      =>  'Monitoring|Monitoring',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
+
+            //Firewall
+            $configurable_options[12] = array
+            (
+                'Name'      =>  'Firewall|Firewall',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
+
+            //IPs Management
+            $configurable_options[13] = array
+            (
+                'Name'      =>  'IPs Management|IPs Management',
+                'Type'      =>  'select',
+                'Values'    =>  array
+                (
+                    1       =>  'Yes',
+                    0       =>  'No'
+                )
+            );
         }
-
-        //Zones
-        $configurable_options[3] = array
-        (
-            'Name'      =>  'Zone|Zone',
-            'Type'      =>  'select',
-            'Values'    =>  array()
-        );
-
-        $ret = $zone->lists();
-        foreach($ret['items'] as $item)
-        {
-            $configurable_options[3]['Values'][$item['id']] = $item['region']['name'].' - '.$item['name'];
-        }
-
-        //Backup
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Backup Enabled|Backup Enabled',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                1       =>  'Yes',
-                0       =>  'No'
-            )
-        );
-
-        //Backup Plan
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Backup Plan|Backup Plan',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                'quota' =>  'Quota',
-                'daily' =>  'Daily'
-            )
-        );
-
-        //Backup Quota
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Backup Quota|Backup Quota',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                '100'    =>  '100GB',
-                '200'    =>  '200GB',
-                '500'    =>  '500GB'
-            )
-        );
-
-        //Daily Backup Quota
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Daily Backup Quota|Daily Backup Quota',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                '1'    =>  '1',
-                '2'    =>  '2',
-                '3'    =>  '3',
-                '4'    =>  '4',
-                '5'    =>  '5'
-            )
-        );
-
-        //Number of IPs
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Number of IP Addresses|Number of IP Addresses',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                '1'     =>  '1',
-                '2'     =>  '2',
-                '3'     =>  '3'
-            )
-        );
-
-        //Maximum IP Addresses
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Maximum IP Addresses|Maximum IP Addresses',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                '8'     =>  '8',
-                '9'     =>  '9',
-                '10'    =>  '10'
-            )
-        );
-
-        //Bandwidth Quota
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Bandwidth Quota|Bandwidth Quota',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                5000    =>  5000,
-                6000    =>  6000,
-                8000    =>  8000,
-                10000   =>  10000,
-                15000   =>  15000,
-                20000   =>  20000,
-            )
-        );
-
-        //Monitoring
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Monitoring|Monitoring',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                1       =>  'Yes',
-                0       =>  'No'
-            )
-        );
-
-        //Firewall
-        $configurable_options[] = array
-        (
-            'Name'      =>  'Firewall|Firewall',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                1       =>  'Yes',
-                0       =>  'No'
-            )
-        );
-
-        //IPs Management
-        $configurable_options[] = array
-        (
-            'Name'      =>  'IPs Management|IPs Management',
-            'Type'      =>  'select',
-            'Values'    =>  array
-            (
-                1       =>  'Yes',
-                0       =>  'No'
-            )
-        );
-
 
         //Create groups
         $groups =   array();
         $groups[] = array
         (
-            'Name'          =>  'Configurable Options For Liquid Web Servers',
+            'Name'          =>  'Configurable Options For Liquid Web Servers - '.$prod_name,
             'Description'   =>  'Auto Generated by Module',
             'Fields'        =>  $configurable_options
         );
 
         $group_id = '';
-        foreach($groups as $group)
-        {
+        foreach($groups as $group) {
             //Add Group
             mysql_query('INSERT INTO tblproductconfiggroups(name,description) VALUES("'.$group['Name'].'","'.$group['Description'].'")');
 
@@ -793,7 +1200,7 @@ function LiquidWeb_ConfigOptions()
             mysql_query('INSERT INTO tblproductconfiglinks(gid,pid) VALUES('.(int)$group_id.', '.(int)$_REQUEST['id'].')');
 
             //Add fields
-            foreach($group['Fields'] as $field)
+            foreach($group['Fields'] as $field) 
             {
                 $type    = 0;
                 switch($field['Type'])
@@ -806,8 +1213,11 @@ function LiquidWeb_ConfigOptions()
                 mysql_query("INSERT INTO tblproductconfigoptions(gid,optionname,optiontype,qtyminimum,qtymaximum,`order`,hidden) VALUES(".(int)$group_id.", '".$field['Name']."', ".$type.",0,0,0,0)");
                 $option_id = mysql_insert_id();
 
+
                 foreach($field['Values'] as $option_value   =>  $option_name)
                 {
+                    $option_value = mysql_real_escape_string($option_value);
+                    $option_name = mysql_real_escape_string($option_name);
                     mysql_query("INSERT INTO tblproductconfigoptionssub(configid,optionname,sortorder,hidden) VALUES(".(int)$option_id.", '".$option_value.'|'.$option_name."',0,0)");
                     mysql_query("INSERT INTO `tblpricing` ( `type` , `currency` , `relid` , `msetupfee` , `qsetupfee` , `ssetupfee` , `asetupfee` , `bsetupfee` , `tsetupfee` , `monthly` , `quarterly` , `semiannually` , `annually` , `biennially` , `triennially`)
                                 VALUES ('configoptions',1,".mysql_insert_id().",'0.00','0.00','0.00','0.00','0.00','0.00','0.00','0.00','0.00','0.00','0.00','0.00')");
@@ -1193,7 +1603,7 @@ function LiquidWeb_CreateAccount($params)
     //get configuration
     $username           =   LiquidWeb_getOption('Username', $params);
     $password           =   LiquidWeb_getOption('Password', $params);
-    $config             =   LiquidWeb_getOption('Config', $params);
+    $configId             =   LiquidWeb_getOption('Config', $params);
     $template           =   LiquidWeb_getOption('Template', $params);
     $bandwidth_quota    =   LiquidWeb_getOption('Bandwidth Quota', $params);
     $hostname           =   $params['customfields']['hostname'] ? $params['customfields']['hostname'] : $params['domain'];
@@ -1204,8 +1614,8 @@ function LiquidWeb_CreateAccount($params)
 
     $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
     $row = mysql_fetch_assoc($q);
-    if($config == null){
-     $config = $row['configoption7'];
+    if($configId == null){
+     $configId = $row['configoption7'];
     }
 
     if($template == null){
@@ -1216,12 +1626,22 @@ function LiquidWeb_CreateAccount($params)
       $bandwidth_quota = $row['configoption13'];
     }
 
-
+	
 	if(isset($params['customfields']['Clone From Server']) && $params['customfields']['Clone From Server']){
 
-	    //load server class
-	    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-	    $server = new StormOnDemandStormServer($username, $password);
+        //load server class
+        
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+        $tmplt = new StormOnDemandStormTemplate($username, $password);
+        $ret = $tmplt->details('',$row['configoption5']);
+    
+        if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+            $server = new StormOnDemandServer($username, $password);
+        } else {
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+            $server = new StormOnDemandStormServer($username, $password);
+        }
 
 		//getting parent hosting
 		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
@@ -1253,40 +1673,112 @@ function LiquidWeb_CreateAccount($params)
 	    //save uniq_id to database. We need it!
 	    mysql_query("REPLACE INTO mg_liquid_web (`hosting_id`, `uniq_id`) VALUES ('".$params['serviceid']."', '".$ret['uniq_id']."')") or die(mysql_error());
 	}else{
-	    //check bandwidth quota
-	    $configuration = LiquidWeb_ConfigOptions();
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+        $tmplt = new StormOnDemandStormTemplate($username, $password);
+        $ret = $tmplt->details('',$row['configoption5']);
 
-	    //load server class
-	    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-	    $server = new StormOnDemandStormServer($username, $password);
+        if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+			$configuration = LiquidWeb_ConfigOptions();
 
-	    $configuration = array
-	    (
-	        'ip_count'          =>  (LiquidWeb_getOption("Number of IPs", $params) == null)? $row['configoption11']:LiquidWeb_getOption("Number of IPs", $params),
-	        'image_id'          =>  (LiquidWeb_getOption('Image', $params) == null)? $row['configoption6']:LiquidWeb_getOption('Image', $params),
-	        'bandwidth_quota'   =>  $bandwidth_quota ,
-	        'zone'              =>  (LiquidWeb_getOption('Zone', $params) == null)? $row['configoption4']:LiquidWeb_getOption('Zone', $params)
-	    );
+            //load server class
+			require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+			$server = new StormOnDemandServer($username, $password);
 
-	    if(LiquidWeb_getOption('Backup Enabled', $params) != null)
-	    {
-	        $configuration['backup_enabled']    =  1;
-	        $configuration['backup_quota']      =  LiquidWeb_getOption('Backup Plan', $params) == 'quota' ? LiquidWeb_getOption('Backup Quota', $params) : LiquidWeb_getOption('Daily Backup Quota', $params);
-	        $configuration['backup_plan']       =  LiquidWeb_getOption('Backup Plan', $params);
-	    }else{
-          if($row['configoption8'] == 'on' ){
-            $configuration['backup_enabled'] = 1;
-            /*NTODO:było: StormOnDemand_getOption('Backup Quota', $params);*/
-            $configuration['backup_quota']   = $row['configoption10'];
-            $configuration['backup_plan']    = $row['configoption9'];
-          }
+			$features = array
+			(
+				'ConfigId' => $configId,
+				'MsSQL' => (LiquidWeb_getOption('MsSQL', $params) == null)? 'None':LiquidWeb_getOption('MsSQL', $params),
+				'WinAV' => (LiquidWeb_getOption('WinAV', $params) == null)? 'None':LiquidWeb_getOption('WinAV', $params),
+				'Template' => $template,
+                'Bandwidth' => 'SS.'.$bandwidth_quota,
+                'ExtraIp'  => (LiquidWeb_getOption('Number of IP Addresses', $params) == null)? array('value'=>'1','count'=>0):array('value'=>LiquidWeb_getOption('Number of IP Addresses', $params),'count'=>0),
+			);
+            
+            
+			$configuration = array
+			(
+				'type' 				=> 	'SS.VPS.WIN',
+				'zone'              =>  (LiquidWeb_getOption('Zone', $params) == null)? $row['configoption4']:LiquidWeb_getOption('Zone', $params),
+				'features'			=>	$features
+            );
+            
+            //check config type
+            //Configs
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormConfig.php';
+            $config = new StormOnDemandStormConfig($username, $password);
+            
+            $configDtl = $config->details($configId);
+            if ($configDtl['category'] == 'bare-metal') {
+                $configuration['type'] = 'SS.VM.WIN';
+            }
 
-      }
+			if(LiquidWeb_getOption('Backup Enabled', $params) != null)
+			{
+				//$configuration['backup_enabled']    =  1;
+				$configuration['features']['LiquidWebBackupPlan'] = 'None';
+				if (strtoupper(LiquidWeb_getOption('Backup Plan', $params)) == 'QUOTA') {
+					$configuration['features']['LiquidWebBackupPlan'] = 'Quota';
+                    $configuration['features']['BackupQuota']      =  LiquidWeb_getOption('Backup Quota', $params);
+                }
+				if (strtoupper(LiquidWeb_getOption('Backup Plan', $params)) == 'DAILY') {
+					$configuration['features']['LiquidWebBackupPlan'] = 'Daily';
+                    $configuration['features']['BackupDay']      =  Array('value'=>'1','num_units'=>LiquidWeb_getOption('Daily Backup Quota', $params));
+                }
+			} else {
+			    $configuration['features']['LiquidWebBackupPlan'] = 'None'; 
+			    if($row['configoption8'] == 'on' ){
+                    if (strtoupper($row['configoption9']) == 'QUOTA') {
+                        $configuration['features']['LiquidWebBackupPlan'] = 'Quota';
+                        $configuration['features']['BackupQuota']   = $row['configoption10'];
+                    }
+                    if (strtoupper($row['configoption9']) == 'DAILY') {
+                        $configuration['features']['LiquidWebBackupPlan'] = 'Daily';
+                        $configuration['features']['BackupDay']   = Array('value'=>'1','num_units'=>'1');
+                    }
+			    }
+		    }
 
-	    //create server with base configuration
-	    $ret = $server->create($hostname, $params['password'], $config, $template, $configuration);
+		    //create server with base configuration
+            $ret = $server->create($hostname, $params['password'], $configuration);
+		} else {
+            //check bandwidth quota
+			$configuration = LiquidWeb_ConfigOptions();
 
-	    //has error?
+			//load server class
+			require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+			$server = new StormOnDemandStormServer($username, $password);
+
+			$configuration = array
+			(
+				//'ip_count'          =>  (LiquidWeb_getOption("Number of IPs", $params) == null)? $row['configoption11']:LiquidWeb_getOption("Number of IPs", $params),
+				//'ip_count'          =>  (LiquidWeb_getOption("Number of IP Addresses", $params) == null)? $row['configoption11']:LiquidWeb_getOption("Number of IP Addresses", $params),
+				'image_id'          =>  (LiquidWeb_getOption('Image', $params) == null)? $row['configoption6']:LiquidWeb_getOption('Image', $params),
+				'bandwidth_quota'   =>  $bandwidth_quota ,
+				'zone'              =>  (LiquidWeb_getOption('Zone', $params) == null)? $row['configoption4']:LiquidWeb_getOption('Zone', $params),
+			);
+
+			if(LiquidWeb_getOption('Backup Enabled', $params) != null)
+			{
+				$configuration['backup_enabled']    =  1;
+				$configuration['backup_quota']      =  LiquidWeb_getOption('Backup Plan', $params) == 'quota' ? LiquidWeb_getOption('Backup Quota', $params) : LiquidWeb_getOption('Daily Backup Quota', $params);
+				$configuration['backup_plan']       =  LiquidWeb_getOption('Backup Plan', $params);
+			}else{
+			  if($row['configoption8'] == 'on' ){
+				$configuration['backup_enabled'] = 1;
+				/*NTODO:było: StormOnDemand_getOption('Backup Quota', $params);*/
+				$configuration['backup_quota']   = $row['configoption10'];
+				$configuration['backup_plan']    = $row['configoption9'];
+			  }
+
+			}
+
+
+
+			//create server with base configuration
+			$ret = $server->create($hostname, $params['password'], $configId, $template, $configuration);
+		}
+
+        //has error?
 	    if($error = $server->getError())
 	    {
 	        return $error;
@@ -1306,11 +1798,11 @@ function LiquidWeb_CreateAccount($params)
                     break;
                 }
             }
-	    }
-	    //save uniq_id to database. We need it!
-	    mysql_query("REPLACE INTO mg_liquid_web (`hosting_id`, `uniq_id`) VALUES ('".$params['serviceid']."', '".$ret['uniq_id']."')") or die(mysql_error());
-	    //return successful message
-	}
+            //save uniq_id to database. We need it!
+            mysql_query("REPLACE INTO mg_liquid_web (`hosting_id`, `uniq_id`) VALUES ('".$params['serviceid']."', '".$ret['uniq_id']."')") or die(mysql_error());
+            //return successful message
+        }
+    }
 
     return "success";
 }
@@ -1327,13 +1819,26 @@ function LiquidWeb_TerminateAccount($params)
     {
         return "Cannot find uniq_id for this service";
     }
-
     $row = mysql_fetch_assoc($q);
+    $uniq_id = $row['uniq_id'];
 
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
+    $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    }
+
     //create server with base configuration
-    $ret = $server->destroy($row['uniq_id']);
+    $ret = $server->destroy($uniq_id);
 
     if($error = $server->getError())
     {
@@ -1448,10 +1953,25 @@ function LiquidWeb_Reboot($params)
 
     $row = mysql_fetch_assoc($q);
 
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
+    $uniq_id = $row['uniq_id'];
+
+    $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    }
+
     //create server with base configuration
-    $ret = $server->reboot($row['uniq_id']);
+    $ret = $server->reboot($uniq_id);
 
     if($error = $server->getError())
     {
@@ -1479,11 +1999,25 @@ function LiquidWeb_clientReboot($params)
     {
         case 'reboot':
             $row = mysql_fetch_assoc($q);
+            $uniq_id = $row['uniq_id'];
 
-            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-            $server = new StormOnDemandStormServer($username, $password);
+            $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+            $row = mysql_fetch_assoc($q);
+            
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+            $tmplt = new StormOnDemandStormTemplate($username, $password);
+            $ret = $tmplt->details('',$row['configoption5']);
+        
+            if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+                $server = new StormOnDemandServer($username, $password);
+            } else {
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+                $server = new StormOnDemandStormServer($username, $password);
+            }
+        
             //create server with base configuration
-            $ret = $server->reboot($row['uniq_id']);
+            $ret = $server->reboot($uniq_id);
 
             if($error = $server->getError())
             {
@@ -1524,11 +2058,25 @@ function LiquidWeb_Shutdown($params)
     }
 
     $row = mysql_fetch_assoc($q);
+    $uniq_id = $row['uniq_id'];
 
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
+    $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    }
+
     //create server with base configuration
-    $ret = $server->shutdown($row['uniq_id']);
+    $ret = $server->shutdown($uniq_id);
 
     if($error = $server->getError())
     {
@@ -1554,10 +2102,25 @@ function LiquidWeb_ClientShutdown($params)
     {
         case 'shutdown':
             $row = mysql_fetch_assoc($q);
-            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-            $server = new StormOnDemandStormServer($username, $password);
+            $uniq_id = $row['uniq_id'];
+
+            $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+            $row = mysql_fetch_assoc($q);
+            
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+            $tmplt = new StormOnDemandStormTemplate($username, $password);
+            $ret = $tmplt->details('',$row['configoption5']);
+        
+            if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+                $server = new StormOnDemandServer($username, $password);
+            } else {
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+                $server = new StormOnDemandStormServer($username, $password);
+            }
+        
             //create server with base configuration
-            $ret = $server->shutdown($row['uniq_id']);
+            $ret = $server->shutdown($uniq_id);
 
             if($error = $server->getError())
             {
@@ -1596,11 +2159,25 @@ function LiquidWeb_Start($params)
     }
 
     $row = mysql_fetch_assoc($q);
+    $uniq_id = $row['uniq_id'];
 
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
-    //staart sever
-    $ret = $server->start($row['uniq_id']);
+    $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    }
+
+    //create server with base configuration
+    $ret = $server->start($uniq_id);
 
     if($error = $server->getError())
     {
@@ -1627,11 +2204,25 @@ function LiquidWeb_ClientStart($params)
     {
         case 'start':
             $row = mysql_fetch_assoc($q);
+            $uniq_id = $row['uniq_id'];
 
-            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-            $server = new StormOnDemandStormServer($username, $password);
-            //staart sever
-            $ret = $server->start($row['uniq_id']);
+            $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+            $row = mysql_fetch_assoc($q);
+            
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+            $tmplt = new StormOnDemandStormTemplate($username, $password);
+            $ret = $tmplt->details('',$row['configoption5']);
+        
+            if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+                $server = new StormOnDemandServer($username, $password);
+            } else {
+                require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+                $server = new StormOnDemandStormServer($username, $password);
+            }
+        
+            //create server with base configuration
+            $ret = $server->start($uniq_id);
 
             if($error = $server->getError())
             {
@@ -1683,8 +2274,20 @@ function LiquidWeb_ChangePackage($params)
     $row = mysql_fetch_assoc($q);
     $uniq_id = $row['uniq_id'];
 
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
+    $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    }
 
     //details
     require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkIP.php';
@@ -1715,11 +2318,10 @@ function LiquidWeb_ChangePackage($params)
     $firewall = new StormOnDemandNetworkFirewall($username, $password, 'bleed');
 
     if($Firewall == '0'){
-      $firewall->update($uniq_id);
+        $firewall->update($uniq_id);
     }else{
-      $firewall->update($uniq_id,'basic',array());
+        $firewall->update($uniq_id,'basic',array());
     }
-
 
     $ret = $server->update($uniq_id, $configuration);
 
@@ -1754,8 +2356,22 @@ function LiquidWeb_ClientArea($params)
     $row = mysql_fetch_assoc($q);
     $uniq_id = $row['uniq_id'];
     ////////////////////////////
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
+
+    /*$q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {*/
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    //}
+
 
     $q2 = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
     $row2 = mysql_fetch_assoc($q2);
@@ -1865,8 +2481,20 @@ function LiquidWeb_AdminServicesTabFields($params)
     $row = mysql_fetch_assoc($q);
     $uniq_id = $row['uniq_id'];
 
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
+    /*$q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {*/
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    //}
 
     if($_REQUEST['stormajax'] == 'storm-history')
     {
@@ -2376,8 +3004,21 @@ function LiquidWeb_IPManagement($params)
                         }
                     }
 
-                    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-                    $server = new StormOnDemandStormServer($username, $password);
+
+                    /*$q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+                    $row = mysql_fetch_assoc($q);
+                                    
+                    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+                    $tmplt = new StormOnDemandStormTemplate($username, $password);
+                    $ret = $tmplt->details('',$row['configoption5']);
+                
+                    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+                        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+                        $server = new StormOnDemandServer($username, $password);
+                    } else {*/
+                        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+                        $server = new StormOnDemandStormServer($username, $password);
+                    //}
                     $status = $server->status($uniq_id);
                     if($status['running'][0]['status'] == 'Adding IPs')
                     {
@@ -2397,8 +3038,22 @@ function LiquidWeb_IPManagement($params)
                 break;
 
             case 'remove':
-                    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-                    $server = new StormOnDemandStormServer($username, $password);
+
+                    /*$q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+                    $row = mysql_fetch_assoc($q);
+                                    
+                    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+                    $tmplt = new StormOnDemandStormTemplate($username, $password);
+                    $ret = $tmplt->details('',$row['configoption5']);
+                
+                    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+                        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+                        $server = new StormOnDemandServer($username, $password);
+                    } else {*/
+                        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+                        $server = new StormOnDemandStormServer($username, $password);
+                    //}
+
                     $status = $server->status($uniq_id);
                     if($status['running'][0]['status'] == 'Removing IP')
                     {
@@ -2562,9 +3217,22 @@ function LiquidWeb_Restore($params)
     $vars['images'] = $images;
 
 
-	//VPS
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $apiServer = new StormOnDemandStormServer($username, $password);
+    //VPS
+    
+    $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+                    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $apiServer = new StormOnDemandServer($username, $password);
+    } else {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $apiServer = new StormOnDemandStormServer($username, $password);
+    }
 
 	$vars['servers'] 		= StormOnDemand_Helper::getAllVpsUserUniqIds($params['clientsdetails']['userid'],StormOnDemand_Helper::LiquidWebLiquidWebServerType,false);
 	if(!empty($vars['servers'])){
@@ -2698,8 +3366,20 @@ function LiquidWeb_History($params)
     $row = mysql_fetch_assoc($q);
     $uniq_id = $row['uniq_id'];
 
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
-    $server = new StormOnDemandStormServer($username, $password);
+    $q = mysql_query("SELECT tblproducts.* FROM tblhosting LEFT JOIN tblproducts ON tblhosting.packageid = tblproducts.id WHERE tblhosting.id = " . (int)$params['serviceid'] . " LIMIT 1");
+    $row = mysql_fetch_assoc($q);
+                    
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
+    $tmplt = new StormOnDemandStormTemplate($username, $password);
+    $ret = $tmplt->details('',$row['configoption5']);
+
+    if (strtoupper($ret['os']) == strtoupper('WINDOWS')) {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandServer.php';
+        $server = new StormOnDemandServer($username, $password);
+    } else {
+        require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormServer.php';
+        $server = new StormOnDemandStormServer($username, $password);
+    }
 
     if(isset($_REQUEST['page']))
         $page = $_REQUEST['page'];

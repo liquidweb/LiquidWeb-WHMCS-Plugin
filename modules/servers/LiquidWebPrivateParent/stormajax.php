@@ -17,7 +17,7 @@ $password   =   $productRow['configoption2'];
 
 
 if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image') {
-    ob_clean();
+    //ob_clean();
     $conf_id = $_REQUEST['conf_id'];
 
     require_once $roopath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormImage.php';
@@ -63,15 +63,20 @@ if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image') {
             });
           </script>';
 } elseif (isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-template') {
-        ob_clean();
+        //ob_clean();
         $conf_id = $_REQUEST['conf_id'];
+
+        $hid_template = array('0');
+        $q = mysql_query("SELECT * FROM `StormBilling_customconfig` where `config_name` = 'wiz_pg_4_hide_from_tmplt_list'");
+        if(($res = mysql_fetch_assoc($q))) {
+            $hid_template = @explode(",", $res['config_value']);
+        }
 
         require_once $roopath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormTemplate.php';
         $template = new StormOnDemandStormTemplate($username, $password, 'bleed');
         $ret = $template->lists();
 
-        if($error = $template->getError())
-        {
+        if($error = $template->getError()) {
             echo '<p style="color: red">'.$error.'</p>';
             die();
         }
@@ -81,16 +86,18 @@ if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image') {
                     <th>Template</th>
                 </tr>
               ';
-        foreach($ret['items'] as $item)
-        {
-            if($item['deprecated'] == 1)
-            {
-                continue;
-            }
+        foreach($ret['items'] as $item) {
+            foreach ($hid_template as $tempid) {
+                if ($tempid != $item['id']) {
+                    if($item['deprecated'] == 1) {
+                        continue;
+                    }
 
-            echo '<tr>
-                    <td><input class="storm-template" type="radio" name="template-id" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
-                  </tr>';
+                    echo '<tr>
+                            <td><input class="storm-template" type="radio" name="template-id" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
+                        </tr>';
+                }
+            }
         }
         echo '</table>';
         echo '<script type="text/javascript">
@@ -133,8 +140,7 @@ if (isset($_REQUEST['modaction']) && ($_REQUEST['modaction'] == 'generate_config
     $page_size = 250;
 
     $response = $private->lists($page_num, $page_size);
-    if(!$response)
-    {
+    if (!$response) {
         ob_clean();
         json_encode(array(
             'status'    =>  0,
@@ -144,15 +150,13 @@ if (isset($_REQUEST['modaction']) && ($_REQUEST['modaction'] == 'generate_config
     }
 
     $parents = $response['items'];
-    while($response['item_total'] > $page_num * $page_size)
-    {
+    while($response['item_total'] > $page_num * $page_size) {
         $page_num++;
         $response = $private->lists($page_size, $page_num);
         $parents = array_merge($parents, $response['items']);
     }
 
-    foreach($parents as $parent)
-    {
+    foreach($parents as $parent) {
         if(!in_array($parent['uniq_id'], $selected_parents))
         {
             continue;
