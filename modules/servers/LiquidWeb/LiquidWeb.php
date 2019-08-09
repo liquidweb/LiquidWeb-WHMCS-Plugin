@@ -717,9 +717,7 @@ function LiquidWeb_ConfigOptions()
                     '500'	=>	'500GB',
                     '1000'	=>	'1000GB',
                     '2000'	=>	'2000GB',
-                    '4000'	=>	'4000GB',
-                    '8000'	=>	'8000GB',
-                    '20000'	=>	'20000GB'
+                    '4000'	=>	'4000GB'
                 )
             );
 
@@ -960,6 +958,17 @@ function LiquidWeb_ConfigOptions()
             require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
             $zone = new StormOnDemandNetworkZone($username, $password);
 
+            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
+            $product 	  = new StormOnDemandProduct($username, $password);
+            $product_ret  = $product->details(null,'SS.VPS');
+            
+            foreach ($product_ret['options'] as $optn) {
+                foreach ($optn['values'] as $values) {
+                    $arr_prices = $values['prices'];
+                    $arr_product_price[$values['value']] = 	$arr_prices[1]['month'];
+                }
+            }
+            
             $tmptDtl = $template->details('',$row['configoption5']);
             
             //Templates
@@ -1013,7 +1022,10 @@ function LiquidWeb_ConfigOptions()
                     if (!$config['available']) {
                         continue;
                     }
-
+                    if ($arr_product_price[$config['id']] == '') {
+                        continue;
+                    }
+  
                     $configurable_options[1]['Values'][$config['id']] = $config['description'];
                 }
             }
@@ -1082,8 +1094,11 @@ function LiquidWeb_ConfigOptions()
                 'Values'    =>  array
                 (
                     '100'    =>  '100GB',
-                    '200'    =>  '200GB',
-                    '500'    =>  '500GB'
+                    '250'    =>  '250GB',
+                    '500'    =>  '500GB',
+                    '1000'   =>  '1000GB',
+                    '2000'   =>  '2000GB',
+                    '4000'   =>  '4000GB'
                 )
             );
 

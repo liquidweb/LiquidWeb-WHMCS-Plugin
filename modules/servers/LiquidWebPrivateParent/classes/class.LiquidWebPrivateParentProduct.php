@@ -292,13 +292,28 @@ class LiquidWebPrivateParentProduct extends StormOnDemand_Product
                         ),
                         array
                         (
-                            'value'     =>  '200',
-                            'title'     =>  '200 GB'
+                            'value'     =>  '250',
+                            'title'     =>  '250 GB'
                         ),
                         array
                         (
                             'value'     =>  '500',
                             'title'     =>  '500 GB'
+                        ),
+                        array
+                        (
+                            'value'     =>  '1000',
+                            'title'     =>  '1000 GB'
+                        ),
+                        array
+                        (
+                            'value'     =>  '2000',
+                            'title'     =>  '2000 GB'
+                        ),
+                        array
+                        (
+                            'value'     =>  '4000',
+                            'title'     =>  '4000 GB'
                         )
                     )
                 ),
