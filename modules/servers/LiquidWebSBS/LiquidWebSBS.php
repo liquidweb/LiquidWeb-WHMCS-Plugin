@@ -307,7 +307,9 @@ function LiquidWebSBS_ConfigOptions($loadValuesFromServer = true) {
 
     if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php' && $_GET['action'] != 'save')
     {
-        $config['Zone']['Description'] .= '<script type="text/javascript">
+        $config['Zone']['Description'] .= '<link rel="stylesheet" href="../assets/css/jquery-ui.css">
+            <script src="../assets/js/jquery-ui.js"></script>
+            <script type="text/javascript">
                 jQuery(function(){
                   jQuery( document ).ready(function() {
                     jQuery(".load-configuration").click(function(event){

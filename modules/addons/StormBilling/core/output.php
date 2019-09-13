@@ -15,6 +15,9 @@ echo '
 <!--FONTS-->
 <link href="'.$ASSETS_DIR.'/css/font-awesome.css" rel="stylesheet">
 
+<link rel="stylesheet" href="../assets/css/jquery-ui.css">
+<script src="../assets/js/jquery-ui.js"></script>
+
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

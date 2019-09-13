@@ -100,8 +100,10 @@ function TemplateProduct_ProductEdit($params)
       }  
 
       $confoptions =   json_encode($confoptionsarraylower);      
-     echo 
-    '<script>
+     echo '<link rel="stylesheet" href="../assets/css/jquery-ui.css">
+     <script src="../assets/js/jquery-ui.js"></script>
+     
+     <script>
      $(function(){
       var servertype = $("select[name=\'servertype\'] option:selected" ).val();
       var productTemplates = {"templates_info":'.$confoptions.',"templates":'.$template.'};

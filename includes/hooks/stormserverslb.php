@@ -69,7 +69,9 @@ if(!function_exists('mysql_get_row'))
         $productdetails = mysql_get_row("SELECT * FROM tblproducts WHERE id=?", array($params['pid']));
         $servertype = $productdetails['servertype'];
         if($servertype == 'LiquidWebLoadBalancer' || $servertype == 'StormOnDemandLoadBalancer'){
-            echo '<script type="text/javascript">
+            echo '<link rel="stylesheet" href="../assets/css/jquery-ui.css">
+            <script src="../assets/js/jquery-ui.js"></script>
+            <script type="text/javascript">
             jQuery(function(){
               jQuery( document ).ready(function() {
                 jQuery(".load-configuration").click(function(event){

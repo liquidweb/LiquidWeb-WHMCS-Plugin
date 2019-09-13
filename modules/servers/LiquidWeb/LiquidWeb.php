@@ -1557,7 +1557,9 @@ function LiquidWeb_ConfigOptions()
 		'templates'		 => $templates,
 	);
 	//script for product configure fields
-	$config['Backup Quota']['Description'] = "<script type='text/javascript'>".LiquidWeb_loadAsset('js/ProductConfigure.tpl.js', $jsTplParams)."</script>";
+    $config['Backup Quota']['Description'] = "<link rel='stylesheet' href='../assets/css/jquery-ui.css'>";
+    $config['Backup Quota']['Description'] .= "<script type='text/javascript' src='../assets/js/jquery-ui.js'></script>";
+    $config['Backup Quota']['Description'] .= "<script type='text/javascript'>".LiquidWeb_loadAsset('js/ProductConfigure.tpl.js', $jsTplParams)."</script>";
 
     if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php')
     {
@@ -1575,6 +1577,8 @@ function LiquidWeb_ConfigOptions()
 			}
 		}
 
+		$config['Backup Quota']['Description'] .= "<link rel='stylesheet' href='../assets/css/jquery-ui.css'>";
+		$config['Backup Quota']['Description'] .= "<script type='text/javascript' src='../assets/js/jquery-ui.js'></script>";
 		$config['Backup Quota']['Description'] .= "<script type='text/javascript'>".LiquidWeb_loadAsset('js/LoadConfiguration.tpl.js', $lcConfig).'</script><div id="conf-dialog" style="display:none;" title=""></div>';
     }
 
