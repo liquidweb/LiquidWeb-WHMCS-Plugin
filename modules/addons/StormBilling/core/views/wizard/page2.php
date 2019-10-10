@@ -51,6 +51,10 @@ if (isset($_SESSION['setup_lw_ssd_vps'])){
 					<td class="fieldlabel"><?php echo MG_Language::translate('Account Password :');?></td>
 					<td class="fieldarea"><input type="password" name="setup_lw_password" id="setup_lw_password" style="width: 310px;"/></td>
 				</tr>
+				<tr>
+					<td class="fieldlabel"><?php echo MG_Language::translate('Email Address :');?></td>
+					<td class="fieldarea"><input type="email" name="setup_lw_email" id="setup_lw_email" style="width: 310px;"/></td>
+				</tr>
         	</tbody>
         	</table>
         	<br/>

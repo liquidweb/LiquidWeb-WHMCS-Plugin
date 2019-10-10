@@ -22,6 +22,10 @@ $action = 'addonmodules.php?module=StormBilling&action=setup&pg=5';
 					<td class="fieldlabel"><h2><?php echo MG_Language::translate('API Password :');?></h2></td>
 					<td class="fieldarea"><h1><label style="margin-left: 10px;"><?php echo $_SESSION['api_password']; ?></label></h1></td>
 				</tr>
+				<tr>
+					<td class="fieldlabel"><h2><?php echo MG_Language::translate('Email Address :');?></h2></td>
+					<td class="fieldarea"><h1><label style="margin-left: 10px;"><?php echo $_SESSION['api_email']; ?></label></h1></td>
+				</tr>
         	</tbody>
         	</table>
     		<br/><br/><br/>

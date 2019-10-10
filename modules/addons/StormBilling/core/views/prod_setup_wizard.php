@@ -364,6 +364,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             if (isset($customConfig['api_username'])) {
                 $_SESSION['api_username'] = $customConfig['api_username'];
                 $_SESSION['api_password'] = $customConfig['api_password'];
+                $_SESSION['api_email'] = $customConfig['api_email'];
                 //$_SESSION['api_password'] = StormOnDemand_Helper::encrypt_decrypt($customConfig['api_password']);
 
                 if (isset($_POST['setup_lw_ssd_vps'])) {
@@ -384,6 +385,7 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             //validate
             $username = html_entity_decode($_POST['setup_lw_username']);
             $password = html_entity_decode($_POST['setup_lw_password']);
+            $email = html_entity_decode($_POST['setup_lw_email']);
             require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'bleed' . DIRECTORY_SEPARATOR . 'class.StormOnDemandStormConfig.php';
             $config = new StormOnDemandStormConfig($username, $password, 'bleed');
 
@@ -392,17 +394,18 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
                 $username = StormOnDemand_Helper::random_password(6);
                 $password = StormOnDemand_Helper::random_password(8);
 
-                $res = $config->userCreate($username,$password, 'bleed');
+                $res = $config->userCreate($username,$password, $email);
                 if (isset($res['active']) && $res['active'] = '1') {
                     $username = 'whmcsuser-'.$username; //prefix whmcsuser
 
                     $_SESSION['api_username'] = $username;
                     $_SESSION['api_password'] = $password;
+                    $_SESSION['api_email'] = $email;
                     //$password = StormOnDemand_Helper::encrypt_decrypt($password, 'encrypt');
 
                     //save to database
                     require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
-                    $api_user = array('api_username'=>$username, 'api_password'=>$password);
+                    $api_user = array('api_username'=>$username, 'api_password'=>$password, 'api_email'=>$email);
                     StormOnDemand_Helper::saveConfigs($api_user);
                 } else {
                     $_REQUEST['pg'] = $_POST['wiz_page'];
@@ -469,57 +472,6 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
         $data['name'] = $_POST['setup_lw_productname'];
         $data['description'] = $_POST['setup_lw_description'];
 
-
-        /*if ($_POST['setup_lw_price_type'] == 'perentage') {
-    		require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
-
-    		$product 	  = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
-    		$product_ret = $product->details(null,'SS.VPS');
-            $arr_price = Array();
-
-            foreach ($product_ret['options'] as $optn) {
-            	if ($optn['key'] == 'LiquidWebBackupPlan') {
-        			foreach ($optn['values'] as $values) {
-    					if ($values['value'] == 'Quota') { //only quota is considered in wizard page
-    						foreach ($values['options'][0]['values'] as $vals) {
-    							foreach ($vals['prices'] as $prKey=>$prVal) {
-    								$zoneprice[$prKey] = $prVal['month'];
-    							}
-    							$arr_price[$optn['key']][$vals['value']] = $zoneprice;
-    						}
-    					}
-        			}
-            	} else {
-                	foreach ($optn as $values) {
-                		if (is_array($values)) {
-                			foreach ($values as $vals) {
-                				foreach ($vals['prices'] as $prKey=>$prVal) {
-            						$zoneprice[$prKey] = $prVal['month'];
-                				}
-                				$arr_price[$optn['key']][$vals['value']] = $zoneprice;
-                			}
-                		}
-                	}
-            	}
-            }
-
-            //get zone list from api
-            require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandNetworkZone.php';
-            $zonedtl = new StormOnDemandNetworkZone($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
-            $zone = $zonedtl->details($_POST['setup_lw_zonecode']);
-
-            $price = 0;
-            $price = $price + $arr_price['Template'][$_POST['setup_lw_ostemplates']][$zone['region']['id']];
-            $price = $price + $arr_price['ConfigId'][$_POST['setup_lw_vpstype']][$zone['region']['id']];
-            if ($_POST['setup_lw_backup'] == 'on'){
-                $price = $price + $arr_price['LiquidWebBackupPlan'][$_POST['setup_lw_backupquota']][$zone['region']['id']];
-            }
-            if ($_POST['setup_lw_ips'] > 1){
-                $xtraips = $_POST['setup_lw_ips']-1;
-                $price = $price + ($arr_price['ExtraIp']['1'][$zone['region']['id']] * $xtraips);
-            }
-            $price = $price + ($price*$_POST['setup_lw_price']*0.01);
-        }*/
 
         require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Helper.php';
 		$new_pid = StormOnDemand_Helper::saveSSDVPSConfigurations($data);
@@ -699,11 +651,6 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             die();
         }
 
-		/*require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
-
-		$product 	  = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');
-		$product_ret = $product->details(null,'SS.VPS');*/
-
 		$product_price = $arr_product_price[$ret['id']] != '' ? $arr_product_price[$ret['id']] : '';
 		if ($product_price != '') {
 			$vpstype[$ret['id']] = $ret['description'].' / $'.$product_price;
@@ -807,9 +754,6 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
             $dropdown .= "</select>";
 
             //Get Product Details
-            /*require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandProduct.php';
-            $product = new StormOnDemandProduct($_SESSION['api_username'],$_SESSION['api_password'],'bleed');*/
-
             $result = $product->details(null,'SS.PP');
 
             $serverdetails = $result['options'][0]['values']; //For code = 'SS.PP';
@@ -853,13 +797,6 @@ if ((isset($_REQUEST['module']) && $_REQUEST['module']=='StormBilling') && (isse
         }
 
         //Get Parent Servers
-        //require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemandStormPrivateParent.php';
-        //$private = new StormOnDemandStormPrivateParent($_SESSION['api_username'], $_SESSION['api_password'], 'bleed');
-
-        //$page_num = 1;
-        //$page_size = 25;
-
-        //$response = $private->lists($page_num, $page_size);
 
         if(!$response) {
             ob_clean();

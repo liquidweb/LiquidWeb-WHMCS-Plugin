@@ -43,12 +43,13 @@ if(!class_exists('StormOnDemandStormConfig'))
             return $results;
         }
 
-        public function userCreate($username, $password) {
-            $data['firstname']   =   'WHMCS';
+        public function userCreate($username, $password, $email) {
+            $data['firstname']  =   'WHMCS';
             $data['lastname']   =   'USER';
             $data['password']   =   $password;
             $data['username']   =   'whmcsuser-'.$username;
-            $data['roles']   =   Array('AccountLogin','Console','Firewall','LoadBalance','Monitoring','Network','Reboot','Resize','RestoreReimage','ServerServices','Users','Support','Destroy','Profile','Invoices');
+            $data['email']      =   $email;
+            $data['roles']      =   Array('AccountLogin','Console','Firewall','LoadBalance','Monitoring','Network','Reboot','Resize','RestoreReimage','ServerServices','Users','Support','Destroy','Profile','Invoices');
 
             $results = $this->__request('Account/User/create', $data, __METHOD__);
 
