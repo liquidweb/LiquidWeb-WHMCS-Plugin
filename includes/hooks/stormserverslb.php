@@ -69,8 +69,8 @@ if(!function_exists('mysql_get_row'))
         $productdetails = mysql_get_row("SELECT * FROM tblproducts WHERE id=?", array($params['pid']));
         $servertype = $productdetails['servertype'];
         if($servertype == 'LiquidWebLoadBalancer' || $servertype == 'StormOnDemandLoadBalancer'){
-            echo '<link rel="stylesheet" href="../assets/css/jquery-ui.css">
-            <script src="../assets/js/jquery-ui.js"></script>
+            echo '<link href="../modules/addons/StormBilling/core/assets/css/jquery-ui.1.12.1.min.css" rel="stylesheet" type="text/css" />
+            <script src="../modules/addons/StormBilling/core/assets/js/jquery-ui.1.12.1.min.js"></script>
             <script type="text/javascript">
             jQuery(function(){
               jQuery( document ).ready(function() {

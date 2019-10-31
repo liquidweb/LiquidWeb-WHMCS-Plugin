@@ -64,19 +64,29 @@ if(!class_exists('StormOnDemand_Product'))
             {
                 //ob_clean();
                 $ret = $this->generateDefaultCustomField();
-                $json = array();
                 if($ret)
                 {
+                    //$json['status']     =   1;
+                    //$json['message']    =   'Custom Fields Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
+                    //echo 'Custom Fields Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
+
+                    $json = array();
                     $json['status']     =   1;
-                    $json['message']    =   'Custom Fields Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
+                    $json['message']    =   'Custom Fields Generated';
+                    $json['goto']        =   'configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4';
+                    echo json_encode($json);
                 }
                 else
                 {
+                    //$json['status']     =   0;
+                    //$json['message']    =   'Custom Fields Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
+                    //echo 'Custom Fields Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
+                    $json = array();
                     $json['status']     =   0;
                     $json['message']    =   'Custom Fields Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=4">here</a></b> to check Custom Fields';
+                    echo json_encode($json);
                 }
 
-                echo json_encode($json);
                 die();
             }
             //Generate Configurable Options
@@ -88,23 +98,32 @@ if(!class_exists('StormOnDemand_Product'))
                 $q = mysql_safequery('SELECT * FROM tblproductconfiglinks WHERE pid = ?', array($_REQUEST['id']));
                 $row = mysql_fetch_assoc($q);
 
-                $json = array();
                 if($ret)
                 {
+                    //$json['status']     =   1;
+                    //$json['message']    =   'Configurable Options Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+                    //echo 'Configurable Options Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+
+                    $json = array();
                     $json['status']     =   1;
-                    //$json['message']    =   'Configurable Options Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
-                    $json['message']    =   'Configurable Options Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
-
-
+                    $json['message']    =   'Configurable Options Generated';
+                    $json['goto']        =   'configproductoptions.php?action=managegroup&id='.$row['gid'];
+                    echo json_encode($json);
                 }
                 else
                 {
+                    //$json['status']     =   0;
+                    //$json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+                    //echo 'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+
+                    $json = array();
                     $json['status']     =   0;
-                    //$json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5">here</a></b> to check Configurable options';
                     $json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+                    //echo 'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+                    echo json_encode($json);
+        
                 }
 
-                echo json_encode($json);
                 die();
             }
         }
@@ -409,6 +428,8 @@ if(!class_exists('StormOnDemand_Product'))
                 return mysql_safequery('DELETE FROM '.$this->_tableName.' WHERE product_id = ' . (int)$this->id);
         }
 
+
+        /*
         public function renderConfigOptions($scripts = ''){
             $scripts .= '
                     <style type="text/css">
@@ -531,7 +552,7 @@ if(!class_exists('StormOnDemand_Product'))
             if ($countFields != 0)
                     $str .= '</tr>';
             return $scripts.$str;
-        }
+        }*/
 
         public function renderConfigOptionInput($name, $type, $default, array $options = array(), $optionsValuesFromKeys = false){
             $value = $this->getConfig($name) ? $this->getConfig($name) : ($this->issetConfig($name) ? '' : $default);

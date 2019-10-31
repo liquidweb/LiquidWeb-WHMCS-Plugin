@@ -219,55 +219,22 @@ function LiquidWeb_ConfigOptions()
 
 
 
-        echo '<div id="storm-config-tabs">';
-        echo '<ul>
-                <!-- <li><a href="#storm-config-tab-storm">Cloud Servers</a></li> -->
-                <li><a href="#storm-config-tab-ssd">SSD Servers</a></li>
-                <li><a href="#storm-config-tab-bare-metal">Bare Metal Servers</a></li>
-              </ul>';
+        echo '<ul id="menus" class="nav nav-pills" role="tablist">
+            <li class="nav-item active"><a class="nav-link active" data-toggle="tab" role="tab" aria-controls="ssd-tab" aria-selected="true" href="#storm-config-tab-ssd"><b>SSD Servers</b></a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-controls="storm-config-tab" aria-selected="false" href="#storm-config-tab-bare-metal"><b>Bare Metal Servers</b></a></li>
+        </ul>
 
-/*              
-        //Storm Servers
-        echo '<div id="storm-config-tab-storm">';
-        echo '<table class="datatable" style="width: 100%">
-                <tr>
-                    <th>Server Type</th>
-                    <th style="width: 80px">VCPU</th>
-                    <th style="width: 80px">Disk</th>
-                    <th style="width: 80px">Memory</th>
-                </tr>
-              ';
-        foreach($confs['storm'] as &$item)
-        {
+        <div class="tab-content" >
+        <div class="tab-pane fade active in" id="storm-config-tab-ssd" role="tabpanel" aria-labelledby="ssd-tab">
+        <table class="datatable" style="width: 100%">
+            <tr>
+                <th>Server Type</th>
+                <th style="width: 80px">Price($)</th>
+                <th style="width: 80px">VCPU</th>
+                <th style="width: 80px">Disk</th>
+                <th style="width: 80px">Memory</th>
+            </tr>';
 
-			if(!isset($item['zone_availability']) 				 ||
-			   empty($item['zone_availability']) 				 ||
-			   !isset($item['zone_availability'][$zoneSelected]) ||
-			   !$item['zone_availability'][$zoneSelected]){
-			    	continue;
-			    }
-
-            echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$item['vcpu'].' CPUs</td>
-                    <td>'.$item['disk'].'</td>
-                    <td>'.$item['memory'].'</td>
-                  </tr>';
-        }
-        echo '</table>';
-        echo '</div>';
-*/
-        //SSD Servers
-        echo '<div id="storm-config-tab-ssd">';
-        echo '<table class="datatable" style="width: 100%">
-                <tr>
-                    <th>Server Type</th>
-					<th style="width: 80px">Price($)</th>
-                    <th style="width: 80px">VCPU</th>
-                    <th style="width: 80px">Disk</th>
-                    <th style="width: 80px">Memory</th>
-                </tr>
-              ';
         foreach($confs['ssd'] as &$item)
         {
 			if(!isset($item['zone_availability']) 				 ||
@@ -281,21 +248,22 @@ function LiquidWeb_ConfigOptions()
                 $product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
 
             echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td style="text-align:right; padding-right:20px;">$'.$product_price.'</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['vcpu'].' CPUs</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['disk'].'GB</td>
-                    <td style="text-align:right; padding-right:8px;">'.round(($item['memory']/1024),1).'GB</td>
+                    <td><input class="storm-config" type="radio" name="config-id" id="ssd_ser_'.$item['id'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> <label for="ssd_ser_'.$item['id'].'">'.$item['description'].'</label></td>
+                    <td style="text-align:right; padding-right:20px;"><label for="ssd_ser_'.$item['id'].'">$'.$product_price.'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="ssd_ser_'.$item['id'].'">'.$item['vcpu'].' CPUs</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="ssd_ser_'.$item['id'].'">'.$item['disk'].' GB</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="ssd_ser_'.$item['id'].'">'.round(($item['memory']/1024),1).' GB</label></td>
                   </tr>';
         }
         echo '</table>';
         echo '</div>';
 
         //Bare-Metal
-        echo '<div id="storm-config-tab-bare-metal" style="font-size: 12px;">';
+        echo '<div class="tab-pane fade" id="storm-config-tab-bare-metal" role="tabpanel" aria-labelledby="storm-config-tab">';
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Server Type</th>
+					<th style="width: 50px">Price</th>
                     <th style="width: 50px">Speed</th>
                     <th style="width: 40px">CPUs</th>
                     <th style="width: 45px">Cores</th>
@@ -317,35 +285,20 @@ function LiquidWeb_ConfigOptions()
 			    }
 
             echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_speed'].'MHz</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_count'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_cores'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.round(($item['ram_total']/1024),1).'GB</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['disk_count'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['disk_total'].'GB</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['disk_type'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</td>
+                    <td><input class="storm-config" type="radio" name="config-id" id="bm_ser_'.$item['id'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> <label for="bm_ser_'.$item['id'].'">'.$item['description'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['cpu_speed'].'MHz</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['cpu_count'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['cpu_cores'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.round(($item['ram_total']/1024),1).'GB</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['disk_count'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['disk_total'].'GB</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['disk_type'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</label></td>
                   </tr>';
         }
         echo '</table>';
         echo '</div>';
-
         echo '</div>'; //close tabs
-
-        echo '<script type="text/javascript">
-                $(function(){
-                    $("#storm-config-tabs").tabs();
-                    $(".storm-config").click(function(event){
-                        event.preventDefault();
-
-                        val = $(this).parent().find("input[name=\'config-id\']").val();
-                        $("#load-storm-config").parent().find("input").val(val).change();
-                        $("#conf-dialog").dialog("destroy");
-                        //$("#conf-dialog").hide();
-                    });
-                });
-              </script>';
         die();
     }
     elseif($_REQUEST['stormajax'] == 'load-template')
@@ -388,8 +341,7 @@ function LiquidWeb_ConfigOptions()
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Template</th>
-                </tr>
-              ';
+                </tr>';
         foreach($ret['items'] as $item) {
             foreach ($hid_template as $tempid) {
                 if ($tempid != $item['id']) {
@@ -403,24 +355,12 @@ function LiquidWeb_ConfigOptions()
 			    	        continue;
 			        }
                     echo '<tr>
-                    <td><input class="storm-template" type="radio" name="template-id" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
+                    <td><input class="storm-template" type="radio" name="template-id" id="template-id-'.$item['name'].'" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/> <label for="template-id-'.$item['name'].'">'.$item['description'].'</label></td>
                   </tr>';
                 }
             }
         }
         echo '</table>';
-        echo '<script type="text/javascript">
-                $(function(){
-                    $(".storm-template").click(function(event){
-                        event.preventDefault();
-
-                        val = $(this).parent().find("input[name=\'template-id\']").val();
-                        $("#load-storm-template").parent().find("input").val(val).change();
-                        $("#conf-dialog").dialog("destroy");
-                        $("#load-storm-image").prev().val("");
-                    });
-                });
-              </script>';
         die();
     }
     elseif($_REQUEST['stormajax'] == 'load-image')
@@ -458,24 +398,12 @@ function LiquidWeb_ConfigOptions()
                 continue;
             }
             echo '<tr>
-                    <td><input class="storm-image" type="radio" name="image-id" value="'.$item['id'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').' />'.$item['template_description'].'</td>
-                    <td>'.$item['source_hostname'].'</td>
-                    <td>'.$item['time_taken'].'</td>
+                    <td><input class="storm-image" type="radio" name="image-id" id="image-id-'.$item['id'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').' /> <label for="image-id-'.$item['id'].'">'.$item['template_description'].'</label></td>
+                    <td><label for="image-id-'.$item['id'].'">'.$item['source_hostname'].'</label></td>
+                    <td><label for="image-id-'.$item['id'].'">'.$item['time_taken'].'</label></td>
                   </tr>';
         }
         echo '</table>';
-        echo '<script type="text/javascript">
-                $(function(){
-                    $(".storm-image").click(function(event){
-                        event.preventDefault();
-
-                        val = $(this).parent().find("input[name=\'image-id\']").val();
-                        $("#load-storm-image").parent().find("input").val(val);
-                        $("#conf-dialog").dialog("destroy");
-                        $("#load-storm-template").prev().val("");
-                    });
-                });
-              </script>';
         die();
     }
     elseif($_REQUEST['stormajax'] == 'load-zone')
@@ -519,25 +447,11 @@ function LiquidWeb_ConfigOptions()
 			}
 
             echo '<tr>
-                    <td><input class="storm-zone" type="radio" name="zone-id" data-zone-name="'.$zoneName.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').' />'.$item['name'].'</td>
-                    <td>'.$item['region']['name'].'</td>
+                    <td><input class="storm-zone" type="radio" name="zone-id" data-zone-name="'.$zoneName.'" id="zone-id-'.$item['id'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').' /> <label for="zone-id-'.$item['id'].'">'.$item['name'].'</label></td>
+                    <td><label for="zone-id-'.$item['id'].'">'.$item['region']['name'].'</label></td>
                   </tr>';
         }
         echo '</table>';
-        echo '<script type="text/javascript">
-                $(function(){
-                    $(".storm-zone").click(function(event){
-                        event.preventDefault();
-
-                        val = $(this).parent().find("input[name=\'zone-id\']").val();
-						name = $(this).parent().find("input[name=\'zone-id\']").attr("data-zone-name");
-
-                        $("#load-storm-zone").parent().find("input").val(val).change();
-						$("#load-storm-zone").parent().find("#zone_name").html(name);
-                        $("#conf-dialog").dialog("destroy");
-                    });
-                });
-              </script>';
         die();
 
     }
@@ -546,10 +460,15 @@ function LiquidWeb_ConfigOptions()
         $configurable_options = array();
 
         ob_clean();
-        $q = mysql_query('SELECT * FROM tblproductconfiglinks WHERE pid = '. (int)$_REQUEST['id']);
+        $q = mysql_safequery('SELECT * FROM tblproductconfiglinks WHERE pid = ?', array($_REQUEST['id']));
+        $row = mysql_fetch_assoc($q);
         if(mysql_num_rows($q))
         {
-            echo '<p style="color: red">Configurable options for this product already exists. Cannot generate</p>';
+            $json = array();
+            $json['status']     =   0;
+            $json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+            //echo 'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+            echo json_encode($json);
             die();
         }
 
@@ -1240,12 +1159,12 @@ function LiquidWeb_ConfigOptions()
             }
         }
 
-        echo '<p style="color: green">Default Configurable options generated!</p>
-              <script type="text/javascript">
-                setTimeout(function(){
-                    window.location = "configproductoptions.php?action=managegroup&id='.$group_id.'";
-                }, 1000);
-              </script>';
+        //echo 'Configurable Options Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$group_id.'">here</a></b> to check Configurable options';
+        $json = array();
+        $json['status']     =   1;
+        $json['message']    =   'Configurable Options Generated';
+        $json['goto']        =   'configproductoptions.php?action=managegroup&id='.$group_id;
+        echo json_encode($json);
         die();
     }
     elseif($_REQUEST['stormajax'] == 'load-quota')
@@ -1428,7 +1347,8 @@ function LiquidWeb_ConfigOptions()
     	//}
     }
 
-   $config['Zone']['Description'] = '<style type="text/css">input[name="packageconfigoption[4]"]{display:none;}</style><span id="zone_name">'.$jsTplParams['zone_name'].'</span>&nbsp;&nbsp;<a id="load-storm-zone" href="stormajax=load-zone" class="load-configuration">Load Zone</a>';
+    // $config['Zone']['Description'] = '<style type="text/css">input[name="packageconfigoption[4]"]{display:none;}</style><span id="zone_name">'.$jsTplParams['zone_name'].'</span>&nbsp;&nbsp;<a id="load-storm-zone" href="stormajax=load-zone" class="load-configuration">Load Zone</a>';
+    $config['Zone']['Description'] = '<style type="text/css">input[name="packageconfigoption[4]"]{display:none;}</style><span id="zone_name">'.$jsTplParams['zone_name'].'</span>&nbsp;&nbsp;<a id="load-storm-zone" href="javascript:;" onclick="showOptions(\'Zone\',this)">Load Zone</a>';
 
    $templates = LiquidWeb_loadTemplates();
 
@@ -1557,8 +1477,8 @@ function LiquidWeb_ConfigOptions()
 		'templates'		 => $templates,
 	);
 	//script for product configure fields
-    $config['Backup Quota']['Description'] = "<link rel='stylesheet' href='../assets/css/jquery-ui.css'>";
-    $config['Backup Quota']['Description'] .= "<script type='text/javascript' src='../assets/js/jquery-ui.js'></script>";
+    //$config['Backup Quota']['Description'] = "<link rel='stylesheet' href='../modules/addons/StormBilling/core/assets/css/jquery-ui.1.12.1.min.css'>";
+    //$config['Backup Quota']['Description'] .= "<script src='../modules/addons/StormBilling/core/assets/js/jquery-ui.1.12.1.min.js'></script>";
     $config['Backup Quota']['Description'] .= "<script type='text/javascript'>".LiquidWeb_loadAsset('js/ProductConfigure.tpl.js', $jsTplParams)."</script>";
 
     if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php')
@@ -1575,11 +1495,28 @@ function LiquidWeb_ConfigOptions()
 					'var_name'  => $k,
 				);
 			}
-		}
-
-		$config['Backup Quota']['Description'] .= "<link rel='stylesheet' href='../assets/css/jquery-ui.css'>";
-		$config['Backup Quota']['Description'] .= "<script type='text/javascript' src='../assets/js/jquery-ui.js'></script>";
-		$config['Backup Quota']['Description'] .= "<script type='text/javascript'>".LiquidWeb_loadAsset('js/LoadConfiguration.tpl.js', $lcConfig).'</script><div id="conf-dialog" style="display:none;" title=""></div>';
+        }
+        
+        $dialog = '<div id="load-storm-options" class="modal fade" role="dialog" data-backdrop="static"  data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Select</h4>
+                    </div>
+                    <div class="modal-body" id="load-storm-options-body" >
+                        
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="Option-OK">OK</button>
+                    <button type="button" class="btn btn-default btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>';
+		$config['Backup Quota']['Description'] .= $dialog;
+        $config['Backup Quota']['Description'] .= "<script type='text/javascript'>".LiquidWeb_loadAsset('js/LoadConfiguration.tpl.js', $lcConfig).'</script>';
     }
 
     /*$newVersion = LiquidWeb_getLatestVersion();
@@ -3858,7 +3795,8 @@ function getConfigFields()
         'Default Configurable Options'       =>  array
         (
             'Type'          =>  '',
-            'Description'   =>  '<a id="generate-storm-confoption" href="stormajax=generate-confoption" class="load-configuration">Generate Default Configurable Options</a>'
+            //'Description'   =>  '<a id="generate-storm-confoption" href="stormajax=generate-confoption" class="load-configuration">Generate Default Configurable Options</a>'
+            'Description' => '<a id="generate-storm-confoption" href="javascript:;" onclick="showOptions(\'Generate Default Configurable Options\',this,'.$idProduct.')">Generate Default Configurable Options</a>'
         ),
         'Zone'              =>  array
         (
@@ -3871,19 +3809,19 @@ function getConfigFields()
         (
             'Type'          =>  'text',
             'Size'          =>  '25',
-            'Description'   =>  '<a id="load-storm-template" href="stormajax=load-template" class="load-configuration">Load Template</a>'
+            'Description'   =>  '<a id="load-storm-template" href="javascript:;" onclick="showOptions(\'Template\',this)">Load Template</a>'
         ),
         'Image'             =>  array
         (
             'Type'          =>  'text',
             'Size'          =>  '25',
-            'Description'   =>  '<a id="load-storm-image" href="stormajax=load-image" class="load-configuration">Load Image</a>'
+            'Description'   =>  '<a id="load-storm-image" href="javascript:;" onclick="showOptions(\'Image\',this)">Load Image</a>'
         ),
         'Config'            =>  array
         (
           'Type'            =>  'text',
           'Size'            =>  '25',
-          'Description'     =>  '<a id="load-storm-config" href="stormajax=load-config" class="load-configuration">Load Config</a>'
+          'Description'     =>  '<a id="load-storm-config" href="javascript:;" onclick="showOptions(\'Config\',this)">Load Config</a>'
         ),
         'Backup Enabled'    =>  array
         (

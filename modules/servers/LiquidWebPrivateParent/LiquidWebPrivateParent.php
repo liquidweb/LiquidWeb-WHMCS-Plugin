@@ -140,12 +140,14 @@ function LiquidWebPrivateParent_ConfigOptions()
      'Default Configurable Options' => array
      (
     		'Type' => '',
-    		'Description' => '<a id="generate-storm-confoption" href="modaction=generate_configurable_options" class="gen-config-options">Generate Default Configurable Options</a>'
+    		//'Description' => '<a id="generate-storm-confoption" href="modaction=generate_configurable_options" class="gen-config-options">Generate Default Configurable Options</a>'
+            'Description' => '<a id="generate-storm-confoption" href="javascript:;" onclick="showOptions(\'Generate Default Configurable Options\',this,'.$idProduct.')">Generate Default Configurable Options</a>'
      ),
      'Custom Fields' => array
      (
     		'Type' => '',
-    		'Description' => '<a id="generate-storm-customfields" href="modaction=generate_custom_fields" class="gen-config-options">Generate Custom Fields</a>'
+            //'Description' => '<a id="generate-storm-customfields" href="modaction=generate_custom_fields" class="gen-config-options">Generate Custom Fields</a>'
+            'Description' => '<a id="generate-storm-customfields" href="javascript:;" onclick="showOptions(\'Generate Custom Fields\',this,'.$idProduct.')">Generate Custom Fields</a>'
      ),
      'Parent Server' => array
      (
@@ -167,13 +169,13 @@ function LiquidWebPrivateParent_ConfigOptions()
      (
     		'Type' => 'text',
     		'Size' => '25',
-    		'Description' => '<a id="load-storm-template" href="stormajax=load-template" class="load-configuration">Load Template</a>'
+            'Description' => '<a id="load-storm-template" href="javascript:;" onclick="showOptions(\'Template\',this,'.$idProduct.')">Load Template</a>'
      ),
      'Image' => array
      (
     		'Type' => 'text',
     		'Size' => '25',
-    		'Description' => '<a id="load-storm-image" href="stormajax=load-image" class="load-configuration">Load Image</a>'
+            'Description' => '<a id="load-storm-image" href="javascript:;" onclick="showOptions(\'Image\',this,'.$idProduct.')">Load Image</a>'
      ),
      'Memory (MB)' => array
      (
@@ -258,58 +260,27 @@ function LiquidWebPrivateParent_ConfigOptions()
 
     if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php' && $_GET['action'] != 'save')
     {
-        $config['Username']['Description'] .= '
-        <link rel="stylesheet" href="../assets/css/jquery-ui.css">
-        <script src="../assets/js/jquery-ui.js"></script>
-        <script type="text/javascript">
-                jQuery(function(){
-                  jQuery( document ).ready(function() {
-                    jQuery(".load-configuration").click(function(event){
-                        event.preventDefault();
-                        if($("#custom-dialog").is(":data(dialog)"))
-                        {
-                            $("#custom-dialog").dialog("destroy");
-                        }
-                        $("#ui-id-3").html($(this).html());
-                        $("#custom-dialog").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWebSBS/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>");
-                        $("#custom-dialog").dialog({
-                        	title: $(this).html(),
-                        	minWidth: 650,
-                        	close: function(event, ui) {
-                        		$(this).dialog(\'close\');
-    						}
-    					});
+        $dialog = '<div id="load-storm-options" class="modal fade" role="dialog" data-backdrop="static"  data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Select</h4>
+                    </div>
+                    <div class="modal-body" id="load-storm-options-body" >
+                        
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="Option-OK">OK</button>
+                    <button type="button" class="btn btn-default btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>';
 
-                        val = $(this).parent().find("input").val();
-                        jQuery.post("../modules/servers/LiquidWebPrivateParent/stormajax.php?action=edit&id='.$_REQUEST['id'].'&conf_id="+val,jQuery(this).attr("href"), function(data){
-                        	$("#custom-dialog").html(data);
-    					});
-                    });
-
-                    jQuery(".gen-config-options").click(function(event){
-                        event.preventDefault();
-                        if($("#custom-dialog").is(":data(dialog)")) {
-                            $("#custom-dialog").dialog("destroy");
-                        }
-                        $("#ui-id-3").html($(this).html());
-                        $("#custom-dialog").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWebSBS/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>");
-                        $("#custom-dialog").dialog({
-                        	title: $(this).html(),
-                        	minWidth: 650,
-                        	close: function(event, ui) {
-                        		$(this).dialog(\'close\');
-    						}
-    					});
-                        jQuery.post("../modules/servers/LiquidWebPrivateParent/stormajax.php?action=edit&id='.$_REQUEST['id'].'",jQuery(this).attr("href"), function(data){
-								$("#custom-dialog").html("<p style=\'text-align: center\'>"+data.message+"<p>");
-								if(data.status == 1) {
-									//window.location.href = "configproducts.php?action=edit&id='.$_REQUEST['id'].'&tab=5";
-								}
-							},"json");
-                    });
-                  });
-                });
-              </script>';
+        $config['Username']['Description'] .= $dialog;
+        $config['Username']['Description'] .= "<script type='text/javascript'>".LiquidWebPrivateParent_loadAsset('js/LoadConfiguration.tpl.js', $lcConfig).'</script>';
     }
 
 
@@ -2537,3 +2508,4 @@ function LiquidWebPrivateParent_validateArray($array, $pregs){
     }
     return true;
 }
+

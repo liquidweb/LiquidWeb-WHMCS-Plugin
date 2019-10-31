@@ -44,24 +44,12 @@ if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image') {
             continue;
         }
         echo '<tr>
-                <td><input class="storm-image" type="radio" name="image-id" value="'.$item['id'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').' />'.$item['template_description'].'</td>
-                <td>'.$item['source_hostname'].'</td>
-                <td>'.$item['time_taken'].'</td>
+                <td><input class="storm-image" type="radio" name="image-id" id="image-id-'.$item['id'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').' /> <label for="image-id-'.$item['id'].'">'.$item['template_description'].'</label></td>
+                <td><label for="image-id-'.$item['id'].'">'.$item['source_hostname'].'</label></td>
+                <td><label for="image-id-'.$item['id'].'">'.$item['time_taken'].'</label></td>
               </tr>';
     }
     echo '</table>';
-    echo '<script type="text/javascript">
-            $(function(){
-                $(".storm-image").click(function(event){
-                    event.preventDefault();
-
-                    val = $(this).parent().find("input[name=\'image-id\']").val();
-                    $("#load-storm-image").closest(".fieldarea").find("input").val(val);
-                    $("#custom-dialog").dialog("destroy");
-                    $("#load-storm-template").closest(".fieldarea").find("input").val("");
-                });
-            });
-          </script>';
 } elseif (isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-template') {
         //ob_clean();
         $conf_id = $_REQUEST['conf_id'];
@@ -94,29 +82,33 @@ if(isset($_REQUEST['stormajax']) && $_REQUEST['stormajax'] == 'load-image') {
                     }
 
                     echo '<tr>
-                            <td><input class="storm-template" type="radio" name="template-id" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
+                            <td><input class="storm-template" type="radio" name="template-id" id="template-id-'.$item['name'].'" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/> <label for="template-id-'.$item['name'].'">'.$item['description'].'</label></td>
                         </tr>';
                 }
             }
         }
         echo '</table>';
-        echo '<script type="text/javascript">
-                $(function(){
-                    $(".storm-template").click(function(event){
-                        event.preventDefault();
-
-                        val = $(this).parent().find("input[name=\'template-id\']").val();
-                        $("#load-storm-template").closest(".fieldarea").find("input").val(val).change();
-                        $("#custom-dialog").dialog("destroy");
-                        $("#load-storm-image").closest(".fieldarea").find("input").val("");
-                    });
-                });
-              </script>';
 }
 
 //Run Auto Configuration
 if (isset($_REQUEST['modaction']) && ($_REQUEST['modaction'] == 'generate_configurable_options' || $_REQUEST['modaction'] == 'generate_custom_fields'))
 {
+    if ($_REQUEST['modaction'] == 'generate_configurable_options')
+    {
+        $q = mysql_safequery('SELECT * FROM tblproductconfiglinks WHERE pid = ?', array($_REQUEST['id']));
+        $row = mysql_fetch_assoc($q);
+        if(mysql_num_rows($q))
+        {
+            //echo 'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+
+            $json = array();
+            $json['status']     =   0;
+            $json['message']    =   'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+            //echo 'Configurable Options Already Generated<br/><br/>Click <b><a href="configproductoptions.php?action=managegroup&id='.$row['gid'].'">here</a></b> to check Configurable options';
+            echo json_encode($json);
+            die();
+        }
+    }    
 
     require_once dirname(__FILE__).DIRECTORY_SEPARATOR.'classes'.DIRECTORY_SEPARATOR.'class.LiquidWebPrivateParentProduct.php';
 
@@ -157,7 +149,7 @@ if (isset($_REQUEST['modaction']) && ($_REQUEST['modaction'] == 'generate_config
     }
 
     foreach($parents as $parent) {
-        if(!in_array($parent['uniq_id'], $selected_parents))
+        if(strcmp($parent['uniq_id'], $selected_parents) != 0)
         {
             continue;
         }

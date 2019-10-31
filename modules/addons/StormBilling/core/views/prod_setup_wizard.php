@@ -44,8 +44,8 @@ if (isset($_REQUEST['ajaxload'])) {
 			}
 
             echo '<tr>
-                    <td><input class="storm-zone" type="radio" name="zone-id" id="zone-id" data-zone-name="'.$zoneName.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').' />'.$item['name'].'</td>
-                    <td>'.$item['region']['name'].'</td>
+                    <td><input class="storm-zone" type="radio" name="zone-id" id="zone-id-'.$item['id'].'" data-zone-name="'.$zoneName.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').' /> <label for="zone-id-'.$item['id'].'">'.$item['name'].'</label></td>
+                    <td><label for="zone-id-'.$item['id'].'">'.$item['region']['name'].'</label></td>
                   </tr>';
         }
         echo '</table>';
@@ -93,7 +93,7 @@ if (isset($_REQUEST['ajaxload'])) {
                     }
 
                     echo '<tr>
-                            <td><input class="storm-template" type="radio" name="template-id" data-template-name="'.$item['description'].'" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
+                            <td><input class="storm-template" type="radio" name="template-id" data-template-name="'.$item['description'].'" id="template-id-'.$item['id'].'" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/> <label for="template-id-'.$item['id'].'">'.$item['description'].'</label></td>
                           </tr>';
                 }
             }
@@ -137,7 +137,7 @@ if (isset($_REQUEST['ajaxload'])) {
                     }
 
                     echo '<tr>
-                            <td><input class="storm-template" type="radio" name="template-id" data-template-name="'.$item['description'].'" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/>'.$item['description'].'</td>
+                            <td><input class="storm-template" type="radio" name="template-id" data-template-name="'.$item['description'].'" id="pptemplate-id-'.$item['id'].'" value="'.$item['name'].'" '.($item['name'] == $conf_id ? 'checked="checked"' : '').'/> <label for="pptemplate-id-'.$item['id'].'">'.$item['description'].'</label></td>
                           </tr>';
                 }
             }
@@ -191,65 +191,26 @@ if (isset($_REQUEST['ajaxload'])) {
 		} else {
 			$confs = $baCache['data'];
 		}
+?>
 
- echo '<script>
-  $(function() {
-    $( "#storm-config-tabs" ).tabs();
-  });
-  </script>';
+        <ul id="menus" class="nav nav-pills" role="tablist">
+            <!-- <li><a href="#storm-config-tab-storm">Cloud Servers</a></li> -->
+            <li class="nav-item active"><a class="nav-link active" data-toggle="tab" role="tab" aria-controls="ssd-tab" aria-selected="true" href="#storm-config-tab-ssd"><b>SSD Servers</b></a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-controls="storm-config-tab" aria-selected="false" href="#storm-config-tab-bare-metal"><b>Bare Metal Servers</b></a></li>
+        </ul>
 
-
-        echo '<div id="storm-config-tabs">';
-        echo '<ul id="menus">
-                <!-- <li><a href="#storm-config-tab-storm">Cloud Servers</a></li> -->
-                <li><a href="#storm-config-tab-ssd">SSD Servers</a></li>
-                <li><a href="#storm-config-tab-bare-metal">Bare Metal Servers</a></li>
-              </ul>';
-
-/*
-        //Storm Servers
-        echo '<div id="storm-config-tab-storm">';
-        echo '<table class="datatable" style="width: 100%">
-                <tr>
-                    <th>Server Type</th>
-					<th style="width: 80px">Price($)</th>
-                    <th style="width: 80px">VCPU</th>
-                    <th style="width: 80px">Disk</th>
-                    <th style="width: 80px">Memory</th>
-                </tr>
-              ';
-        foreach($confs['storm'] as &$item)
-        {
-
-			if(!isset($item['zone_availability']) 				 ||
-			   empty($item['zone_availability']) 				 ||
-			   !isset($item['zone_availability'][$zoneSelected]) ||
-			   !$item['zone_availability'][$zoneSelected]){
-			    	continue;
-			    }
-			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
-            echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td>'.$product_price.'</td>
-					<td>'.$item['vcpu'].' CPUs</td>
-                    <td>'.$item['disk'].'</td>
-                    <td>'.$item['memory'].'</td>
-                  </tr>';
-        }
-        echo '</table>';
-        echo '</div>';
-*/
-        //SSD Servers
-        echo '<div id="storm-config-tab-ssd">';
-        echo '<table class="datatable" style="width: 100%">
-                <tr>
-                    <th>Server Type</th>
-					<th style="width: 80px">Price($)</th>
-                    <th style="width: 80px">VCPU</th>
-                    <th style="width: 80px">Disk</th>
-                    <th style="width: 80px">Memory</th>
-                </tr>
-              ';
+        <div class="tab-content" >
+        <div class="tab-pane fade active in" id="storm-config-tab-ssd" role="tabpanel" aria-labelledby="ssd-tab">
+        <table class="datatable" style="width: 100%">
+            <tr>
+                <th>Server Type</th>
+                <th style="width: 80px">Price($)</th>
+                <th style="width: 80px">VCPU</th>
+                <th style="width: 80px">Disk</th>
+                <th style="width: 80px">Memory</th>
+            </tr>
+              
+<?php              
         foreach($confs['ssd'] as &$item)
         {
 			if(!isset($item['zone_availability']) 				 ||
@@ -263,18 +224,18 @@ if (isset($_REQUEST['ajaxload'])) {
 			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
 
             echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td style="text-align:right; padding-right:20px;">$'.$product_price.'</td>
-					<td style="text-align:right; padding-right:20px;">'.$item['vcpu'].' CPUs</td>
-                    <td style="text-align:right; padding-right:20px;">'.$item['disk'].'GB</td>
-                    <td style="text-align:right; padding-right:20px;">'.round(($item['memory']/1024),1).'GB</td>
+                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" id="ssd_ser_'.$item['id'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> <label for="ssd_ser_'.$item['id'].'">'.$item['description'].'</label></td>
+                    <td style="text-align:right; padding-right:20px;"><label for="ssd_ser_'.$item['id'].'">$'.$product_price.'</label></td>
+					<td style="text-align:right; padding-right:20px;"><label for="ssd_ser_'.$item['id'].'">'.$item['vcpu'].' CPUs</label></td>
+                    <td style="text-align:right; padding-right:20px;"><label for="ssd_ser_'.$item['id'].'">'.$item['disk'].'GB</label></td>
+                    <td style="text-align:right; padding-right:20px;"><label for="ssd_ser_'.$item['id'].'">'.round(($item['memory']/1024),1).'GB</label></td>
                   </tr>';
         }
         echo '</table>';
         echo '</div>';
 
         //Bare-Metal
-        echo '<div id="storm-config-tab-bare-metal">';
+        echo '<div class="tab-pane fade" id="storm-config-tab-bare-metal" role="tabpanel" aria-labelledby="storm-config-tab">';
         echo '<table class="datatable" style="width: 100%">
                 <tr>
                     <th>Server Type</th>
@@ -300,24 +261,22 @@ if (isset($_REQUEST['ajaxload'])) {
 			    }
 			$product_price = $arr_product_price[$item['id']] != '' ? $arr_product_price[$item['id']] : '';
             echo '<tr style="border-top: 1px solid  #efefef">
-                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> '.$item['description'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.$product_price.'</td>
-					<td style="text-align:right; padding-right:8px;">'.$item['cpu_speed'].'MHz</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_count'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['cpu_cores'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.round(($item['ram_total']/1024),1).'GB</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['disk_count'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['disk_total'].'GB</td>
-                    <td style="text-align:right; padding-right:8px;">'.$item['disk_type'].'</td>
-                    <td style="text-align:right; padding-right:8px;">'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</td>
+                    <td><input class="storm-config" type="radio" name="config-id" data-VPSType-name="'.$item['description'].'" data-VPSType-price="'.$product_price.'" id="bm_ser_'.$item['id'].'" value="'.$item['id'].'" '.($item['id'] == $conf_id ? 'checked="checked"' : '').'/> <label for="bm_ser_'.$item['id'].'">'.$item['description'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$product_price.'</label></td>
+					<td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['cpu_speed'].'MHz</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['cpu_count'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['cpu_cores'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.round(($item['ram_total']/1024),1).'GB</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['disk_count'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['disk_total'].'GB</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.$item['disk_type'].'</label></td>
+                    <td style="text-align:right; padding-right:8px;"><label for="bm_ser_'.$item['id'].'">'.($item['raid_level'] == -1 ? '(none)' : 'RAID'.$item['raid_level']).'</label></td>
                   </tr>';
         }
         echo '</table>';
         echo '</div>';
-
-        echo '</div>'; //close tabs
+        echo '</div>';
     }
-
     die;
 }
 ?>

@@ -23,8 +23,8 @@ global $CONFIG;
 }
 </style>
 
-<link href="../modules/addons/StormBilling/core/assets/css/jquery-ui-slider-pips.min.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="../modules/addons/StormBilling/core/assets/js/jquery-ui-slider-pips.min.js"></script>
+<link href="../modules/addons/StormBilling/core/assets/css/jquery-ui.1.12.1.min.css" rel="stylesheet" type="text/css" />
+<script src="../modules/addons/StormBilling/core/assets/js/jquery-ui.1.12.1.min.js"></script>
 
 
     	<h2 class="section-heading">
@@ -37,18 +37,6 @@ global $CONFIG;
         <input type="hidden" name="setup_lw_add_server_name" id="setup_lw_add_server_name" value="">
         <!--<input type="hidden" name="setup_lw_add_server_password" id="setup_lw_add_server_password" value="">-->
         <input type="hidden" name="setup_lw_add_server_configid" id="setup_lw_add_server_configid" value="">
-        <div id="load-storm-add-server" style="overflow-x: hidden; overflow-y: hidden; font-size: 12px;">
-            <div style="text-align: left; width: 100%;">
-                <? echo $servertypetable;?>
-            </div>
-            <div style="text-align: left; width: 100%;">
-                <? echo $servertable;?>
-            </div>
-            <br/>
-            <div style="text-align: center;; width: 100%;">
-                 Host Name:<input type="text" name="lw_add_server_name" id="lw_add_server_name" style="width: 330px;"/>
-            </div>
-        </div>
     	<h3 class="section-heading">
     		<i class="icon-book"></i> <?php echo MG_Language::translate('Product details');?>
     	</h3>
@@ -96,21 +84,21 @@ global $CONFIG;
 					<td class="fieldarea">
 						<b><span id="setup_lw_ostemplates_name"><?php echo $ostemplate[$private_parent['template']];?></span></b>
 						<input type="hidden" name="setup_lw_ostemplates" id="setup_lw_ostemplates" style="width: 200px;" value="<?php echo $private_parent['template'];?>"/>
-						<a href="javascript:;" onclick="showTemplates()"> <img width="16" height="16" class="absmiddle" alt="Load Template" src="images/icons/search.png"></a>
-						<div id="load-storm-templates"></div>
+						<a href="javascript:;" onclick="showOptions('Templates')"> <img width="16" height="16" class="absmiddle" alt="Load Template" src="images/icons/search.png"></a>
+						<!--- <div id="load-storm-templates"></div> -->
 					</td>
 				</tr>
 				<tr>
 					<td class="fieldlabel"><?php echo MG_Language::translate('Memory (MB) :');?></td>
 					<td class="fieldarea">
 						<input type="text" name="setup_lw_spp_memory" id="setup_lw_spp_memory"  style="float: left; width: 20%;" value="<?php echo $private_parent['memory'];?>" onchange="setSlider(<?php echo (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES'));?>);"/>
-						<div id="memory_slider" style="margin-left: 120px; width: 50%;"></div>
+						<div id="memory_slider" style="margin-left: 120px; margin-top: 10px; width: 50%;"></div>
 					</td>
 
 					<td class="fieldlabel"><?php echo MG_Language::translate('Disk Space (GB) :');?></td>
 					<td class="fieldarea">
 						<input type="text" name="setup_lw_spp_diskspace" id="setup_lw_spp_diskspace" style="float: left; width: 20%;" value="<?php echo $private_parent['diskspace'];?>" onchange="setSlider(<?php echo (($CONFIG['Template'] == 'six') || (LW_CUSTOM_TEMPLATE_SIX == 'YES'));?>);"/>
-						<div id="diskspace_slider" style="margin-left: 140px; width: 50%;"></div>
+						<div id="diskspace_slider" style="margin-left: 140px; margin-top: 10px; width: 50%;"></div>
 					</td>
 				</tr>
 				<tr>
@@ -165,9 +153,57 @@ global $CONFIG;
         	</tbody>
     	</table>
 	</form>
+
+<div class="modal fade" id="load-storm-options" role="dialog">
+	<div class="modal-dialog">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Select</h4>
+			</div>
+			<div class="modal-body" id="load-storm-options-body" >
+				
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-primary" id="Option-OK">OK</button>
+			<button type="button" class="btn btn-default btn-danger" data-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="load-storm-add-server" class="modal fade bd-example-modal-lg" role="dialog">
+    <div class="modal-dialog modal-lg">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Add New Server</h4>
+			</div>
+			<div class="modal-body" id="load-storm-add-server-body" >
+                <div style="text-align: left; width: 100%;">
+                    <? echo $servertypetable;?>
+                </div>
+                <div style="text-align: left; width: 100%;">
+                    <? echo $servertable;?>
+                </div>
+                <div style="text-align: center;; width: 100%;">
+                        Host Name:<input type="text" name="lw_add_server_name" id="lw_add_server_name" style="width: 330px;"/>
+                </div>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-primary" id="Option-AddServer">Add Server</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
 
 $(document).ready(function() {
+
+    /*
     if ($("#wiz_page5_action").val() == "Add Server") {
         $("#load-storm-add-server").dialog({
             autoOpen : true,
@@ -239,14 +275,37 @@ $(document).ready(function() {
             }
         }},
         open: function(event, ui) {
-            /*$('#load-storm-templates').load(location+'&ajaxload=template&zone='+$('#setup_lw_zonecode').val()+'&conf_id='+$('#setup_lw_ostemplates').val(), function() {
-              //
-            });*/
             $('#load-storm-templates').load(location+'&ajaxload=pp_template&conf_id='+$('#setup_lw_ostemplates').val(), function() {
-              //
             });
           }
     });
+    */
+
+    $('#Option-AddServer').on('click', function(){
+        action = $("#wiz_page5_action").val();
+        $("#setup_lw_add_server_name").val($("#lw_add_server_name").val());
+        $("#setup_lw_add_server_password").val($("#lw_add_server_password").val());
+        $('#load-storm-add-server').modal('hide');
+        submitForm(action);
+    });
+
+	$('#load-storm-options').on('show.bs.modal', function (e) {
+		$('#load-storm-options-body').html('<p style="text-align:center"><img src="../modules/servers/LiquidWeb/assets/images/admin/loading.gif" alt="loading..."/></p><p style="text-align:center;font-size:12px;margin-top:0px;margin-bottom:0px;">Please note that this may take 30+ seconds to load all the data from our API.</p>');
+	});
+
+	$('#Option-OK').on('click', function(){
+
+		if ($('#load-storm-options').find(".modal-title").html() == 'Load Templates') {
+			val = $("#load-storm-options").find("input[name='template-id']:checked").val();
+			$('#setup_lw_ostemplates').val(val).trigger('change');
+			name = $("#load-storm-options").find("input[name='template-id']:checked").attr("data-template-name");
+			$('#setup_lw_ostemplates_name').html(name);
+			$("#setup_lw_ostemplates_name").css("color", "#4c4c4c");
+		}
+		$('#load-storm-options').modal('hide');
+	});
+
+
 
     $('#setup_lw_ostemplates').on('change', function(){
         if (($('#setup_lw_ostemplates').val() == '0') || ($('#setup_lw_vpstype').val() == '0')){
@@ -275,13 +334,32 @@ $(document).ready(function() {
         // Make sure the previous value is updated
         previous = this.value;
     });
+
+    if ($("#wiz_page5_action").val() == "Add Server") {
+        $('#load-storm-add-server').modal('show');
+    }
+
 });
 
-function showTemplates()
+/*function showTemplates()
 {
     $("#load-storm-templates").dialog('open');
     $("#load-storm-templates").html("<p style=\"text-align:center\"><img src=\"../modules/servers/LiquidWeb/assets/images/admin/loading.gif\" alt=\"loading...\"/></p>.");
+}*/
+
+function showOptions(option)
+{
+	$('#load-storm-options').find(".modal-title").html('Load '+option);
+	$('#load-storm-options').modal('show');
+
+	$('#load-storm-options').removeClass("bd-example-modal-lg");
+	$('#load-storm-options').find('.modal-dialog').removeClass("modal-lg");
+	if (option == 'Templates') {
+		$('#load-storm-options-body').load(location+'&ajaxload=pp_template&conf_id='+$('#setup_lw_ostemplates').val());
+	}
 }
+
+
 
 function submitForm(action)
 {
@@ -343,3 +421,4 @@ function setSlider(tmlSix) {
 
 
 </script>
+

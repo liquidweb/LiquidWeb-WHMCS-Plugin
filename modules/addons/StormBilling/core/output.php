@@ -5,8 +5,8 @@ require_once 'core.php';
 #ATTACH STYLES
 echo '
 
-<link href="'.$ASSETS_DIR.'/css/bootstrap.css" rel="stylesheet">
-<link href="'.$ASSETS_DIR.'/css/bootstrap-responsive.css" rel="stylesheet">
+<link href="'.$ASSETS_DIR.'/css/bootstrap_old.css" rel="stylesheet">
+<link href="'.$ASSETS_DIR.'/css/bootstrap-responsive_old.css" rel="stylesheet">
 
 <link href="'.$ASSETS_DIR.'/css/template-styles.css" rel="stylesheet">
 
@@ -15,8 +15,7 @@ echo '
 <!--FONTS-->
 <link href="'.$ASSETS_DIR.'/css/font-awesome.css" rel="stylesheet">
 
-<link rel="stylesheet" href="../assets/css/jquery-ui.css">
-<script src="../assets/js/jquery-ui.js"></script>
+
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>

@@ -100,8 +100,8 @@ function TemplateProduct_ProductEdit($params)
       }  
 
       $confoptions =   json_encode($confoptionsarraylower);      
-     echo '<link rel="stylesheet" href="../assets/css/jquery-ui.css">
-     <script src="../assets/js/jquery-ui.js"></script>
+     echo '<link href="../modules/addons/StormBilling/core/assets/css/jquery-ui.1.12.1.min.css" rel="stylesheet" type="text/css" />
+     <script src="../modules/addons/StormBilling/core/assets/js/jquery-ui.1.12.1.min.js"></script>
      
      <script>
      $(function(){
