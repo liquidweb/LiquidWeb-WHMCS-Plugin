@@ -149,7 +149,7 @@ if (isset($_REQUEST['ajaxload'])) {
         $conf_id = $_REQUEST['conf_id'];
         $zoneSelected = $_REQUEST['zone'];
 
-
+        require_once ROOTDIR.DIRECTORY_SEPARATOR."includes".DIRECTORY_SEPARATOR."modulesgarden".DIRECTORY_SEPARATOR."class.ModuleInformationClient.php";
 	    $confs   = array();
 		$baCache = ModuleInformationClient::getWHMCSconfig(LiquidWebConfigName);
 		if($baCache){

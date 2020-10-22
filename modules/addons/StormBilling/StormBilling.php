@@ -27,13 +27,7 @@ function StormBilling_config()
     $module = StormBilling_getModuleClass(__FILE__);
     $MGC = new $module();
     $description = $MGC->description;
-    $newVersion = StormBilling_getLatestVersion();
     $script = substr($_SERVER['SCRIPT_NAME'], strrpos($_SERVER['SCRIPT_NAME'], DIRECTORY_SEPARATOR) + 1);
-
-    if($newVersion && $script == 'configaddonmods.php')
-    {
-        $description .=  '<p><span class="label closed">New version</span> of  Liquid Web Cloud Servers Billing is available! <span><br>Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span></p>';
-    }
 
     return array
     (
@@ -115,88 +109,5 @@ function StormBilling_getModuleClass($file)
     $dirname = dirname($file);
     $basename = basename($dirname);
     return $basename;
-}
-
-
-/****************** MODULE INFORMATION ************************/
-//Register instance
-StormBilling_registerInstance();
-
-function StormBilling_registerInstance()
-{
-    /****************************************************
-     *              EDIT ME
-     ***************************************************/
-    //Set up name for your module.
-    $moduleName         =   'Cloud Servers Billing For WHMCS';
-    //Set up module version. You should change module version every time after updating source code.
-    $moduleVersion      =   STORM_SERVERS_BILLING_VERSION;
-    //Encryption key
-    $moduleKey          =   'WPtcK1Qbsof8dIau6yC1Ku1JwI1vMwTsT5UfzpVoPXlwSCzDBgnNzAAzDOamGJdM';
-    /***************************************************
-     *                      DO NOT TOUCH!
-     ***************************************************/
-
-    //Load API Class
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
-
-    //Create Client Class
-    $client = new ModuleInformationClient($moduleName, $moduleKey);
-
-    //Register current instance
-    $ret = $client->registerModuleInstance($moduleVersion, $_SERVER['SERVER_ADDR'], $_SERVER['SERVER_NAME']);
-
-    if($ret->status == 1)
-    {
-        ModuleInformationClient::setLocalVersion($moduleName, $moduleVersion);
-    }
-}
-
-function StormBilling_getLatestVersion()
-{
-    /****************************************************
-     *              EDIT ME
-     ***************************************************/
-    //Set up name for your module.
-    $moduleName         =   'Cloud Servers Billing For WHMCS';
-    //Set up module version. You should change module version every time after updating source code.
-    $moduleVersion      =   STORM_SERVERS_BILLING_VERSION;
-    //Encryption key
-    $moduleKey          =   'WPtcK1Qbsof8dIau6yC1Ku1JwI1vMwTsT5UfzpVoPXlwSCzDBgnNzAAzDOamGJdM';;
-    /***************************************************
-     *                      DO NOT TOUCH!
-     ***************************************************/
-
-    //Load API Class
-    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
-
-    //Is Already Registered?
-    $currentVersion = ModuleInformationClient::getLocalVersion($moduleName);
-    if(!$currentVersion)
-    {
-        return false;
-    }
-
-    //Create Client Class
-    $client = new ModuleInformationClient($moduleName, $moduleKey);
-
-    //Get Information about latest version
-    $res = $client->getLatestModuleVersion();
-
-    if(!$res)
-    {
-        return false;
-    }
-
-    if($res->data->version == $moduleVersion)
-    {
-        return false;
-    }
-
-    return array
-    (
-        'version'   =>  $res->data->version,
-        'site'      =>  $res->data->site,
-    );
 }
 

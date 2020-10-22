@@ -335,18 +335,7 @@ function LiquidWebSBS_ConfigOptions($loadValuesFromServer = true) {
               </div>';
     }
 
-
-    $newVersion = LiquidWebSBSForWHMCS_getLatestVersion();
-
     $script = substr($_SERVER['SCRIPT_NAME'], strrpos($_SERVER['SCRIPT_NAME'], DIRECTORY_SEPARATOR) + 1);
-
-    if($newVersion && $script == 'configproducts.php' && $_GET['action'] != 'save')
-    {
-        echo '<p style="text-align: center;" class="infobox op_version">
-            <span style="font-weight: bold">New version of Storm On Demand module is available!</span>
-            <span style="font-weight: bold"><br />Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span>
-         </p>';
-    }
 
     if($script == 'configproducts.php'){
         $testConnection = LiquidWebSBS_checkConnection();
@@ -531,109 +520,4 @@ function LiquidWebSBS_ClientArea($params) {
             );
       }
 
-}
-
-/****************** MODULE INFORMATION ************************/
-
-//Register instance
-LiquidWebSBSForWHMCS_registerInstance();
-function LiquidWebSBSForWHMCS_registerInstance()
-{
-    /****************************************************
-     *              EDIT ME
-     ***************************************************/
-    //Set up name for your module.
-    $moduleName         =   "Liquid Web SBS For WHMCS";
-    //Set up module version. You should change module version every time after updating source code.
-    $moduleVersion      =   LIQUID_WEB_SBS_VERSION;
-    //Encryption key
-    $moduleKey          =   "hqao9lV2xxXUyTQmwRPEVnk8TPdMNGOKznFuRgTdyE24fK8muWVxz2DDuUDVKzCg";
-    //Server URL
-    //$serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
-
-
-
-    /***************************************************
-     *                      DO NOT TOUCH!
-     ***************************************************/
-
-    //Load API Class
-    require_once ROOTDIR.DIRECTORY_SEPARATOR."includes".DIRECTORY_SEPARATOR."modulesgarden".DIRECTORY_SEPARATOR."class.ModuleInformationClient.php";
-
-    //Is Already Registered?
-    $currentVersion = ModuleInformationClient::getLocalVersion($moduleName);
-    if($currentVersion == $moduleVersion)
-    {
-        return false;
-    }
-
-    //Create Client Class
-    $client = new ModuleInformationClient( $moduleName, $moduleKey);
-
-    //Register current instance
-    $ret = $client->registerModuleInstance($moduleVersion, $_SERVER["SERVER_ADDR"], $_SERVER["SERVER_NAME"]);
-
-    if($ret->status == 1)
-    {
-        ModuleInformationClient::clearCache($moduleName, "getLatestModuleVersion");
-        ModuleInformationClient::setLocalVersion($moduleName, $moduleVersion);
-    }
-}
-
-function LiquidWebSBSForWHMCS_getLatestVersion()
-{
-    /****************************************************
-     *              EDIT ME
-     ***************************************************/
-    //Set up name for your module.
-    $moduleName         =   "Liquid Web SBS For WHMCS";
-    //Set up module version. You should change module version every time after updating source code.
-    $moduleVersion      =   LIQUID_WEB_SBS_VERSION;
-    //Encryption key
-    $moduleKey          =   "hqao9lV2xxXUyTQmwRPEVnk8TPdMNGOKznFuRgTdyE24fK8muWVxz2DDuUDVKzCg";
-    //Server URL
-    //$serverUrl          =   "https://www.liquidweb.com/manage/modules/addons/ModuleInformation/server.php";
-
-
-    /***************************************************
-     *                      DO NOT TOUCH!
-     ***************************************************/
-
-    //Load API Class
-    require_once ROOTDIR.DIRECTORY_SEPARATOR."includes".DIRECTORY_SEPARATOR."modulesgarden".DIRECTORY_SEPARATOR."class.ModuleInformationClient.php";
-
-    //Is Already Registered?
-    $currentVersion = ModuleInformationClient::getLocalVersion($moduleName);
-    if(!$currentVersion)
-    {
-        return false;
-    }
-
-    //Is current instance registered?
-    if($currentVersion != $moduleVersion)
-    {
-        return false;
-    }
-
-    //Create Client Class
-    $client = new ModuleInformationClient($moduleName, $moduleKey);
-
-    //Get Information about latest version
-    $res = $client->getLatestModuleVersion();
-
-    if(!$res)
-    {
-        return false;
-    }
-
-    if($res->data->version == $moduleVersion)
-    {
-        return false;
-    }
-
-    return array
-    (
-        "version"   =>  $res->data->version,
-        "site"      =>  $res->data->site,
-    );
 }
