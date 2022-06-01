@@ -113,7 +113,6 @@ function LiquidWeb_ConfigOptions()
 {
     //load server helper class
     require_once ROOTDIR . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'StormOnDemand' . DIRECTORY_SEPARATOR . 'modulesgarden' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'class.StormOnDemand_Helper.php';
-    require_once ROOTDIR . DIRECTORY_SEPARATOR . "includes" . DIRECTORY_SEPARATOR . "modulesgarden" . DIRECTORY_SEPARATOR . "class.ModuleInformationClient.php";
 
 	if(isset($_REQUEST['id']) && $_REQUEST['id'] && preg_match('/^[0-9]{1,}$/D', $_REQUEST['id'])){
 
@@ -1520,6 +1519,17 @@ function LiquidWeb_ConfigOptions()
         $config['Backup Quota']['Description'] .= "<script type='text/javascript'>".LiquidWeb_loadAsset('js/LoadConfiguration.tpl.js', $lcConfig).'</script>';
     }
 
+    /*$newVersion = LiquidWeb_getLatestVersion();
+    $script = substr($_SERVER['SCRIPT_NAME'], strrpos($_SERVER['SCRIPT_NAME'], DIRECTORY_SEPARATOR) + 1);
+
+    if($newVersion && $script == 'configproducts.php' && $_GET['action'] != 'save')
+    {
+        echo '<p style="text-align: center;" class="infobox op_version">
+            <span style="font-weight: bold">New version of Liquid Web module is available!</span>
+            <span style="font-weight: bold"><br />Check this address to find out more <a target="_blank" href="'.$newVersion['site'].'">'.$newVersion['site'].'</a></span>
+         </p>';
+    }*/
+
     if(basename($_SERVER["SCRIPT_NAME"]) == 'configproducts.php'){
         $testConnection = LiquidWeb_checkConnection();
     }else{
@@ -2735,7 +2745,7 @@ function LiquidWeb_AdminServicesTabFields($params)
         return array
         (
             'Error'             =>  '<p style="color: red">'.$error.'</p>',
-            'Server Uniq ID'    =>  '<input type="text" name="uniq_id" value="'.$uniq_id.'" />'
+            'Server Uniq ID'    =>  '<input type="text" name="uniq_id" value="'.$uniq_id.'" readonly disabled />'
         );
     }
 
@@ -3357,7 +3367,7 @@ function LiquidWeb_BlockStorage($params){
     $username   =   LiquidWeb_getOption('Username', $params);
     $password   =   LiquidWeb_getOption('Password', $params);
 
-	//require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
+	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
 	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'StormOnDemand'.DIRECTORY_SEPARATOR.'bleed'.DIRECTORY_SEPARATOR.'class.StormOnDemand_Storage.php';
 	$storageService = new StormOnDemand_Storage($username,$password);
 
@@ -3465,7 +3475,6 @@ function LiquidWeb_BlockStorage($params){
 		die();
 	}
 
-	require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
 
 	//get hosting uniq_id key
 	$hostingUniqKeyQuery   = ModuleInformationClient::mysql_safequery('SELECT * FROM mg_liquid_web WHERE hosting_id = ? LIMIT 1', array($hosting_id));
@@ -3620,6 +3629,90 @@ function LiquidWeb_getOption($option, $params)
         $i++;
     }
 }
+
+
+/****************** MODULE INFORMATION ************************/
+
+LiquidWeb_registerInstance();
+
+function LiquidWeb_registerInstance()
+{
+
+    /****************************************************
+     *              EDIT ME
+     ***************************************************/
+    //Set up name for your module.
+    $moduleName         =   'Liquid Web For WHMCS';
+    //Set up module version. You should change module version every time after updating source code.
+    $moduleVersion      =   LIQUID_WEB_VERSION;
+    //Encryption key
+    $moduleKey          =   'kxgpToMGObXOiUUCcJeQWpuNC9AZHvowsiOr6QFwi1VFUnQCnd0NNJDfoTi9UP7h';
+    /***************************************************
+     *                      DO NOT TOUCH!
+     ***************************************************/
+
+    //Load API Class
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
+
+    //Create Client Class
+    $client = new ModuleInformationClient($moduleName, $moduleKey);
+
+    //Register current instance
+    $ret = $client->registerModuleInstance($moduleVersion, $_SERVER['SERVER_ADDR'], $_SERVER['SERVER_NAME']);
+    if($ret->status == 1)
+    {
+        ModuleInformationClient::setLocalVersion($moduleName, $moduleVersion);
+    }
+}
+
+function LiquidWeb_getLatestVersion()
+{
+    /****************************************************
+     *              EDIT ME
+     ***************************************************/
+    //Set up name for your module.
+    $moduleName         =   'Liquid Web For WHMCS';
+    //Set up module version. You should change module version every time after updating source code.
+    $moduleVersion      =   LIQUID_WEB_VERSION;
+    //Encryption key
+    $moduleKey          =   'kxgpToMGObXOiUUCcJeQWpuNC9AZHvowsiOr6QFwi1VFUnQCnd0NNJDfoTi9UP7h';
+    /***************************************************
+     *                      DO NOT TOUCH!
+     ***************************************************/
+
+    //Load API Class
+    require_once ROOTDIR.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'modulesgarden'.DIRECTORY_SEPARATOR.'class.ModuleInformationClient.php';
+
+    //Is Already Registered?
+    $currentVersion = ModuleInformationClient::getLocalVersion($moduleName);
+    if(!$currentVersion)
+    {
+        return false;
+    }
+
+    //Create Client Class
+    $client = new ModuleInformationClient($moduleName, $moduleKey);
+
+    //Get Information about latest version
+    $res = $client->getLatestModuleVersion();
+
+    if(!$res)
+    {
+        return false;
+    }
+
+    if($res->data->version == $moduleVersion)
+    {
+        return false;
+    }
+
+    return array
+    (
+        'version'   =>  $res->data->version,
+        'site'      =>  $res->data->site,
+    );
+}
+
 
 function LiquidWeb_loadAsset($assetPath, $vars = array())
 {
