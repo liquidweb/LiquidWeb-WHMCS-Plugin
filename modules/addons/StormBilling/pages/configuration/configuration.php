@@ -18,8 +18,8 @@ foreach($products as $id => $p)
     }
 }
 
-uasort($disabled, sortx);
-uasort($enabled, sortx);
+uasort($disabled, 'sortx');
+uasort($enabled, 'sortx');
         
 function sortx($a, $b)
 {
