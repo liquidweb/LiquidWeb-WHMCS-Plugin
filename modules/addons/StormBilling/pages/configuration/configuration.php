@@ -17,11 +17,11 @@ foreach($products as $id => $p)
         $disabled[$id] = $p;
     }
 }
-
-uasort($disabled, 'sortx');
-uasort($enabled, 'sortx');
-        
 function sortx($a, $b)
 {
     return strcmp($a['group'], $b['group']);
 }
+uasort($disabled, 'sortx');
+uasort($enabled, 'sortx');
+        
+
